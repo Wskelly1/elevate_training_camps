@@ -113,7 +113,9 @@ const Layout: React.FC<LayoutProps> = ({
     >
       {/* Header */}
       <header
-        className={`sticky top-4 z-50 w-full transition-transform duration-300 px-4 ${mounted && isNavVisible ? 'translate-y-0' : '-translate-y-full'}`}
+        className={`sticky top-4 z-50 w-full transition-opacity duration-300 px-4 ${
+          mounted && isNavVisible ? 'opacity-100' : 'opacity-0 invisible'
+        }`}
       >
         <div className="max-w-7xl mx-auto rounded-full shadow-sm" style={{ backgroundColor: customColors.headerFooterBg }}>
           <div className="flex flex-row h-auto items-center justify-between px-6 py-3">
@@ -150,7 +152,7 @@ const Layout: React.FC<LayoutProps> = ({
                               <span className="hover-bar absolute bottom-0 left-0 right-0"></span>
                             </div>
                             <NavigationMenuContent>
-                              <div className="grid grid-cols-2 gap-0 p-0 w-[500px]" style={{ minHeight: 250 }}>
+                              <div className="grid grid-cols-2 gap-0 p-0 w-[500px]" style={{ minHeight: 250, backgroundColor: customColors.headerFooterBg }}>
                                 {/* Left: Learn About Us fills full height */}
                                 <div className="flex flex-col h-full">
                                   <NavigationMenuLink asChild>
