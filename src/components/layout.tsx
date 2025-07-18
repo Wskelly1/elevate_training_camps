@@ -297,7 +297,7 @@ const Layout: React.FC<LayoutProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow">
+      <main className="flex-grow -mt-[4.5rem]">
         {children}
       </main>
 
