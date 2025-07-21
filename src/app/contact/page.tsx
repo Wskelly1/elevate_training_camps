@@ -6,11 +6,11 @@ import { Button } from "../../components/ui/button";
 export default function ContactPage() {
   return (
     <Layout>
-      <div className="max-w-xl mx-auto mt-10">
+      <div className="max-w-xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-center">Contact Us</h1>
         <p className="text-center text-gray-600 mb-8">We'd love to hear from you! Please fill out the form below and we'll get back to you as soon as possible.</p>
       </div>
-      <div className="max-w-xl mx-auto p-8 bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="max-w-xl mx-auto p-8 bg-white rounded-xl shadow-sm border border-gray-200 mb-24">
         <form className="space-y-6">
           <div className="flex gap-4">
             <div className="flex-1">

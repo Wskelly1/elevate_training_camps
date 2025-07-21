@@ -14,6 +14,7 @@ export interface SanityTestimonial {
 
 export interface SanityContentSection {
   _key: string;
+  slug?: string;
   heading: string;
   subheading?: string;
   text: any; // Typically rich text

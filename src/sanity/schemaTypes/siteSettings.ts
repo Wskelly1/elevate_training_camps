@@ -111,7 +111,32 @@ export default defineType({
           }
         }
       ]
-    })
+    }),
+    defineField({
+      name: 'faqPage',
+      title: 'FAQ Page Settings',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'title',
+          title: 'FAQ Page Title',
+          type: 'string',
+        }),
+        defineField({
+          name: 'introduction',
+          title: 'FAQ Page Introduction',
+          type: 'text',
+        }),
+        defineField({
+          name: 'faqPageImage',
+          title: 'FAQ Page Image',
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+        }),
+      ],
+    }),
   ],
   preview: {
     select: {

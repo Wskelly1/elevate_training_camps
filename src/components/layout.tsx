@@ -19,6 +19,7 @@ import Image from "next/image";
 import Logo from "./Logo";
 import { getSiteSettings, SiteSettings } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
+import { usePathname } from "next/navigation";
 
 const customColors = {
   primary: '#755f4f',
@@ -53,6 +54,7 @@ const Layout: React.FC<LayoutProps> = ({
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const lastScrollY = useRef(0);
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -83,10 +85,10 @@ const Layout: React.FC<LayoutProps> = ({
       title: "About", 
       icon: User, 
       subItems: [
-        { title: "Our Story", href: "/about/our-story", icon: BookOpen },
-        { title: "Our Team", href: "/about/our-team", icon: Users },
-        { title: "Our Mission", href: "/about/our-mission", icon: Target },
-        { title: "Our Locations", href: "/about/our-locations", icon: MapPin },
+        { title: "Our Story", href: "/about#our-story", icon: BookOpen },
+        { title: "Our Team", href: "/about#our-team", icon: Users },
+        { title: "Our Mission", href: "/about#our-mission", icon: Target },
+        { title: "Our Locations", href: "/about#our-locations", icon: MapPin },
       ],
       href: "/about"
     },
@@ -297,7 +299,9 @@ const Layout: React.FC<LayoutProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow -mt-[4.5rem]">
+      <main className={`flex-grow ${
+        (pathname === '/' || pathname === '/faq') ? '-mt-[4.5rem]' : 'pt-12'
+      }`}>
         {children}
       </main>
 
