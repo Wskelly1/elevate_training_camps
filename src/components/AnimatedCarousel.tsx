@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Types
 export type TeamIntroduction = {
@@ -13,30 +14,19 @@ export type TeamIntroduction = {
 
 type AnimatedTeamIntroductionsProps = {
   introductions: TeamIntroduction[];
-  autoplay?: boolean;
-  autoplaySpeed?: number;
 };
 
 export function AnimatedTeamIntroductions({
   introductions,
-  autoplay = false,
-  autoplaySpeed = 5000,
 }: AnimatedTeamIntroductionsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Autoplay functionality
-  useEffect(() => {
-    if (!autoplay) return;
-    
-    const interval = setInterval(() => {
-      setActiveIndex((current) => (current + 1) % introductions.length);
-    }, autoplaySpeed);
-    
-    return () => clearInterval(interval);
-  }, [autoplay, autoplaySpeed, introductions.length]);
+  const handlePrev = () => {
+    setActiveIndex((current) => (current - 1 + introductions.length) % introductions.length);
+  };
 
-  const handleDotClick = (index: number) => {
-    setActiveIndex(index);
+  const handleNext = () => {
+    setActiveIndex((current) => (current + 1) % introductions.length);
   };
 
   if (!introductions.length) {
@@ -46,7 +36,7 @@ export function AnimatedTeamIntroductions({
   return (
     <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Testimonial Cards */}
-      <div className="relative h-[500px] overflow-hidden">
+      <div className="relative h-[600px] overflow-hidden">
         {introductions.map((intro, index) => (
           <div
             key={index}
@@ -57,8 +47,8 @@ export function AnimatedTeamIntroductions({
             }`}
           >
             {/* Image */}
-            <div className="w-full md:w-1/3 flex-shrink-0 mb-6 md:mb-0">
-              <div className="relative w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-gray-200">
+            <div className="w-full md:w-1/2 flex-shrink-0 mb-6 md:mb-0">
+              <div className="relative w-96 h-96 mx-auto rounded-lg overflow-hidden border-4 border-gray-200">
                 <Image
                   src={intro.src}
                   alt={intro.name}
@@ -69,29 +59,33 @@ export function AnimatedTeamIntroductions({
             </div>
             
             {/* Content */}
-            <div className="w-full md:w-2/3 md:pl-8">
-              <blockquote className="text-lg md:text-xl italic mb-4">
+            <div className="w-full md:w-1/2 md:pl-8 text-center md:text-left">
+              <div className="font-bold text-lg">{intro.name}</div>
+              <div className="text-gray-600 mb-4">{intro.designation}</div>
+              <blockquote className="text-lg md:text-xl italic">
                 "{intro.quote}"
               </blockquote>
-              <div className="font-bold text-lg">{intro.name}</div>
-              <div className="text-gray-600">{intro.designation}</div>
             </div>
           </div>
         ))}
       </div>
       
-      {/* Navigation Dots */}
-      <div className="flex justify-center mt-6 space-x-2">
-        {introductions.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => handleDotClick(index)}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              index === activeIndex ? 'bg-primary' : 'bg-gray-300'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+      {/* Navigation Arrows */}
+      <div className="flex justify-center space-x-4">
+        <button
+          onClick={handlePrev}
+          className="transition-opacity hover:opacity-75"
+          aria-label="Previous"
+        >
+          <ChevronLeft className="w-8 h-8 text-green-700" />
+        </button>
+        <button
+          onClick={handleNext}
+          className="transition-opacity hover:opacity-75"
+          aria-label="Next"
+        >
+          <ChevronRight className="w-8 h-8 text-green-700" />
+        </button>
       </div>
     </div>
   );

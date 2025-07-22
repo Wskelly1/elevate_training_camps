@@ -12,6 +12,89 @@ export default defineType({
       description: 'Title for the home page (for admin purposes)',
       validation: (Rule) => Rule.required(),
     }),
+    // ScrollExpandMedia fields
+    defineField({
+      name: 'useScrollExpandMedia',
+      title: 'Use Scroll Expand Media',
+      description: 'Enable the scroll-to-expand media component at the top of the homepage',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'expandMediaType',
+      title: 'Media Type',
+      description: 'Type of media to show in the expanding component',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Video', value: 'video'},
+          {title: 'Image', value: 'image'},
+        ],
+      },
+      initialValue: 'video',
+      hidden: ({document}) => !document?.useScrollExpandMedia,
+    }),
+    defineField({
+      name: 'expandMediaSrc',
+      title: 'Video File',
+      description: 'Upload a video file (for video type)',
+      type: 'file',
+      options: {
+        accept: 'video/*',
+      },
+      hidden: ({document}) => !document?.useScrollExpandMedia || document?.expandMediaType !== 'video',
+    }),
+    defineField({
+      name: 'expandMediaImage',
+      title: 'Media Image',
+      description: 'Upload an image (for image type)',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+      hidden: ({document}) => !document?.useScrollExpandMedia || document?.expandMediaType !== 'image',
+    }),
+    defineField({
+      name: 'expandPosterSrc',
+      title: 'Video Poster Image',
+      description: 'Image to show before video plays and as the sliding image in the intro sequence',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+      hidden: ({document}) => !document?.useScrollExpandMedia || document?.expandMediaType !== 'video',
+    }),
+    defineField({
+      name: 'expandBgImageSrc',
+      title: 'Background Image',
+      description: 'Image shown behind the media and as the initial full-screen image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+      hidden: ({document}) => !document?.useScrollExpandMedia,
+    }),
+    defineField({
+      name: 'expandTitle',
+      title: 'Expand Media Title',
+      type: 'string',
+      hidden: ({document}) => !document?.useScrollExpandMedia,
+    }),
+    defineField({
+      name: 'expandSubtitle',
+      title: 'Expand Media Subtitle',
+      type: 'string',
+      hidden: ({document}) => !document?.useScrollExpandMedia,
+    }),
+    defineField({
+      name: 'scrollToExpandText',
+      title: 'Scroll Prompt Text',
+      description: 'Text that prompts users to scroll (e.g., "Scroll to Expand")',
+      type: 'string',
+      initialValue: 'Scroll to Expand',
+      hidden: ({document}) => !document?.useScrollExpandMedia,
+    }),
+    // Original homepage fields
     defineField({
       name: 'heroImage',
       title: 'Hero Image',

@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Layout from "../../components/layout";
 import { client, urlFor } from "../../lib/sanity";
 import { AnimatedTeamIntroductions, type TeamIntroduction } from "../../components/AnimatedCarousel";
-import { SanityTeamMember, SanityContentSection } from '../../lib/types';
+import { SanityTeamMember } from '../../lib/types';
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
+import ScrollExpandMedia from "../../components/ScrollExpandMedia";
 
 // Type for team member from Sanity
 type TeamMember = {
@@ -16,6 +17,30 @@ type TeamMember = {
   bio?: string; // Make bio optional
   image: any;
 };
+
+// Type for about section from Sanity
+interface AboutSection {
+  _id: string;
+  title: string;
+  slug: {
+    current: string;
+  };
+  content: any;
+  image: any;
+}
+
+interface AboutHero {
+  mediaType: 'video' | 'image';
+  mediaSrc?: { asset: { url: string } };
+  mediaImage?: any;
+  posterSrc?: any;
+  bgImageSrc: any;
+  title?: string;
+  date?: string;
+  scrollToExpand?: string;
+  overview?: string;
+  conclusion?: string;
+}
 
 // Fetch team members from Sanity
 async function getTeamMembers() {
@@ -30,16 +55,28 @@ async function getTeamMembers() {
   `);
 }
 
-// Fetch content sections from Sanity
+// Fetch about sections from Sanity
 async function getAboutSections() {
     return await client.fetch(`
-    *[_type == "contentSection" && (slug.current == "our-story" || slug.current == "our-mission" || slug.current == "our-locations")] {
+    *[_type == "aboutSection"] {
       _id,
-      heading,
-      subheading,
-      text,
-      image,
-      "slug": slug.current
+      title,
+      slug,
+      content,
+      image
+    }
+  `);
+}
+
+async function getAboutHero() {
+  return await client.fetch(`
+    *[_type == "aboutHero"][0] {
+      ...,
+      mediaSrc {
+        asset-> {
+          url
+        }
+      }
     }
   `);
 }
@@ -48,7 +85,7 @@ async function getAboutSections() {
 function convertToIntroductions(members: TeamMember[]): TeamIntroduction[] {
   return members.map(member => {
     // Default placeholder bio if none exists
-    const bio = member.bio || `${member.name} is a valued member of our team at Summit Flagstaff.`;
+    const bio = member.bio || `${member.name} is a valued member of our team at Elevate Training Camps.`;
     
     return {
       name: member.name,
@@ -61,13 +98,18 @@ function convertToIntroductions(members: TeamMember[]): TeamIntroduction[] {
 
 export default function AboutPage() {
   const [teamIntroductions, setTeamIntroductions] = useState<TeamIntroduction[]>([]);
-  const [aboutSections, setAboutSections] = useState<SanityContentSection[]>([]);
+  const [aboutSections, setAboutSections] = useState<AboutSection[]>([]);
+  const [aboutHero, setAboutHero] = useState<AboutHero | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadAboutData() {
       try {
-        const [members, sections] = await Promise.all([getTeamMembers(), getAboutSections()]);
+        const [members, sections, hero] = await Promise.all([
+          getTeamMembers(),
+          getAboutSections(),
+          getAboutHero(),
+        ]);
         
         if (members && members.length > 0) {
           setTeamIntroductions(convertToIntroductions(members));
@@ -84,6 +126,7 @@ export default function AboutPage() {
         }
         
         setAboutSections(sections);
+        setAboutHero(hero);
 
       } catch (error) {
         console.error("Error fetching about page data:", error);
@@ -97,42 +140,21 @@ export default function AboutPage() {
   
   return (
     <Layout>
-      <section id="our-story" className="py-12">
-        <h1 className="text-4xl font-bold mb-6 text-center">About Us</h1>
-        <p className="max-w-2xl mx-auto text-lg text-center mb-12">
-          Discover our story, mission, and the dedicated team behind Elevate Training Camps.
-        </p>
-      </section>
+      {aboutHero && (
+        <ScrollExpandMedia
+          mediaType={aboutHero.mediaType}
+          mediaSrc={aboutHero.mediaType === 'video' ? aboutHero.mediaSrc?.asset.url : urlFor(aboutHero.mediaImage).url()}
+          posterSrc={aboutHero.posterSrc ? urlFor(aboutHero.posterSrc).url() : undefined}
+          bgImageSrc={urlFor(aboutHero.bgImageSrc).url()}
+          title={aboutHero.title}
+          date={aboutHero.date}
+          scrollToExpand={aboutHero.scrollToExpand}
+          textBlend
+        />
+      )}
 
-      {aboutSections.map((section) => (
-        <section key={section._key} id={section.slug} className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-8">{section.heading}</h2>
-            {section.subheading && <p className="text-xl text-center text-gray-600 mb-12">{section.subheading}</p>}
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="md:w-1/2">
-                {section.image && (
-                  <Image
-                    src={urlFor(section.image).url()}
-                    alt={section.heading}
-                    width={800}
-                    height={600}
-                    className="rounded-lg shadow-lg"
-                  />
-                )}
-              </div>
-              <div className="md:w-1/2">
-                <div className="prose prose-lg max-w-none">
-                  <PortableText value={section.text} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      ))}
-
-      <section id="our-team" className="py-12">
-        <h2 className="text-3xl font-bold text-center mb-8">Our Team</h2>
+      <section id="our-team" className="py-12 bg-[#f0ead6]">
+        <h2 className="text-5xl font-bold text-center mb-4">Our Team</h2>
         {isLoading ? (
           <div className="text-center py-12">
             <p className="text-lg text-gray-500">Loading team members...</p>
@@ -140,7 +162,6 @@ export default function AboutPage() {
         ) : teamIntroductions.length > 0 ? (
           <AnimatedTeamIntroductions 
             introductions={teamIntroductions} 
-            autoplay={true} 
           />
         ) : (
           <div className="text-center py-12">
@@ -148,6 +169,32 @@ export default function AboutPage() {
           </div>
         )}
       </section>
+
+      {aboutSections.map((section, index) => (
+        <section key={section._id} id={section.slug.current} className={`py-12 ${index % 2 !== 0 ? 'bg-[#f0ead6]' : 'bg-transparent'}`}>
+          <div className="container mx-auto px-4">
+            <div className={`flex flex-col items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+              <div className="md:w-1/2">
+                {section.image && (
+                  <Image
+                    src={urlFor(section.image).url()}
+                    alt={section.title}
+                    width={800}
+                    height={600}
+                    className="rounded-lg shadow-lg"
+                  />
+                )}
+              </div>
+              <div className="md:w-1/2">
+                <h2 className="text-5xl font-bold mb-4">{section.title}</h2>
+                <div className="prose prose-lg max-w-none">
+                  <PortableText value={section.content} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ))}
     </Layout>
   );
 } 

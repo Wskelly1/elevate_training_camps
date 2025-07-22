@@ -69,10 +69,59 @@ export async function getTeamMembers() {
   `);
 } 
 
+// Fetch home hero data
+export async function getHomeHero() {
+  return await client.fetch(`
+    *[_type == "homeHero"][0] {
+      mediaType,
+      mediaSrc {
+        asset-> {
+          url
+        }
+      },
+      mediaImage,
+      posterSrc,
+      bgImageSrc,
+      title,
+      date,
+      scrollToExpand
+    }
+  `);
+}
+
 export const homePageQuery = groq`
   *[_type == "homePage"][0] {
     _id,
     title,
+    useScrollExpandMedia,
+    expandMediaType,
+    expandMediaSrc {
+      asset->{
+        _id,
+        url
+      }
+    },
+    expandMediaImage {
+      asset->{
+        _id,
+        url
+      }
+    },
+    expandPosterSrc {
+      asset->{
+        _id,
+        url
+      }
+    },
+    expandBgImageSrc {
+      asset->{
+        _id,
+        url
+      }
+    },
+    expandTitle,
+    expandSubtitle,
+    scrollToExpandText,
     heroImage {
       asset->{
         _id,

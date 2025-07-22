@@ -85,8 +85,8 @@ const Layout: React.FC<LayoutProps> = ({
       title: "About", 
       icon: User, 
       subItems: [
-        { title: "Our Story", href: "/about#our-story", icon: BookOpen },
         { title: "Our Team", href: "/about#our-team", icon: Users },
+        { title: "Our Story", href: "/about#our-story", icon: BookOpen },
         { title: "Our Mission", href: "/about#our-mission", icon: Target },
         { title: "Our Locations", href: "/about#our-locations", icon: MapPin },
       ],
@@ -161,7 +161,7 @@ const Layout: React.FC<LayoutProps> = ({
                                     <a
                                       className="flex flex-1 flex-col justify-end rounded-md px-6 pt-6 pb-4 m-4 no-underline outline-none focus:shadow-md relative"
                                       style={{ backgroundColor: customColors.muted, minHeight: 0 }}
-                                      href={item.href}
+                                      href="/about"
                                     >
                                       {mounted && siteSettings?.aboutUsImage && (
                                         <Image
@@ -300,7 +300,7 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Main Content */}
       <main className={`flex-grow ${
-        (pathname === '/' || pathname === '/faq') ? '-mt-[4.5rem]' : 'pt-12'
+        (pathname === '/' || pathname === '/faq' || pathname === '/about') ? '-mt-[4.5rem]' : 'pt-12'
       }`}>
         {children}
       </main>

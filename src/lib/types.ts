@@ -26,6 +26,15 @@ export interface SanityContentSection {
 export interface SanityHomePage {
   _id: string;
   title: string;
+  useScrollExpandMedia?: boolean;
+  expandMediaType?: 'video' | 'image';
+  expandMediaSrc?: SanityImage;
+  expandMediaImage?: SanityImage;
+  expandPosterSrc?: SanityImage;
+  expandBgImageSrc?: SanityImage;
+  expandTitle?: string;
+  expandSubtitle?: string;
+  scrollToExpandText?: string;
   heroImage: SanityImage;
   heroHeading?: string;
   heroSubheading?: string;
@@ -39,4 +48,15 @@ export interface SanityTeamMember {
   title: string;
   bio: any; // Typically rich text
   image: SanityImage;
+}
+
+export interface HomeHero {
+  mediaType: 'video' | 'image';
+  mediaSrc?: { asset: { url: string } };
+  mediaImage?: any;
+  posterSrc?: any;
+  bgImageSrc: any;
+  title?: string;
+  date?: string;
+  scrollToExpand?: string;
 } 

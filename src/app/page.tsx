@@ -3,11 +3,11 @@
 import { client } from '../lib/sanity';
 import { homePageQuery } from '../lib/queries';
 import { SanityHomePage } from '../lib/types';
-import ScrollingHomepage from '../components/ScrollingHomepage';
 import Layout from "../components/layout";
 import { TestimonialCard } from '../components/TestimonialCard';
 import React, { useState, useEffect } from 'react';
 import { urlFor } from '../lib/sanity';
+import IntegratedHomepage from '../components/IntegratedHomepage';
 
 export default function Home() {
   const [homePageData, setHomePageData] = useState<SanityHomePage | null>(null);
@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data: SanityHomePage = await client.fetch(homePageQuery);
+        const data = await client.fetch(homePageQuery);
         setHomePageData(data);
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -62,7 +62,10 @@ export default function Home() {
 
   return (
     <Layout>
-      <ScrollingHomepage data={homePageData} />
+      {/* Integrated Homepage Component */}
+      <IntegratedHomepage data={homePageData} />
+      
+      {/* Testimonials section */}
       <div className="relative h-screen w-full bg-[#f0ead6] flex flex-col items-center justify-center">
         <h2 className="text-3xl font-bold mb-8" style={{ color: '#755f4f' }}>
           Testimonials
