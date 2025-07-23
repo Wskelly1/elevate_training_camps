@@ -20,6 +20,64 @@ import Logo from "./Logo";
 import { getSiteSettings, SiteSettings } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
 import { usePathname } from "next/navigation";
+import { client } from "../lib/sanity";
+
+// Interface for about sections from Sanity
+interface AboutSection {
+  _id: string;
+  title: string;
+  slug: {
+    current: string;
+  };
+}
+
+// Function to fetch about sections
+async function getAboutSections(): Promise<AboutSection[]> {
+  try {
+    return await client.fetch(`
+      *[_type == "aboutSection"] | order(_createdAt asc) {
+        _id,
+        title,
+        slug
+      }
+    `);
+  } catch (error) {
+    console.error("Error fetching about sections:", error);
+    return [];
+  }
+}
+
+// Custom scroll handler for section navigation
+function scrollToSection(sectionId: string, e: React.MouseEvent<HTMLAnchorElement>) {
+  // Get current path
+  const currentPath = window.location.pathname;
+  
+  // For same-page navigation, handle it directly
+  if (currentPath === '/about') {
+    e.preventDefault();
+    
+    // Find the section
+    const section = document.getElementById(sectionId);
+    if (section) {
+      // Get header height for offset
+      const headerHeight = document.querySelector('header')?.getBoundingClientRect().height || 80;
+      
+      // Calculate the top position
+      const targetPosition = section.offsetTop - headerHeight - 40;
+      
+      // Scroll to the section
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+      
+      // For debugging
+      console.log(`In-page scroll to: ${sectionId}, position: ${targetPosition}`);
+    }
+  }
+  // For cross-page navigation, let the link work normally
+  // The about page will handle the scroll after loading
+}
 
 const customColors = {
   primary: '#755f4f',
@@ -51,7 +109,9 @@ const Layout: React.FC<LayoutProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [aboutOpen, setAboutOpen] = React.useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
+  const [navOverridden, setNavOverridden] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const [aboutSections, setAboutSections] = useState<AboutSection[]>([]);
   const lastScrollY = useRef(0);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -60,6 +120,12 @@ const Layout: React.FC<LayoutProps> = ({
     setMounted(true);
     
     const handleScroll = () => {
+      // For homepage, let the IntegratedHomepage component control nav visibility
+      if (pathname === '/') {
+        return;
+      }
+      
+      // For other pages, use default scroll behavior
       const currentScrollY = window.scrollY;
       if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
         setIsNavVisible(false); // scrolling down
@@ -69,26 +135,68 @@ const Layout: React.FC<LayoutProps> = ({
       lastScrollY.current = currentScrollY;
     };
 
+    // Listen for custom nav visibility events from IntegratedHomepage
+    const handleNavVisibilityEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<{visible: boolean}>;
+      setIsNavVisible(customEvent.detail.visible);
+      setNavOverridden(customEvent.detail.visible === false); // Only override when hiding
+    };
+
     const fetchSettings = async () => {
       const settings = await getSiteSettings();
       setSiteSettings(settings);
     };
 
+    const fetchAboutSections = async () => {
+      const sections = await getAboutSections();
+      setAboutSections(sections);
+    };
+
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("navVisibility", handleNavVisibilityEvent);
     fetchSettings();
+    fetchAboutSections();
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("navVisibility", handleNavVisibilityEvent);
+    };
+  }, [pathname]);
 
-    const navigationItems = [
+  // Helper function to assign appropriate icons based on section title
+  function getIconForSection(title: string) {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('story') || lowerTitle.includes('history')) return BookOpen;
+    if (lowerTitle.includes('mission') || lowerTitle.includes('vision') || lowerTitle.includes('goal')) return Target;
+    if (lowerTitle.includes('location') || lowerTitle.includes('where') || lowerTitle.includes('address')) return MapPin;
+    if (lowerTitle.includes('team') || lowerTitle.includes('staff') || lowerTitle.includes('people')) return Users;
+    return BookOpen; // Default icon
+  }
+
+  // Helper function to get dynamic description for sections
+  function getDescriptionForSection(title: string) {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('story') || lowerTitle.includes('history')) return "Discover our journey.";
+    if (lowerTitle.includes('mission') || lowerTitle.includes('vision') || lowerTitle.includes('goal')) return "What drives us forward.";
+    if (lowerTitle.includes('location') || lowerTitle.includes('where') || lowerTitle.includes('address')) return "Explore our camp locations.";
+    if (lowerTitle.includes('team') || lowerTitle.includes('staff') || lowerTitle.includes('people')) return "Meet the people behind Elevate.";
+    return "Learn more about us."; // Default description
+  }
+
+  // Generate navigation items dynamically
+  const navigationItems = [
     { 
       title: "About", 
       icon: User, 
       subItems: [
+        // Always include "Our Team" first
         { title: "Our Team", href: "/about#our-team", icon: Users },
-        { title: "Our Story", href: "/about#our-story", icon: BookOpen },
-        { title: "Our Mission", href: "/about#our-mission", icon: Target },
-        { title: "Our Locations", href: "/about#our-locations", icon: MapPin },
+        // Add dynamic sections from Sanity
+        ...aboutSections.map(section => ({
+          title: section.title,
+          href: `/about#${section.slug.current}`,
+          icon: getIconForSection(section.title)
+        }))
       ],
       href: "/about"
     },
@@ -96,7 +204,7 @@ const Layout: React.FC<LayoutProps> = ({
     { title: "Media", href: "/media", icon: ImageIcon },
     { title: "FAQ", href: "/faq", icon: HelpCircle },
     { title: "Contact Us", href: "/contact", icon: Mail },
-  ]
+  ];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -159,22 +267,33 @@ const Layout: React.FC<LayoutProps> = ({
                                 <div className="flex flex-col h-full">
                                   <NavigationMenuLink asChild>
                                     <a
-                                      className="flex flex-1 flex-col justify-end rounded-md px-6 pt-6 pb-4 m-4 no-underline outline-none focus:shadow-md relative"
+                                      className="flex flex-1 flex-col justify-end rounded-md px-6 pt-6 pb-4 m-4 no-underline outline-none focus:shadow-md relative overflow-hidden hover-scale-effect hover:shadow-lg transform transition-all duration-300 hover:scale-[1.03] cursor-pointer group"
                                       style={{ backgroundColor: customColors.muted, minHeight: 0 }}
                                       href="/about"
+                                      onClick={(e) => {
+                                        // Just navigate to the about page without scrolling to a specific section
+                                        if (pathname === '/about') {
+                                          e.preventDefault();
+                                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }
+                                      }}
                                     >
                                       {mounted && siteSettings?.aboutUsImage && (
-                                        <Image
-                                          src={urlFor(siteSettings.aboutUsImage).url()}
-                                          alt="About us"
-                                          layout="fill"
-                                          objectFit="cover"
-                                          className="rounded-md"
-                                          style={{
-                                            maskImage: 'linear-gradient(to bottom, black 20%, rgba(0,0,0,0.1) 70%)',
-                                            WebkitMaskImage: 'linear-gradient(to bottom, black 20%, rgba(0,0,0,0.1) 70%)',
-                                          }}
-                                        />
+                                        <>
+                                          <Image
+                                            src={urlFor(siteSettings.aboutUsImage).url()}
+                                            alt="About us"
+                                            layout="fill"
+                                            objectFit="cover"
+                                            className="rounded-md transition-transform duration-300 hover-scale-target"
+                                            style={{
+                                              maskImage: 'linear-gradient(to bottom, black 20%, rgba(0,0,0,0.1) 70%)',
+                                              WebkitMaskImage: 'linear-gradient(to bottom, black 20%, rgba(0,0,0,0.1) 70%)',
+                                            }}
+                                          />
+                                          <div className="absolute inset-0 border-0 group-hover:border-4 transition-all duration-200 rounded-md border-transparent group-hover:border-[#d1c3a1] cursor-pointer">
+                                          </div>
+                                        </>
                                       )}
                                       <div className="mb-2 mt-4 text-lg font-medium relative z-10">
                                         Learn About Us
@@ -193,15 +312,19 @@ const Layout: React.FC<LayoutProps> = ({
                                         <a
                                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors focus:text-accent-foreground"
                                           href={subItem.href}
+                                          onClick={(e) => {
+                                            if (subItem.href.startsWith('/about#')) {
+                                              const sectionId = subItem.href.split('#')[1];
+                                              // Use the scrollToSection function which handles pathname checks
+                                              scrollToSection(sectionId, e);
+                                            }
+                                          }}
                                           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = customColors.accent}
                                           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                                         >
                                           <div className="text-sm font-medium leading-none">{subItem.title}</div>
                                           <p className="text-sm leading-snug" style={{ color: customColors.darkAccent }}>
-                                            {subItem.title === "Our Story" && "Discover our journey."}
-                                            {subItem.title === "Our Team" && "Meet the people behind Elevate."}
-                                            {subItem.title === "Our Mission" && "What drives us forward."}
-                                            {subItem.title === "Our Locations" && "Explore our camp locations."}
+                                            {getDescriptionForSection(subItem.title)}
                                           </p>
                                         </a>
                                       </NavigationMenuLink>
@@ -275,6 +398,15 @@ const Layout: React.FC<LayoutProps> = ({
                               href={subItem.href}
                               className="block py-2 px-4 rounded-md hover:bg-muted/50"
                               style={{ color: customColors.navText }}
+                              onClick={(e) => {
+                                if (subItem.href.startsWith('/about#')) {
+                                  const sectionId = subItem.href.split('#')[1];
+                                  // Use the scrollToSection function which handles pathname checks
+                                  scrollToSection(sectionId, e);
+                                }
+                                // Close the mobile menu after navigation
+                                toggleMobileMenu();
+                              }}
                             >
                               {subItem.title}
                             </Link>
@@ -305,135 +437,135 @@ const Layout: React.FC<LayoutProps> = ({
         {children}
       </main>
 
-            {/* Footer */}
+      {/* Footer */}
       <footer style={{ backgroundColor: customColors.headerFooterBg, color: customColors.navText }} className="relative border-t border-[#e6dfd3] transition-colors duration-300">
-  <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
-    <div className="grid gap-12 md:grid-cols-1 lg:grid-cols-2">
-      {/* Contact/newsletter section */}
-      <div className="relative" style={{ backgroundColor: 'rgba(168, 152, 133, 0.2)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
-        <h2 className="mb-4 text-3xl font-bold tracking-tight" style={{ color: '#000000' }}>Stay Connected</h2>
-        <p className="mb-6" style={{ color: customColors.primary }}>
-          Join our newsletter for the latest updates and exclusive offers.
-        </p>
-        <form className="relative">
-          <Input
-            type="email"
-            placeholder="Enter your email"
-            className="pr-12 backdrop-blur-sm"
-            style={{ background: 'rgba(255, 255, 255, 0.6)', borderColor: customColors.primary, color: customColors.foreground }}
-          />
-          <Button
-            type="submit"
-            size="icon"
-            className="absolute right-1 top-1 h-8 w-8 rounded-full"
-            style={{ backgroundColor: customColors.primary, color: '#fff' }}
-          >
-            <Send className="h-4 w-4" />
-            <span className="sr-only">Subscribe</span>
-          </Button>
-        </form>
-        <div className="absolute -right-4 top-0 h-24 w-24 rounded-full" style={{ backgroundColor: customColors.primary, opacity: 0.1, filter: 'blur(32px)' }} />
-      </div>
+        <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
+          <div className="grid gap-12 md:grid-cols-1 lg:grid-cols-2">
+            {/* Contact/newsletter section */}
+            <div className="relative" style={{ backgroundColor: 'rgba(168, 152, 133, 0.2)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
+              <h2 className="mb-4 text-3xl font-bold tracking-tight" style={{ color: '#000000' }}>Stay Connected</h2>
+              <p className="mb-6" style={{ color: customColors.primary }}>
+                Join our newsletter for the latest updates and exclusive offers.
+              </p>
+              <form className="relative">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="pr-12 backdrop-blur-sm"
+                  style={{ background: 'rgba(255, 255, 255, 0.6)', borderColor: customColors.primary, color: customColors.foreground }}
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="absolute right-1 top-1 h-8 w-8 rounded-full"
+                  style={{ backgroundColor: customColors.primary, color: '#fff' }}
+                >
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">Subscribe</span>
+                </Button>
+              </form>
+              <div className="absolute -right-4 top-0 h-24 w-24 rounded-full" style={{ backgroundColor: customColors.primary, opacity: 0.1, filter: 'blur(32px)' }} />
+            </div>
 
-      <div className="grid gap-12 md:grid-cols-3">
-        <div>
-          <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Quick Links</h3>
-          <nav className="space-y-2 text-sm">
-            <a href="/" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
-              Home
-            </a>
-            <a href="/about" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
-              About Us
-            </a>
-            <a href="/registration" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
-              Registration
-            </a>
-            <a href="/media" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
-              Media
-            </a>
-            <a href="/faq" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
-              Frequently Asked Questions
-            </a>
-            <a href="/contact" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
-              Contact
-            </a>
-          </nav>
-        </div>
-        <div>
-          <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Contact Us</h3>
-          <address className="space-y-2 text-sm not-italic" style={{ color: customColors.primary }}>
-            <p>830 N Turquoise Dr</p>
-            <p>Flagstaff, AZ 86001</p>
-            <p>Phone: 651-207-4749</p>
-            <p>Email: elevatetrainingcamps@gmail.com</p>
-          </address>
-        </div>
-        <div className="relative">
-          <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Follow Us</h3>
-          <div className="mb-6 flex space-x-4">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
-                    <Facebook className="h-4 w-4 text-[#a89885]" />
-                    <span className="sr-only">Facebook</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Follow us on Facebook</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
-                    <Twitter className="h-4 w-4 text-[#a89885]" />
-                    <span className="sr-only">Twitter</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Follow us on Twitter</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
-                    <Instagram className="h-4 w-4 text-[#a89885]" />
-                    <span className="sr-only">Instagram</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Follow us on Instagram</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="grid gap-12 md:grid-cols-3">
+              <div>
+                <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Quick Links</h3>
+                <nav className="space-y-2 text-sm">
+                  <a href="/" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    Home
+                  </a>
+                  <a href="/about" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    About Us
+                  </a>
+                  <a href="/registration" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    Registration
+                  </a>
+                  <a href="/media" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    Media
+                  </a>
+                  <a href="/faq" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    Frequently Asked Questions
+                  </a>
+                  <a href="/contact" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    Contact
+                  </a>
+                </nav>
+              </div>
+              <div>
+                <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Contact Us</h3>
+                <address className="space-y-2 text-sm not-italic" style={{ color: customColors.primary }}>
+                  <p>830 N Turquoise Dr</p>
+                  <p>Flagstaff, AZ 86001</p>
+                  <p>Phone: 651-207-4749</p>
+                  <p>Email: elevatetrainingcamps@gmail.com</p>
+                </address>
+              </div>
+              <div className="relative">
+                <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Follow Us</h3>
+                <div className="mb-6 flex space-x-4">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
+                          <Facebook className="h-4 w-4 text-[#a89885]" />
+                          <span className="sr-only">Facebook</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Follow us on Facebook</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
+                          <Twitter className="h-4 w-4 text-[#a89885]" />
+                          <span className="sr-only">Twitter</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Follow us on Twitter</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
+                          <Instagram className="h-4 w-4 text-[#a89885]" />
+                          <span className="sr-only">Instagram</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Follow us on Instagram</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#e6dfd3] pt-8 text-center md:flex-row">
+            <p className="text-sm" style={{ color: customColors.primary }}>
+              © 2024 Summit Flagstaff. All rights reserved.
+            </p>
+            <nav className="flex gap-4 text-sm">
+              <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
+                Privacy Policy
+              </a>
+              <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
+                Terms of Service
+              </a>
+              <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
+                Cookie Settings
+              </a>
+            </nav>
           </div>
         </div>
-      </div>
-    </div>
-    <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#e6dfd3] pt-8 text-center md:flex-row">
-      <p className="text-sm" style={{ color: customColors.primary }}>
-        © 2024 Summit Flagstaff. All rights reserved.
-      </p>
-      <nav className="flex gap-4 text-sm">
-        <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
-          Privacy Policy
-        </a>
-        <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
-          Terms of Service
-        </a>
-        <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
-          Cookie Settings
-        </a>
-      </nav>
-    </div>
-  </div>
-</footer>
+      </footer>
     </div>
   )
 }
 
-export default Layout 
+export default Layout
