@@ -31,6 +31,8 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const contentSectionsRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
+  const previousScrollProgressRef = useRef<number>(0); // Track previous scroll position for direction detection
+  const lastContentScrollTopRef = useRef<number>(0); // Track content section scroll position
 
   // Check initial scroll position on page load
   useEffect(() => {
@@ -354,6 +356,115 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       playVideo();
     }
   }, [scrollStarted, data.expandMediaType]);
+  
+  // Control navigation visibility based on scroll state
+  useEffect(() => {
+    // Create custom event for nav visibility
+    const createNavVisibilityEvent = (visible: boolean) => {
+      const event = new CustomEvent('navVisibility', {
+        detail: { visible }
+      });
+      window.dispatchEvent(event);
+    };
+    
+    // Determine scroll direction
+    const isScrollingUp = scrollProgress < previousScrollProgressRef.current;
+    
+    // Function to check content section scroll direction
+    const checkContentSectionScroll = () => {
+      if (contentSectionsVisible && scrollableContainerRef.current) {
+        const currentScrollTop = scrollableContainerRef.current.scrollTop;
+        const isScrollingUpInContent = currentScrollTop < lastContentScrollTopRef.current;
+        
+        // Update last scroll position
+        lastContentScrollTopRef.current = currentScrollTop;
+        
+        // Show navbar when scrolling up in content sections
+        if (isScrollingUpInContent) {
+          createNavVisibilityEvent(true);
+        } else {
+          createNavVisibilityEvent(false);
+        }
+      }
+    };
+    
+    // Add scroll event listener to content sections container
+    if (contentSectionsVisible && scrollableContainerRef.current) {
+      scrollableContainerRef.current.addEventListener('scroll', checkContentSectionScroll);
+      
+      // Clean up
+      return () => {
+        if (scrollableContainerRef.current) {
+          scrollableContainerRef.current.removeEventListener('scroll', checkContentSectionScroll);
+        }
+      };
+    }
+    
+    // Initial state - show navbar
+    if (initialPhase) {
+      createNavVisibilityEvent(true);
+    }
+    // When video is expanding - show navbar
+    else if (!initialPhase && scrollProgress < EXPAND_END) {
+      createNavVisibilityEvent(true);
+    }
+    // When scrolling down and video has exited - hide the nav
+    else if (hasStartedExiting && exitProgress > 0.1 && !isScrollingUp) {
+      createNavVisibilityEvent(false);
+    }
+    // When scrolling up - immediately show navbar
+    else if (isScrollingUp) {
+      createNavVisibilityEvent(true);
+    }
+    // When content sections are visible but not scrolling up - keep nav hidden
+    else if (contentSectionsVisible && !isScrollingUp) {
+      createNavVisibilityEvent(false);
+    }
+    // When animation is complete (regular page scroll) - show nav
+    else if (animationCompleted) {
+      createNavVisibilityEvent(true);
+    }
+    
+    // Update the previous scroll position after all checks
+    previousScrollProgressRef.current = scrollProgress;
+    
+  }, [initialPhase, entryProgress, hasStartedExiting, exitProgress, scrollProgress, contentSectionsVisible, animationCompleted, EXPAND_END, EXIT_END]);
+  
+  // Handle navigation visibility for the main page scroll
+  useEffect(() => {
+    if (!animationCompleted) return;
+    
+    // Track window scroll for the main page
+    let lastWindowScrollY = window.scrollY;
+    
+    const handleWindowScroll = () => {
+      const currentScrollY = window.scrollY;
+      const isScrollingUp = currentScrollY < lastWindowScrollY;
+      
+      // Create custom event for nav visibility
+      const createNavVisibilityEvent = (visible: boolean) => {
+        const event = new CustomEvent('navVisibility', {
+          detail: { visible }
+        });
+        window.dispatchEvent(event);
+      };
+      
+      // Show navbar when scrolling up, hide when scrolling down
+      if (isScrollingUp) {
+        createNavVisibilityEvent(true);
+      } else if (currentScrollY > 100) { // Only hide when scrolled down a bit
+        createNavVisibilityEvent(false);
+      }
+      
+      lastWindowScrollY = currentScrollY;
+    };
+    
+    window.addEventListener('scroll', handleWindowScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleWindowScroll);
+    };
+  }, [animationCompleted]);
   
   // Calculate current media dimensions based on animation state
   const currentMediaWidth = mediaWidth;

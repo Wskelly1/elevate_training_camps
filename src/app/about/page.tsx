@@ -8,6 +8,7 @@ import { SanityTeamMember } from '../../lib/types';
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
 import ScrollExpandMedia from "../../components/ScrollExpandMedia";
+import LoadingBar from "../../components/LoadingBar";
 
 // Type for team member from Sanity
 type TeamMember = {
@@ -101,6 +102,40 @@ export default function AboutPage() {
   const [aboutSections, setAboutSections] = useState<AboutSection[]>([]);
   const [aboutHero, setAboutHero] = useState<AboutHero | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  
+  // Handle URL hash navigation after content loads
+  useEffect(() => {
+    // Only execute this once everything is loaded
+    if (!isLoading) {
+      // Need to wait a bit longer to ensure all images and components are fully rendered
+      const timer = setTimeout(() => {
+        // Get the hash from the URL (if any)
+        if (window.location.hash) {
+          const sectionId = window.location.hash.substring(1);
+          const section = document.getElementById(sectionId);
+          
+          if (section) {
+            // Get header height for offset
+            const headerHeight = document.querySelector('header')?.getBoundingClientRect().height || 80;
+            
+            // Scroll with enough offset to account for the fixed header
+            window.scrollTo({
+              top: section.offsetTop - headerHeight - 40,
+              behavior: 'smooth'
+            });
+            
+            // For debugging
+            console.log(`Scrolling to section: ${sectionId} at position: ${section.offsetTop - headerHeight - 40}`);
+          }
+        }
+      }, 1000); // Longer timeout to ensure everything is rendered
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]); // Run when loading changes to false
+  
+  // We don't need the timeout anymore since we're setting videoLoaded immediately
 
   useEffect(() => {
     async function loadAboutData() {
@@ -127,16 +162,41 @@ export default function AboutPage() {
         
         setAboutSections(sections);
         setAboutHero(hero);
+        
+        // Always set videoLoaded to true when data is loaded
+        // The actual video will load in the background
+        setVideoLoaded(true);
+        
+        // Set loading to false immediately after data is loaded
+        setIsLoading(false);
 
       } catch (error) {
         console.error("Error fetching about page data:", error);
-      } finally {
+        // Still set loading to false even if there's an error
         setIsLoading(false);
+        // Also set videoLoaded to true in case of error
+        setVideoLoaded(true);
       }
     }
 
     loadAboutData();
   }, []);
+  
+  // Handle video load completion
+  const handleMediaLoaded = () => {
+    setVideoLoaded(true);
+  };
+  
+  // Show loading screen only while data is loading from Sanity
+  if (isLoading) {
+    return <LoadingBar 
+      message="Loading About Page" 
+      subMessage="Fetching content from our servers..." 
+    />;
+  }
+  
+  // Remove the second loading screen for video - we'll show content immediately
+  // and let the video load in the background
   
   return (
     <Layout>
@@ -150,10 +210,11 @@ export default function AboutPage() {
           date={aboutHero.date}
           scrollToExpand={aboutHero.scrollToExpand}
           textBlend
+          onFullyExpanded={handleMediaLoaded}
         />
       )}
 
-      <section id="our-team" className="py-12 bg-[#f0ead6]">
+      <section id="our-team" className="py-12 bg-[#f0ead6] scroll-mt-32">
         <h2 className="text-5xl font-bold text-center mb-4">Our Team</h2>
         {isLoading ? (
           <div className="text-center py-12">
@@ -171,7 +232,7 @@ export default function AboutPage() {
       </section>
 
       {aboutSections.map((section, index) => (
-        <section key={section._id} id={section.slug.current} className={`py-12 ${index % 2 !== 0 ? 'bg-[#f0ead6]' : 'bg-transparent'}`}>
+        <section key={section._id} id={section.slug.current} className={`py-12 ${index % 2 !== 0 ? 'bg-[#f0ead6]' : 'bg-transparent'} scroll-mt-32`}>
           <div className="container mx-auto px-4">
             <div className={`flex flex-col items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
               <div className="md:w-1/2">
