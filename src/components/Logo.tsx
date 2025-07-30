@@ -18,6 +18,24 @@ interface LogoData {
   height: number;
 }
 
+/**
+ * Logo - Dynamic logo component that fetches logo data from Sanity CMS
+ * 
+ * This component displays the site logo with proper dimensions and responsive behavior.
+ * It can show different logos for header and footer based on Sanity settings.
+ * 
+ * Features:
+ * - Dynamically loads logo from Sanity CMS
+ * - Supports different logos for header and footer
+ * - Maintains proper aspect ratio
+ * - Handles loading states and errors
+ * - Allows customization of max width
+ * 
+ * @param {Object} props - Component props
+ * @param {string} [props.className=""] - Additional CSS classes
+ * @param {boolean} [props.isFooter=false] - Whether to show footer logo variant
+ * @param {number} [props.maxWidth] - Maximum width constraint for the logo
+ */
 export default function Logo({ className = "", isFooter = false, maxWidth }: LogoProps) {
   const [logoData, setLogoData] = useState<LogoData | null>(null);
   const [isLoading, setIsLoading] = useState(true);

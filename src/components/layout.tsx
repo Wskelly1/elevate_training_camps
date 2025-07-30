@@ -11,8 +11,8 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "../components/ui/navigation-menu"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import { Input } from "../components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -101,6 +101,24 @@ interface LayoutProps {
   footerContent?: React.ReactNode
 }
 
+/**
+ * Main layout component for the Elevate Training Camps website.
+ * 
+ * This component provides the consistent layout structure for all pages including:
+ * - Header with responsive navigation (desktop and mobile versions)
+ * - Main content area
+ * - Footer with contact information and newsletter signup
+ * 
+ * Features:
+ * - Dynamic navigation based on Sanity CMS data
+ * - Scroll-aware header that hides/shows based on scroll direction
+ * - Mobile-responsive design with hamburger menu
+ * - Custom color theming from Sanity settings
+ * - Smooth scroll functionality for anchor links
+ * 
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Page content to render within the layout
+ */
 const Layout: React.FC<LayoutProps> = ({
   children,
   showNavigation = true,

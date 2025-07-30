@@ -5,6 +5,27 @@ import { ChevronDown } from "lucide-react"
 
 import { cn } from "../../lib/utils"
 
+/**
+ * NavigationMenu - Accessible navigation menu component
+ * 
+ * This component provides a fully accessible navigation menu system based on Radix UI.
+ * It supports dropdown menus, keyboard navigation, and proper ARIA attributes.
+ * 
+ * Features:
+ * - Dropdown menus with smooth animations
+ * - Keyboard navigation support
+ * - Mobile-responsive design
+ * - Accessible by default with proper ARIA attributes
+ * - Consistent styling with the site's design system
+ * 
+ * The component is composed of several subcomponents:
+ * - NavigationMenu: The root container
+ * - NavigationMenuList: Container for navigation items
+ * - NavigationMenuItem: Individual navigation item
+ * - NavigationMenuTrigger: Clickable element that opens a dropdown
+ * - NavigationMenuContent: Content displayed in the dropdown
+ * - NavigationMenuLink: Navigation link (can be used inside or outside dropdowns)
+ */
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>

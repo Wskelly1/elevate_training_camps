@@ -1,8 +1,28 @@
+"use client"
+
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "../../lib/utils"
 
+/**
+ * Tooltip - Accessible tooltip component
+ * 
+ * This component provides a fully accessible tooltip system based on Radix UI.
+ * It displays additional information when users hover over or focus on an element.
+ * 
+ * Features:
+ * - Accessible by default with proper ARIA attributes
+ * - Customizable appearance and positioning
+ * - Keyboard navigation support
+ * - Consistent styling with the site's design system
+ * 
+ * The component is composed of several subcomponents:
+ * - TooltipProvider: Context provider for tooltips
+ * - Tooltip: The root container
+ * - TooltipTrigger: Element that triggers the tooltip
+ * - TooltipContent: Content displayed in the tooltip
+ */
 const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = TooltipPrimitive.Root

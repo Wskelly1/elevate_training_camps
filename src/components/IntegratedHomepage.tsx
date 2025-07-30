@@ -11,6 +11,25 @@ interface IntegratedHomepageProps {
   data: SanityHomePage;
 }
 
+/**
+ * IntegratedHomepage - Advanced interactive homepage component with scroll animations
+ * 
+ * This component creates a dynamic, scroll-driven homepage experience with:
+ * - Animated hero section with expandable media (video or image)
+ * - Scroll-based animations and transitions
+ * - Content sections that appear as the user scrolls
+ * - Responsive navigation visibility based on scroll position
+ * 
+ * Features:
+ * - Multi-phase animation sequence (entry, expand, exit)
+ * - Custom scroll handling for both mouse wheel and touch events
+ * - Dynamic navigation visibility control via custom events
+ * - Smooth transitions between animation states
+ * - Support for both video and image media types
+ * 
+ * @param {Object} props - Component props
+ * @param {SanityHomePage} props.data - Homepage data from Sanity CMS
+ */
 const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   // Animation phases
   const [initialPhase, setInitialPhase] = useState<boolean>(true); // Initial phase (media not visible yet)

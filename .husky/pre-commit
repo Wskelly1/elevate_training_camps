@@ -1,0 +1,28 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Check for missing JSDoc comments in new or modified files
+echo "Checking for proper documentation in changed files..."
+
+# Get list of staged .js, .jsx, .ts, and .tsx files
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$')
+
+if [ -n "$FILES" ]; then
+  for FILE in $FILES; do
+    # Check if file exists (it might have been deleted)
+    if [ -f "$FILE" ]; then
+      # Count functions/components without JSDoc comments
+      MISSING_DOCS=$(grep -E '(function |const .* = \(|class |interface )' "$FILE" | grep -v -B1 '/\*\*' | wc -l)
+      
+      if [ "$MISSING_DOCS" -gt 0 ]; then
+        echo "⚠️  Warning: $FILE may have functions or components without proper JSDoc comments."
+        echo "    Please add documentation following the standards in DOCUMENTATION_GUIDE.md"
+        # Uncomment the line below to block commits with missing documentation
+        # exit 1
+      fi
+    fi
+  done
+fi
+
+# Continue with the commit
+exit 0 

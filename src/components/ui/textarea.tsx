@@ -5,6 +5,20 @@ import { cn } from "../../lib/utils"
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
+/**
+ * Textarea - Styled multiline text input component
+ * 
+ * This component provides a styled textarea field that matches the site's design system.
+ * It extends the native HTML textarea element with consistent styling while maintaining
+ * all standard functionality and accessibility features.
+ * 
+ * Features:
+ * - Consistent styling with the site's design system
+ * - Supports all standard HTML textarea attributes
+ * - Proper focus and hover states
+ * - Accessible by default
+ * - Resizable by users for better UX
+ */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     return (

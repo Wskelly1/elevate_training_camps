@@ -1,5 +1,8 @@
-import * as React from 'react';
+'use client';
+
 import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { useEffect, useState, useRef } from 'react';
 
 function getClientX(e: MouseEvent | TouchEvent | PointerEvent): number {
   if ('clientX' in e) return e.clientX;
@@ -9,16 +12,38 @@ function getClientX(e: MouseEvent | TouchEvent | PointerEvent): number {
 }
 
 interface TestimonialCardProps {
-  handleShuffle: () => void;
-  testimonial: string;
-  position: 'front' | 'left' | 'right' | 'hidden';
   id: number;
+  testimonial: string;
   author: string;
   imageUrl?: string;
+  position: 'left' | 'right' | 'front' | 'hidden';
+  handleShuffle: () => void;
 }
 
-export function TestimonialCard({ handleShuffle, testimonial, position, id, author, imageUrl }: TestimonialCardProps) {
-  const dragRef = React.useRef(0);
+/**
+ * TestimonialCard - Interactive testimonial display component with animations
+ * 
+ * This component creates an animated card that displays customer testimonials
+ * with support for carousel-style navigation and interactive animations.
+ * 
+ * Features:
+ * - Animated transitions between positions (left, right, front, hidden)
+ * - Click interaction to navigate through testimonials
+ * - Responsive design with proper image handling
+ * - Elegant styling with drop shadows and hover effects
+ * - Support for testimonials with or without images
+ * 
+ * @param {Object} props - Component props
+ * @param {number} props.id - Unique identifier for the testimonial
+ * @param {string} props.testimonial - The testimonial text content
+ * @param {string} props.author - Name of the person giving the testimonial
+ * @param {string} [props.imageUrl] - Optional URL to the person's image
+ * @param {string} props.position - Current position of card ('left', 'right', 'front', 'hidden')
+ * @param {Function} props.handleShuffle - Function to call when card is clicked
+ */
+export function TestimonialCard({
+  handleShuffle, testimonial, position, id, author, imageUrl }: TestimonialCardProps) {
+  const dragRef = useRef(0);
   const isFront = position === "front";
 
   // Closer fan-out style logic

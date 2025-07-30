@@ -1,0 +1,150 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2023-07-14",
+  "errorCategories": {
+    "react": {
+      "hooks": [
+        {
+          "error": "Invalid hook call. Hooks can only be called inside of the body of a function component.",
+          "pattern": "Invalid hook call",
+          "solutions": [
+            {
+              "description": "Move hooks to the top level of the component",
+              "code": "// ❌ Don't call hooks inside loops, conditions, or nested functions\nif (condition) {\n  useEffect(() => {}, []); // This is invalid\n}\n\n// ✅ Call hooks at the top level\nuseEffect(() => {\n  if (condition) {\n    // Put the conditional logic inside the hook\n  }\n}, [condition]);",
+              "effectiveness": "high"
+            },
+            {
+              "description": "Ensure hooks are only called in React function components or custom hooks",
+              "code": "// ❌ Don't call hooks in regular JavaScript functions\nfunction normalFunction() {\n  const [state, setState] = useState(); // This is invalid\n}\n\n// ✅ Call hooks in React function components\nfunction MyComponent() {\n  const [state, setState] = useState(); // This is valid\n  return <div>{state}</div>;\n}",
+              "effectiveness": "high"
+            }
+          ]
+        },
+        {
+          "error": "React Hook useEffect has a missing dependency",
+          "pattern": "React Hook useEffect has (?:a missing|missing) dependenc(?:y|ies)",
+          "solutions": [
+            {
+              "description": "Add the missing dependency to the dependency array",
+              "code": "// ❌ Missing dependency\nuseEffect(() => {\n  console.log(value);\n}, []); // value is missing from deps array\n\n// ✅ Include all dependencies\nuseEffect(() => {\n  console.log(value);\n}, [value]);",
+              "effectiveness": "high"
+            },
+            {
+              "description": "Use useCallback or useMemo for functions or objects to stabilize references",
+              "code": "// ❌ Unstable reference causing infinite re-renders\nuseEffect(() => {\n  doSomething(options);\n}, [options]); // options is recreated every render\n\n// ✅ Stabilize with useMemo\nconst stableOptions = useMemo(() => options, [/* dependencies */]);\nuseEffect(() => {\n  doSomething(stableOptions);\n}, [stableOptions]);",
+              "effectiveness": "medium"
+            }
+          ]
+        }
+      ],
+      "state": [
+        {
+          "error": "Too many re-renders",
+          "pattern": "Too many re-renders. React limits the number of renders to prevent an infinite loop",
+          "solutions": [
+            {
+              "description": "Move setState out of the component body",
+              "code": "// ❌ This causes infinite renders\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  setCount(count + 1); // Don't do this\n  return <div>{count}</div>;\n}\n\n// ✅ Move state updates to event handlers or effects\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  \n  useEffect(() => {\n    // This runs after render, not during\n    setCount(count + 1);\n  }, []);\n  \n  return <div>{count}</div>;\n}",
+              "effectiveness": "high"
+            }
+          ]
+        }
+      ]
+    },
+    "nextjs": {
+      "routing": [
+        {
+          "error": "Error: Cannot find module '../components/LoadingBar'",
+          "pattern": "Cannot find module '.*'",
+          "solutions": [
+            {
+              "description": "Create the missing module",
+              "code": "// Create the missing file at the specified path\n// Example for LoadingBar.tsx:\n\n'use client';\n\nimport React from 'react';\n\ninterface LoadingBarProps {\n  message?: string;\n  subMessage?: string;\n}\n\nconst LoadingBar: React.FC<LoadingBarProps> = ({\n  message = \"Loading...\",\n  subMessage = \"Please wait\"\n}) => {\n  return (\n    <div className=\"flex flex-col items-center justify-center min-h-screen\">\n      <div className=\"text-2xl font-bold mb-4\">{message}</div>\n      <div className=\"w-64 h-2 bg-gray-200 rounded-full overflow-hidden\">\n        <div className=\"h-full bg-blue-500 animate-pulse\" />\n      </div>\n      <div className=\"mt-4 text-sm text-gray-500\">{subMessage}</div>\n    </div>\n  );\n};\n\nexport default LoadingBar;",
+              "effectiveness": "high"
+            },
+            {
+              "description": "Fix the import path",
+              "code": "// Check if the path is correct\n// ❌ Incorrect path\nimport LoadingBar from '../components/LoadingBar';\n\n// ✅ Correct path might be:\nimport LoadingBar from '../../components/LoadingBar';",
+              "effectiveness": "high"
+            }
+          ]
+        },
+        {
+          "error": "Module not found: Can't resolve './.next/routes-manifest.json'",
+          "pattern": "Module not found: Can't resolve './.next/routes-manifest.json'",
+          "solutions": [
+            {
+              "description": "Clean Next.js build cache and rebuild",
+              "code": "# Run these commands in the terminal\nrm -rf .next\nnpm run build\nnpm run dev",
+              "effectiveness": "high"
+            },
+            {
+              "description": "Reinstall node_modules if build cache cleaning doesn't work",
+              "code": "# More thorough cleanup\nrm -rf .next node_modules\nnpm install\nnpm run dev",
+              "effectiveness": "medium"
+            }
+          ]
+        }
+      ],
+      "hydration": [
+        {
+          "error": "Hydration failed because the initial UI does not match what was rendered on the server",
+          "pattern": "Hydration failed because the initial UI does not match what was rendered on the server",
+          "solutions": [
+            {
+              "description": "Use useEffect for client-side only code",
+              "code": "// ❌ Don't use browser APIs directly in component body\nfunction Component() {\n  const width = window.innerWidth; // This causes hydration mismatch\n  return <div>{width}</div>;\n}\n\n// ✅ Use useEffect and useState for browser APIs\nfunction Component() {\n  const [width, setWidth] = useState(0);\n  \n  useEffect(() => {\n    setWidth(window.innerWidth);\n  }, []);\n  \n  return <div>{width || 'Loading...'}</div>;\n}",
+              "effectiveness": "high"
+            },
+            {
+              "description": "Add suppressHydrationWarning for dynamic content",
+              "code": "function Component() {\n  return (\n    <div suppressHydrationWarning>\n      {/* Content that might differ between server and client */}\n      Current time: {new Date().toLocaleTimeString()}\n    </div>\n  );\n}",
+              "effectiveness": "medium"
+            }
+          ]
+        }
+      ]
+    },
+    "typescript": {
+      "types": [
+        {
+          "error": "Property 'X' does not exist on type 'Y'",
+          "pattern": "Property '.*' does not exist on type",
+          "solutions": [
+            {
+              "description": "Add the missing property to the interface/type",
+              "code": "// ❌ Missing property\ninterface User {\n  name: string;\n}\n\nconst user: User = { name: 'John' };\nconsole.log(user.email); // Property 'email' does not exist\n\n// ✅ Add the property to the interface\ninterface User {\n  name: string;\n  email?: string; // Make it optional with ?\n}",
+              "effectiveness": "high"
+            },
+            {
+              "description": "Use type assertion if you're sure the property exists",
+              "code": "// Use type assertion (use sparingly)\nconst user = { name: 'John', email: 'john@example.com' } as any;\nconsole.log(user.email); // Works but loses type safety\n\n// Better approach with proper typing\ninterface User {\n  name: string;\n  email: string;\n}\nconst user: User = { name: 'John', email: 'john@example.com' };\nconsole.log(user.email);",
+              "effectiveness": "medium"
+            }
+          ]
+        }
+      ]
+    },
+    "sanity": {
+      "queries": [
+        {
+          "error": "Failed to fetch data from Sanity",
+          "pattern": "Error fetching data from Sanity|Failed to fetch data from Sanity",
+          "solutions": [
+            {
+              "description": "Check Sanity API configuration",
+              "code": "// Verify your Sanity configuration\nconst client = createClient({\n  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,\n  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,\n  apiVersion: '2023-05-03', // Use a current date\n  useCdn: true,\n});\n\n// Make sure environment variables are set correctly\n// Check .env.local file for:\n// NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id\n// NEXT_PUBLIC_SANITY_DATASET=production",
+              "effectiveness": "high"
+            },
+            {
+              "description": "Check CORS settings in Sanity dashboard",
+              "code": "// No code change needed - check Sanity dashboard:\n// 1. Go to sanity.io/manage\n// 2. Select your project\n// 3. Go to API settings\n// 4. Add your domain to CORS origins (e.g., http://localhost:3000)",
+              "effectiveness": "medium"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "recentErrors": []
+}

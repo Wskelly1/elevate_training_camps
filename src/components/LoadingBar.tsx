@@ -7,6 +7,23 @@ interface LoadingBarProps {
   subMessage?: string;
 }
 
+/**
+ * LoadingBar - Full-screen loading indicator component
+ * 
+ * This component displays a loading screen with a message, animated progress bar,
+ * and optional subtext. It's designed to provide visual feedback during data fetching
+ * or other asynchronous operations.
+ * 
+ * Features:
+ * - Animated progress bar with smooth transitions
+ * - Customizable messages
+ * - Styled to match the site's color scheme
+ * - Full-screen overlay for consistent user experience
+ * 
+ * @param {Object} props - Component props
+ * @param {string} [props.message="Loading..."] - Primary loading message
+ * @param {string} [props.subMessage="Please wait while we prepare your experience"] - Secondary explanatory message
+ */
 const LoadingBar: React.FC<LoadingBarProps> = ({ 
   message = "Loading...",
   subMessage = "Please wait while we prepare your experience"

@@ -4,6 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "../../lib/utils"
 
+/**
+ * Button - Customizable button component with multiple variants
+ * 
+ * This component provides a versatile button implementation with various style variants
+ * and configurable properties. It's built on Radix UI's Slot primitive for composition.
+ * 
+ * Features:
+ * - Multiple style variants (default, destructive, outline, etc.)
+ * - Size variations (default, sm, lg)
+ * - Support for asChild pattern for composition
+ * - Accessible by default with proper ARIA attributes
+ * - Consistent styling with the site's design system
+ */
 const buttonVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {

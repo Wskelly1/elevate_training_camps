@@ -7,7 +7,6 @@ import { AnimatedTeamIntroductions, type TeamIntroduction } from "../../componen
 import { SanityTeamMember } from '../../lib/types';
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
-import ScrollExpandMedia from "../../components/ScrollExpandMedia";
 import LoadingBar from "../../components/LoadingBar";
 
 // Type for team member from Sanity
@@ -102,7 +101,6 @@ export default function AboutPage() {
   const [aboutSections, setAboutSections] = useState<AboutSection[]>([]);
   const [aboutHero, setAboutHero] = useState<AboutHero | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [videoLoaded, setVideoLoaded] = useState(false);
   
   // Handle URL hash navigation after content loads
   useEffect(() => {
@@ -134,8 +132,6 @@ export default function AboutPage() {
       return () => clearTimeout(timer);
     }
   }, [isLoading]); // Run when loading changes to false
-  
-  // We don't need the timeout anymore since we're setting videoLoaded immediately
 
   useEffect(() => {
     async function loadAboutData() {
@@ -163,10 +159,6 @@ export default function AboutPage() {
         setAboutSections(sections);
         setAboutHero(hero);
         
-        // Always set videoLoaded to true when data is loaded
-        // The actual video will load in the background
-        setVideoLoaded(true);
-        
         // Set loading to false immediately after data is loaded
         setIsLoading(false);
 
@@ -174,18 +166,11 @@ export default function AboutPage() {
         console.error("Error fetching about page data:", error);
         // Still set loading to false even if there's an error
         setIsLoading(false);
-        // Also set videoLoaded to true in case of error
-        setVideoLoaded(true);
       }
     }
 
     loadAboutData();
   }, []);
-  
-  // Handle video load completion
-  const handleMediaLoaded = () => {
-    setVideoLoaded(true);
-  };
   
   // Show loading screen only while data is loading from Sanity
   if (isLoading) {
@@ -195,23 +180,19 @@ export default function AboutPage() {
     />;
   }
   
-  // Remove the second loading screen for video - we'll show content immediately
-  // and let the video load in the background
-  
   return (
     <Layout>
       {aboutHero && (
-        <ScrollExpandMedia
-          mediaType={aboutHero.mediaType}
-          mediaSrc={aboutHero.mediaType === 'video' ? aboutHero.mediaSrc?.asset.url : urlFor(aboutHero.mediaImage).url()}
-          posterSrc={aboutHero.posterSrc ? urlFor(aboutHero.posterSrc).url() : undefined}
-          bgImageSrc={urlFor(aboutHero.bgImageSrc).url()}
-          title={aboutHero.title}
-          date={aboutHero.date}
-          scrollToExpand={aboutHero.scrollToExpand}
-          textBlend
-          onFullyExpanded={handleMediaLoaded}
-        />
+        <div className="relative h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: `url(${urlFor(aboutHero.bgImageSrc).url()})` }}>
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          <div className="z-10 text-white text-center px-4 max-w-4xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">{aboutHero.title}</h1>
+            <p className="text-lg md:text-xl mb-6">{aboutHero.overview}</p>
+            {aboutHero.conclusion && (
+              <p className="text-xl md:text-2xl font-bold">{aboutHero.conclusion}</p>
+            )}
+          </div>
+        </div>
       )}
 
       <section id="our-team" className="py-12 bg-[#f0ead6] scroll-mt-32">

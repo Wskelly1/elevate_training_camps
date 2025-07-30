@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "addComments": {
+      "enabled": true,
+      "description": "Automatically add explanatory comments to code",
+      "settings": {
+        "functionComments": true,
+        "classComments": true,
+        "componentComments": true,
+        "complexLogicComments": true,
+        "commentStyle": "jsdoc"
+      }
+    },
+    "codeQuality": {
+      "enabled": true,
+      "description": "Enforce code quality standards",
+      "settings": {
+        "explainComplexLogic": true,
+        "documentParameters": true,
+        "documentReturnValues": true,
+        "documentExceptions": true
+      }
+    },
+    "errorTracking": {
+      "enabled": true,
+      "description": "Track errors and their solutions",
+      "settings": {
+        "solutionsFile": ".cursor/error-solutions.json",
+        "checkSolutionsFirst": true,
+        "documentTriedSolutions": true,
+        "categorizeErrors": true,
+        "includeStackTraces": true
+      }
+    }
+  },
+  "autoformat": {
+    "onSave": true,
+    "addComments": true
+  },
+  "editor": {
+    "suggestComments": true,
+    "commentPrompt": "Explain what this code does in a clear, concise manner"
+  },
+  "errorHandling": {
+    "checkKnownSolutions": true,
+    "suggestSolutions": true,
+    "documentNewSolutions": true,
+    "trackErrorFrequency": true
+  }
+}
