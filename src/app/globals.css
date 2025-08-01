@@ -41,38 +41,63 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-:root {
-  --radius: 0.625rem;
-  --background: #F8F4E3;
-  --foreground: #2F2F2F;
-  --card: #F8F4E3;
-  --card-foreground: #2F2F2F;
-  --popover: #F8F4E3;
-  --popover-foreground: #2F2F2F;
-  --primary: #2E5631;
-  --primary-foreground: #F8F4E3;
-  --secondary: #D6CBB4;
-  --secondary-foreground: #2F2F2F;
-  --muted: #D6CBB4;
-  --muted-foreground: #2F2F2F;
-  --accent: #c5b89c; /* Darker cream/brown for hover */
-  --accent-foreground: #2F2F2F;
-  --accent-2: #BC6C25;
-  --destructive: #BC6C25;
-  --border: #D6CBB4;
-  --input: #2E5631;
-  --ring: #A8DADC;
-  --footer-bg: #2F2F2F;
-  --footer-text: #F8F4E3;
-  --footer-link: #A8DADC;
-}
-
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    /* Enable smooth scrolling for better performance */
+    scroll-behavior: smooth;
+    /* Optimize for animations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Reduce motion for users who prefer it */
+    @media (prefers-reduced-motion: reduce) {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Optimize animations for better performance */
+  * {
+    /* Enable hardware acceleration for transforms */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Ensure smooth scrolling on all elements */
+  html {
+    scroll-behavior: smooth;
+    @media (prefers-reduced-motion: reduce) {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Video expansion scroll behavior */
+  .video-expanding {
+    overflow: hidden !important;
+  }
+
+  .video-expanding body {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+  }
+
+  /* Smooth transitions for video expansion */
+  .media-container {
+    transition: width 0.1s ease-out, height 0.1s ease-out;
+    z-index: 50 !important; /* Ensure it's above other content during expansion */
+  }
+
+  /* Prevent scroll during video expansion */
+  .prevent-scroll {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
   }
 }
 
@@ -144,5 +169,74 @@
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 1rem;
+  }
+}
+
+/* Performance optimizations for animations */
+.smooth-animation {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Hero section styling */
+.hero-section {
+  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Media container for video/image */
+.media-container {
+  max-width: calc(100vw - 64px) !important; /* 32px margin on each side */
+  max-height: calc(100vh - 160px) !important; /* 80px navbar + 48px top margin + 32px bottom margin */
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  border-radius: 0.75rem !important;
+}
+
+.media-container video,
+.media-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 0.75rem !important;
+}
+
+/* Content section styling */
+.content-section {
+  position: relative;
+  z-index: 20;
+  background-color: white;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* First section in content should have minimal top padding */
+.content-section section:first-child {
+  padding-top: 2rem;
+  margin-top: 0;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

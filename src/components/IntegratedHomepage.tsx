@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { SanityHomePage, SanityContentSection } from '../lib/types';
 import { urlFor } from '../lib/sanity';
@@ -15,490 +15,251 @@ interface IntegratedHomepageProps {
  * IntegratedHomepage - Advanced interactive homepage component with scroll animations
  *
  * This component creates a dynamic, scroll-driven homepage experience with:
- * - Animated hero section with expandable media (video or image)
- * - Scroll-based animations and transitions
- * - Content sections that appear as the user scrolls
- * - Responsive navigation visibility based on scroll position
- *
- * Features:
- * - Multi-phase animation sequence (entry, expand, exit)
- * - Custom scroll handling for both mouse wheel and touch events
- * - Dynamic navigation visibility control via custom events
- * - Smooth transitions between animation states
- * - Support for both video and image media types
- *
- * @param {Object} props - Component props
- * @param {SanityHomePage} props.data - Homepage data from Sanity CMS
+ * - Full-screen background image
+ * - Video that expands on scroll
+ * - Static content sections below
  */
 const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
-  // Animation phases
-  const [initialPhase, setInitialPhase] = useState<boolean>(true); // Initial phase (media not visible yet)
-  const [entryProgress, setEntryProgress] = useState<number>(0); // Progress of entry animation (0 to 1)
-  const [entryComplete, setEntryComplete] = useState<boolean>(false); // Entry animation complete
+  // Animation states
+  const [initialPhase, setInitialPhase] = useState<boolean>(true); // Initial phase (video not visible yet)
+  const [videoExpanded, setVideoExpanded] = useState<boolean>(false); // Whether video has reached full screen
+  const [videoLoaded, setVideoLoaded] = useState<boolean>(false); // Whether video has loaded
+  const [scrollProgress, setScrollProgress] = useState<number>(0); // 0 to 1 for video expansion
+  const [isExpanding, setIsExpanding] = useState<boolean>(false); // Whether video is currently expanding
 
-  // Scroll-expand functionality states
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
-  const [scrollStarted, setScrollStarted] = useState<boolean>(false);
-  const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
-
-  // Content sections integration states
-  const [contentSectionsVisible, setContentSectionsVisible] = useState<boolean>(false);
-  const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
-
-  // Refs for the different sections
+  // Refs
   const heroSectionRef = useRef<HTMLDivElement>(null);
-  const contentSectionsRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const scrollableContainerRef = useRef<HTMLDivElement>(null);
-  const previousScrollProgressRef = useRef<number>(0); // Track previous scroll position for direction detection
-  const lastContentScrollTopRef = useRef<number>(0); // Track content section scroll position
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Check initial scroll position on page load
+  // Window dimensions for responsive sizing
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0
+  });
+
+  // Update window dimensions on resize
   useEffect(() => {
-    const handleInitialScrollPosition = () => {
-      // If page is loaded scrolled down, set all animations to completed state
-      if (window.scrollY > window.innerHeight / 2) {
-        // Set all animation phases to completed
-        setInitialPhase(false);
-        setEntryProgress(1);
-        setEntryComplete(true);
-        setScrollProgress(EXIT_END);
-        setScrollStarted(true);
-        setContentSectionsVisible(true);
-        setAnimationCompleted(true);
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
 
-        // Also make sure video is in correct state if it's a video
-        if (videoRef.current && data.expandMediaType === 'video') {
-          videoRef.current.currentTime = 0;
-          setVideoLoaded(true);
+    // Initial setup
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Handle scroll events
+  useEffect(() => {
+    let ticking = false;
+    let lastScrollY = window.scrollY;
+    let scrollLocked = false;
+    let expansionStartY = 0;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // If we're in the locked expansion phase, prevent actual page scrolling
+      if (scrollLocked) {
+        // Force the page back to the expansion start position
+        window.scrollTo(0, expansionStartY);
+        return;
+      }
+
+      // Calculate how far we've scrolled within the hero section
+      const heroHeight = windowDimensions.height; // Hero section is 100vh
+      const scrollThreshold = heroHeight * 0.2; // Start expansion at 20% scroll
+
+      // Check if we've reached the expansion trigger point
+      if (currentScrollY > scrollThreshold && currentScrollY < heroHeight && !scrollLocked && !videoExpanded) {
+        // We've hit the expansion trigger point - lock scroll and start expansion
+        scrollLocked = true;
+        expansionStartY = scrollThreshold;
+        document.body.classList.add('video-expanding');
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.top = `-${scrollThreshold}px`;
+        setIsExpanding(true);
+
+        // Exit initial phase once expansion begins
+        if (initialPhase) {
+          setInitialPhase(false);
         }
 
-        // Allow normal page scrolling
-        document.body.style.overflow = 'auto';
+        // Start the controlled expansion animation
+        startExpansionAnimation();
+        return;
+      }
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          // Normal scroll behavior outside expansion zone
+          if (currentScrollY < scrollThreshold) {
+            setScrollProgress(0);
+            setIsExpanding(false);
+          } else if (currentScrollY >= heroHeight && !videoExpanded) {
+            // User has scrolled past the hero section before expansion completes
+            // This shouldn't happen with our lock, but handle it just in case
+            completeExpansion();
+          }
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    // Function to animate the video expansion
+    const startExpansionAnimation = () => {
+      let progress = 0;
+      const duration = 1000; // 1 second expansion
+      const startTime = performance.now();
+
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        progress = Math.min(elapsed / duration, 1);
+
+        setScrollProgress(progress);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          completeExpansion();
+        }
+      };
+
+      requestAnimationFrame(animate);
+    };
+
+    // Function to complete the expansion and unlock scrolling
+    const completeExpansion = () => {
+      scrollLocked = false;
+      setScrollProgress(1);
+      setIsExpanding(false);
+      setVideoExpanded(true);
+
+      // Unlock the scroll
+      document.body.classList.remove('video-expanding');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+
+      // Restore scroll position to after the hero section
+      const heroHeight = windowDimensions.height;
+      window.scrollTo(0, heroHeight);
+
+      // Play the video
+      if (videoRef.current) {
+        videoRef.current.play().catch(err => console.error("Video play failed:", err));
       }
     };
 
-    // Run on initial load
-    handleInitialScrollPosition();
+    // Handle wheel events - completely prevent during expansion
+    const handleWheel = (event: WheelEvent) => {
+      if (isExpanding || scrollLocked) {
+        event.preventDefault();
+        return false;
+      }
+    };
 
-    // Also run when page is resized (in case user resizes while scrolled down)
-    window.addEventListener('resize', handleInitialScrollPosition);
+    // Handle touch events for mobile
+    const handleTouchMove = (event: TouchEvent) => {
+      if (isExpanding || scrollLocked) {
+        event.preventDefault();
+      }
+    };
+
+    // Handle keyboard events
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isExpanding || scrollLocked) {
+        // Prevent arrow keys, space, page up/down during expansion
+        if (['ArrowDown', 'ArrowUp', ' ', 'PageDown', 'PageUp', 'Home', 'End'].includes(event.key)) {
+          event.preventDefault();
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+
+    // Initial call to set correct state based on current scroll position
+    handleScroll();
 
     return () => {
-      window.removeEventListener('resize', handleInitialScrollPosition);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('keydown', handleKeyDown);
+
+      // Clean up any locks that might be active
+      document.body.classList.remove('video-expanding');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
     };
-  }, [data.expandMediaType]);
+  }, [initialPhase, videoExpanded, windowDimensions.height, isExpanding]);
 
-  // Animation constants
-  const EXPAND_END = 1;
-  const STICK_DURATION = 0; // Removed stickiness for a smooth transition
-  const EXIT_DURATION = 1;
-  const STICK_END = EXPAND_END + STICK_DURATION;
-  const EXIT_END = STICK_END + EXIT_DURATION;
+  // Preload video
+  useEffect(() => {
+    if (videoRef.current && data.expandMediaType === 'video' && data.expandMediaSrc?.asset.url) {
+      videoRef.current.preload = 'auto';
+      videoRef.current.load();
 
-  // Derived animation values from scrollProgress
-  const expansionProgress = Math.min(scrollProgress, EXPAND_END);
-  const hasStartedExiting = scrollProgress > STICK_END;
-  const exitProgress = hasStartedExiting
-    ? (scrollProgress - STICK_END) / EXIT_DURATION
-    : 0;
+      const handleCanPlayThrough = () => {
+        setVideoLoaded(true);
+      };
 
-  // Media dimensions based on scroll progress
-  const mediaWidth = 300 + expansionProgress * 1250;
-  const mediaHeight = 400 + expansionProgress * 400;
-  const textTranslateX = expansionProgress * 150;
+      videoRef.current.addEventListener('canplaythrough', handleCanPlayThrough, { once: true });
 
-  // Entry animation positions (for sliding up from bottom)
-  const entryTranslateY = initialPhase ? 100 - (entryProgress * 100) : 0;
+      return () => {
+        if (videoRef.current) {
+          videoRef.current.removeEventListener('canplaythrough', handleCanPlayThrough);
+        }
+      };
+    }
+  }, [data.expandMediaType, data.expandMediaSrc?.asset.url]);
 
-  // Media position based on exit progress (for scrolling up and off screen)
-  const mediaTranslateY = -100 * exitProgress;
+  // Video dimensions based on scroll progress
+  const navBarHeight = 80; // Approximate height of nav bar
+  const sideMargin = 32; // Side margins
+  const topMargin = 48; // Top margin
+  const bottomMargin = 32; // Bottom margin
 
-  // Content sections position (slide up from bottom as video exits)
-  const contentSectionsTranslateY = contentSectionsVisible
-    ? 0
-    : hasStartedExiting
-    ? 100 - exitProgress * 100
-    : 100;
+  const maxVideoWidth = windowDimensions.width - (sideMargin * 2);
+  const maxVideoHeight = windowDimensions.height - navBarHeight - topMargin - bottomMargin;
 
-  const contentSectionsOpacity = contentSectionsVisible
-    ? 1
-    : hasStartedExiting
-    ? exitProgress
-    : 0;
+  // Calculate video dimensions
+  const initialVideoWidth = 300;
+  const initialVideoHeight = 400;
+  const videoWidth = initialVideoWidth + (scrollProgress * (maxVideoWidth - initialVideoWidth));
+  const videoHeight = initialVideoHeight + (scrollProgress * (maxVideoHeight - initialVideoHeight));
 
-  // Ensure content sections align with the main page when animation is completed
-  const finalContentSectionsTranslateY = animationCompleted ? 0 : contentSectionsTranslateY;
+  // Text animation based on scroll progress
+  const textTranslateX = scrollProgress * 150;
 
   // Split title for animation effect
   const firstWord = data.expandTitle ? data.expandTitle.split(' ')[0] : '';
   const restOfTitle = data.expandTitle ? data.expandTitle.split(' ').slice(1).join(' ') : '';
 
-  // Scroll animation for content sections
-  const { scrollYProgress } = useScroll({
-    target: contentSectionsRef,
-    container: scrollableContainerRef,
-    offset: ['start start', 'end end'],
-  });
-
-  // Handle all animation and scroll events
-  useEffect(() => {
-    // --- Wheel Handler ---
-    const handleWheel = (e: WheelEvent) => {
-      const scrollDelta = e.deltaY;
-
-      // 1. Page Scroll Mode
-      if (animationCompleted) {
-        if (scrollDelta < 0) {
-          const heroRect = heroSectionRef.current?.getBoundingClientRect();
-          if (heroRect && heroRect.top >= -10) {
-            e.preventDefault();
-            setAnimationCompleted(false);
-            setContentSectionsVisible(true);
-            // Ensure we're at the bottom of content sections
-            setTimeout(() => {
-              if (scrollableContainerRef.current) {
-                scrollableContainerRef.current.scrollTop = scrollableContainerRef.current.scrollHeight;
-              }
-            }, 0);
-          }
-        }
-        return;
-      }
-
-      // 2. Content Sections Scroll Mode
-      if (contentSectionsVisible) {
-        const container = scrollableContainerRef.current;
-        if (container) {
-          const { scrollTop, scrollHeight, clientHeight } = container;
-          const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // Small buffer for smooth transition
-
-          if (scrollDelta > 0 && isAtBottom) {
-            // Transition to main page scroll when we're at the bottom of content
-            setAnimationCompleted(true);
-            return;
-          } else if (scrollDelta < 0 && scrollTop <= 0) {
-            e.preventDefault();
-            setContentSectionsVisible(false);
-            setScrollProgress(EXIT_END);
-          } else {
-            // Allow normal scrolling within the container
-            return;
-          }
-        }
-        return;
-      }
-
-      e.preventDefault();
-
-      // 3. Main Animation Sequence (Entry -> Expand -> Stick -> Exit)
-      if (initialPhase) {
-        // Handle entry
-        const newEntryProgress = entryProgress + scrollDelta * 0.0007; // Faster synchronized speed
-        const clampedEntry = Math.min(Math.max(newEntryProgress, 0), 1);
-        setEntryProgress(clampedEntry);
-
-        if (clampedEntry >= 1) {
-          setInitialPhase(false);
-          setEntryComplete(true);
-          setScrollProgress(0);
-        }
-      } else {
-        // Handle expand, stick, and exit
-        if (!scrollStarted && scrollDelta > 0 && scrollProgress < EXPAND_END) {
-          setScrollStarted(true);
-        }
-
-        const newProgress = scrollProgress + scrollDelta * 0.0007; // Faster synchronized speed
-
-        if (newProgress >= EXIT_END) {
-          setScrollProgress(EXIT_END);
-          setContentSectionsVisible(true);
-        } else if (newProgress < 0) {
-          setScrollProgress(0);
-          setInitialPhase(true);
-          setEntryProgress(1);
-          setScrollStarted(false);
-        } else {
-          setScrollProgress(newProgress);
-        }
-      }
-    };
-
-    // --- Touch Handler ---
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-    const handleTouchMove = (e: TouchEvent) => {
-      const touchY = e.touches[0].clientY;
-      const scrollDelta = touchStartY - touchY; // Positive for scroll down
-
-       // 1. Page Scroll Mode
-      if (animationCompleted) {
-        if (scrollDelta < 0) {
-          const heroRect = heroSectionRef.current?.getBoundingClientRect();
-          if (heroRect && heroRect.top >= -10) {
-            e.preventDefault();
-            setAnimationCompleted(false);
-            setContentSectionsVisible(true);
-            // Ensure we're at the bottom of content sections
-            setTimeout(() => {
-              if (scrollableContainerRef.current) {
-                scrollableContainerRef.current.scrollTop = scrollableContainerRef.current.scrollHeight;
-              }
-            }, 0);
-          }
-        }
-        touchStartY = touchY;
-        return;
-      }
-
-      // 2. Content Sections Scroll Mode
-      if (contentSectionsVisible) {
-        const container = scrollableContainerRef.current;
-        if (container) {
-          const { scrollTop, scrollHeight, clientHeight } = container;
-          const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // Small buffer for smooth transition
-
-          if (scrollDelta > 0 && isAtBottom) {
-            // Transition to main page scroll when we're at the bottom of content
-            setAnimationCompleted(true);
-            return;
-          } else if (scrollDelta < 0 && scrollTop <= 0) {
-            e.preventDefault();
-            setContentSectionsVisible(false);
-            setScrollProgress(EXIT_END);
-          } else {
-            // Allow normal scrolling within the container
-            return;
-          }
-        }
-        touchStartY = touchY;
-        return;
-      }
-
-      e.preventDefault();
-
-      // 3. Main Animation Sequence (Entry -> Expand -> Stick -> Exit)
-      if (initialPhase) {
-        // Handle entry
-        const newEntryProgress = entryProgress + scrollDelta * 0.0007; // Faster synchronized speed
-        const clampedEntry = Math.min(Math.max(newEntryProgress, 0), 1);
-        setEntryProgress(clampedEntry);
-
-        if (clampedEntry >= 1) {
-          setInitialPhase(false);
-          setEntryComplete(true);
-          setScrollProgress(0);
-        }
-      } else {
-        // Handle expand, stick, and exit
-        if (!scrollStarted && scrollDelta > 0 && scrollProgress < EXPAND_END) {
-          setScrollStarted(true);
-        }
-
-        const newProgress = scrollProgress + scrollDelta * 0.0007; // Faster synchronized speed
-
-        if (newProgress >= EXIT_END) {
-          setScrollProgress(EXIT_END);
-          setContentSectionsVisible(true);
-        } else if (newProgress < 0) {
-          setScrollProgress(0);
-          setInitialPhase(true);
-          setEntryProgress(1);
-          setScrollStarted(false);
-        } else {
-          setScrollProgress(newProgress);
-        }
-      }
-      touchStartY = touchY;
-    };
-
-    // --- Add Listeners ---
-    const options = { passive: false };
-    window.addEventListener('wheel', handleWheel, options);
-    window.addEventListener('touchstart', handleTouchStart, options);
-    window.addEventListener('touchmove', handleTouchMove, options);
-
-    // --- Cleanup ---
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, [
-    scrollProgress,
-    scrollStarted,
-    data.useScrollExpandMedia,
-    initialPhase,
-    entryProgress,
-    contentSectionsVisible,
-    animationCompleted,
-  ]);
-
-  // Effect to lock body scroll during animation
-  useEffect(() => {
-    if (!animationCompleted) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [animationCompleted]);
-
-  // Handle video playback when scrolling starts
-  useEffect(() => {
-    if (scrollStarted && videoRef.current && data.expandMediaType === 'video') {
-      const playVideo = async () => {
-        try {
-          await videoRef.current?.play();
-          setVideoLoaded(true);
-        } catch (err) {
-          console.error('Video play failed:', err);
-
-          // Try again after a short delay
-          setTimeout(async () => {
-            try {
-              await videoRef.current?.play();
-              setVideoLoaded(true);
-            } catch (retryErr) {
-              console.error('Video play retry failed:', retryErr);
-            }
-          }, 300);
-        }
-      };
-
-      playVideo();
-    }
-  }, [scrollStarted, data.expandMediaType]);
-
-  // Control navigation visibility based on scroll state
-  useEffect(() => {
-    // Create custom event for nav visibility
-    const createNavVisibilityEvent = (visible: boolean) => {
-      const event = new CustomEvent('navVisibility', {
-        detail: { visible }
-      });
-      window.dispatchEvent(event);
-    };
-
-    // Determine scroll direction
-    const isScrollingUp = scrollProgress < previousScrollProgressRef.current;
-
-    // Function to check content section scroll direction
-    const checkContentSectionScroll = () => {
-      if (contentSectionsVisible && scrollableContainerRef.current) {
-        const currentScrollTop = scrollableContainerRef.current.scrollTop;
-        const isScrollingUpInContent = currentScrollTop < lastContentScrollTopRef.current;
-
-        // Update last scroll position
-        lastContentScrollTopRef.current = currentScrollTop;
-
-        // Show navbar when scrolling up in content sections
-        if (isScrollingUpInContent) {
-          createNavVisibilityEvent(true);
-        } else {
-          createNavVisibilityEvent(false);
-        }
-      }
-    };
-
-    // Add scroll event listener to content sections container
-    if (contentSectionsVisible && scrollableContainerRef.current) {
-      scrollableContainerRef.current.addEventListener('scroll', checkContentSectionScroll);
-
-      // Clean up
-      return () => {
-        if (scrollableContainerRef.current) {
-          scrollableContainerRef.current.removeEventListener('scroll', checkContentSectionScroll);
-        }
-      };
-    }
-
-    // Initial state - show navbar
-    if (initialPhase) {
-      createNavVisibilityEvent(true);
-    }
-    // When video is expanding - show navbar
-    else if (!initialPhase && scrollProgress < EXPAND_END) {
-      createNavVisibilityEvent(true);
-    }
-    // When scrolling down and video has exited - hide the nav
-    else if (hasStartedExiting && exitProgress > 0.1 && !isScrollingUp) {
-      createNavVisibilityEvent(false);
-    }
-    // When scrolling up - immediately show navbar
-    else if (isScrollingUp) {
-      createNavVisibilityEvent(true);
-    }
-    // When content sections are visible but not scrolling up - keep nav hidden
-    else if (contentSectionsVisible && !isScrollingUp) {
-      createNavVisibilityEvent(false);
-    }
-    // When animation is complete (regular page scroll) - show nav
-    else if (animationCompleted) {
-      createNavVisibilityEvent(true);
-    }
-
-    // Update the previous scroll position after all checks
-    previousScrollProgressRef.current = scrollProgress;
-
-  }, [initialPhase, entryProgress, hasStartedExiting, exitProgress, scrollProgress, contentSectionsVisible, animationCompleted, EXPAND_END, EXIT_END]);
-
-  // Handle navigation visibility for the main page scroll
-  useEffect(() => {
-    if (!animationCompleted) return;
-
-    // Track window scroll for the main page
-    let lastWindowScrollY = window.scrollY;
-
-    const handleWindowScroll = () => {
-      const currentScrollY = window.scrollY;
-      const isScrollingUp = currentScrollY < lastWindowScrollY;
-
-      // Create custom event for nav visibility
-      const createNavVisibilityEvent = (visible: boolean) => {
-        const event = new CustomEvent('navVisibility', {
-          detail: { visible }
-        });
-        window.dispatchEvent(event);
-      };
-
-      // Show navbar when scrolling up, hide when scrolling down
-      if (isScrollingUp) {
-        createNavVisibilityEvent(true);
-      } else if (currentScrollY > 100) { // Only hide when scrolled down a bit
-        createNavVisibilityEvent(false);
-      }
-
-      lastWindowScrollY = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleWindowScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleWindowScroll);
-    };
-  }, [animationCompleted]);
-
-  // Calculate current media dimensions based on animation state
-  const currentMediaWidth = mediaWidth;
-
-  const currentMediaHeight = mediaHeight;
-
   return (
-    <div className="relative">
-      {/* Hero Section with integrated content sections */}
-      <div
-        ref={heroSectionRef}
-        className="relative h-screen overflow-hidden"
-      >
-        {/* Background Image (fixed in place) - Always visible */}
-        <div className="absolute inset-0 z-0">
+    <div ref={containerRef} className="relative">
+      {/* Hero Section */}
+      <div className="hero-section" ref={heroSectionRef}>
+        {/* Background Image */}
+        <div className="hero-background">
           <Image
             src={urlFor(data.heroImage).url()}
             alt={data.heroHeading || "Hero Image"}
@@ -512,7 +273,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         {/* Hero Content */}
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-white">
           {/* Initial instruction to scroll */}
-          {initialPhase && entryProgress < 0.2 && (
+          {initialPhase && (
             <motion.div
               className="absolute bottom-10 left-0 right-0 text-center"
               initial={{ opacity: 0 }}
@@ -525,24 +286,33 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
             </motion.div>
           )}
 
-          {/* Media Container */}
-          {data.useScrollExpandMedia && (
-            <motion.div
-              className="absolute z-0 left-1/2 transform -translate-x-1/2 transition-none rounded-2xl"
+          {/* Initial Hero Text - Only visible before scrolling starts */}
+          {initialPhase && (
+            <div className="text-center px-4">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4">
+                Elevate Training Camps
+              </h1>
+              <p className="text-xl md:text-2xl max-w-2xl mx-auto">
+                An elevated training experience for all athletes
+              </p>
+            </div>
+          )}
+
+          {/* Video Container - Appears on scroll */}
+          {data.useScrollExpandMedia && !initialPhase && (
+            <div
+              className="absolute z-10 rounded-2xl media-container"
               style={{
-                width: `${currentMediaWidth}px`,
-                height: `${currentMediaHeight}px`,
-                maxWidth: '95vw',
-                maxHeight: '85vh',
-                boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.3)',
-                top: initialPhase ? `calc(55% + ${entryTranslateY}vh)` : `calc(55% + ${mediaTranslateY}vh)`,
-                translateY: '-50%',
-                opacity: initialPhase ? entryProgress : (1 - exitProgress),
-                display: (scrollProgress >= EXIT_END || animationCompleted) ? 'none' : 'block'
+                width: videoWidth,
+                height: videoHeight,
+                top: `${navBarHeight + topMargin + (windowDimensions.height - navBarHeight - topMargin - bottomMargin - videoHeight) / 2}px`,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                overflow: 'hidden'
               }}
             >
               {data.expandMediaType === 'video' ? (
-                <div className="relative w-full h-full pointer-events-none">
+                <div className="relative w-full h-full pointer-events-none overflow-hidden rounded-xl">
                   {/* Video Element */}
                   <video
                     ref={videoRef}
@@ -552,38 +322,23 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     loop
                     playsInline
                     preload="auto"
-                    className={`w-full h-full object-cover rounded-xl ${scrollStarted ? 'opacity-100' : 'opacity-0'}`}
+                    className={`w-full h-full object-cover rounded-xl ${videoExpanded ? 'opacity-100' : 'opacity-80'}`}
                     controls={false}
                     disablePictureInPicture
                     disableRemotePlayback
+                    style={{
+                      objectFit: 'cover',
+                      transition: 'opacity 0.3s ease-in-out'
+                    }}
                   />
 
-                  {/* Poster Image */}
-                  {(!scrollStarted || !videoLoaded) && data.expandPosterSrc && (
-                    <motion.div
-                      className="absolute inset-0"
-                      initial={{ opacity: 1 }}
-                      animate={{ opacity: scrollStarted && videoLoaded ? 0 : 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <Image
-                        src={urlFor(data.expandPosterSrc).url()}
-                        alt={data.expandTitle || 'Video thumbnail'}
-                        fill
-                        className="object-cover rounded-xl"
-                        priority
-                      />
-                    </motion.div>
-                  )}
-
                   {/* Overlay */}
-                  <motion.div
+                  <div
                     className="absolute inset-0 bg-black/30 rounded-xl"
-                    initial={{ opacity: 0.7 }}
-                    animate={{
-                      opacity: 0.5 - expansionProgress * 0.3
+                    style={{
+                      opacity: 0.5 - scrollProgress * 0.3,
+                      transition: 'opacity 0.1s ease-out'
                     }}
-                    transition={{ duration: 0.2 }}
                   />
                 </div>
               ) : (
@@ -595,197 +350,211 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     className="w-full h-full object-cover rounded-xl"
                   />
 
-                  <motion.div
+                  <div
                     className="absolute inset-0 bg-black/50 rounded-xl"
-                    initial={{ opacity: 0.7 }}
-                    animate={{
-                      opacity: 0.7 - expansionProgress * 0.3
+                    style={{
+                      opacity: 0.7 - scrollProgress * 0.3,
+                      transition: 'opacity 0.1s ease-out'
                     }}
-                    transition={{ duration: 0.2 }}
                   />
                 </div>
               )}
 
-              {/* Media Text */}
-              <div className="flex flex-col items-center text-center relative z-10 mt-4 transition-none">
+              {/* Video Title Text */}
+              <div className="flex flex-col items-center text-center relative z-10 mt-4">
                 {data.expandSubtitle && (
-                  <motion.p
+                  <p
                     className="text-2xl text-blue-200"
                     style={{
-                      transform: initialPhase
-                        ? `translateY(${entryTranslateY * 0.5}vh)`
-                        : `translateX(-${textTranslateX}vw)`,
-                      opacity: initialPhase ? entryProgress : 1
+                      transform: `translateX(-${textTranslateX}px)`,
+                      transition: 'transform 0.1s ease-out'
                     }}
                   >
                     {data.expandSubtitle}
-                  </motion.p>
-                )}
-                {data.scrollToExpandText && scrollProgress < EXPAND_END && !initialPhase && (
-                  <motion.p
-                    className="text-blue-200 font-medium text-center"
-                    style={{ transform: `translateX(${textTranslateX}vw)` }}
-                  >
-                    {data.scrollToExpandText}
-                  </motion.p>
-                )}
-                {initialPhase && entryProgress > 0.5 && (
-                  <motion.p
-                    className="text-blue-200 font-medium text-center"
-                    style={{ opacity: (entryProgress - 0.5) * 2 }}
-                  >
-                    Keep scrolling
-                  </motion.p>
-                )}
-                {scrollProgress >= EXPAND_END && scrollProgress < STICK_END && (
-                  <p className="text-blue-200 font-medium text-center animate-bounce">
-                    Scroll to continue
                   </p>
                 )}
+
+                {!videoExpanded && data.scrollToExpandText && (
+                  <p
+                    className="text-blue-200 font-medium text-center"
+                    style={{
+                      transform: `translateX(${textTranslateX}px)`,
+                      transition: 'transform 0.1s ease-out'
+                    }}
+                  >
+                    {data.scrollToExpandText}
+                  </p>
+                )}
+
+                {/* Expansion progress indicator */}
+                {isExpanding && !videoExpanded && (
+                  <motion.div
+                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex flex-col items-center text-blue-200">
+                      <span className="text-sm mb-2">Expanding video...</span>
+                      <div className="w-32 h-1 bg-blue-200/30 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-blue-200 rounded-full"
+                          style={{ width: `${scrollProgress * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs mt-2 opacity-75">
+                        Please wait
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+
+                {videoExpanded && (
+                  <p className="text-blue-200 font-medium text-center animate-pulse">
+                    Continue scrolling
+                  </p>
+                )}
+
+                {/* Scroll indicator when video expansion is complete */}
+                {videoExpanded && (
+                  <motion.div
+                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <div className="flex flex-col items-center text-blue-200">
+                      <span className="text-sm mb-1 font-bold">Video Expanded</span>
+                      <span className="text-sm mb-1">Scroll to continue</span>
+                      <motion.div
+                        className="w-6 h-10 border-2 border-blue-200 rounded-full flex justify-center"
+                        animate={{ y: [0, 10, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        <motion.div
+                          className="w-1 h-3 bg-blue-200 rounded-full mt-2"
+                          animate={{ y: [0, 12, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        />
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
               </div>
-            </motion.div>
+            </div>
           )}
 
-          {/* Title Animation for ScrollExpandMedia */}
-          {data.useScrollExpandMedia && (
-            <motion.div
-              className="flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col mix-blend-difference"
+          {/* Title Animation */}
+          {data.useScrollExpandMedia && !initialPhase && (
+            <div
+              className="flex items-center justify-center text-center gap-4 w-full relative z-10 flex-col mix-blend-difference"
               style={{
-                opacity: initialPhase ? entryProgress : (1 - exitProgress),
-                transform: initialPhase
-                  ? `translateY(${entryTranslateY * 0.5}vh)`
-                  : 'none',
-                display: (scrollProgress >= EXIT_END || animationCompleted) ? 'none' : 'flex'
+                opacity: 1 - scrollProgress,
+                transition: 'opacity 0.2s ease-out'
               }}
             >
-              <motion.h2
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none"
+              <h2
+                className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200"
                 style={{
-                  transform: !initialPhase
-                    ? `translateX(-${textTranslateX}vw)`
-                    : 'none'
+                  transform: `translateX(-${textTranslateX}px)`,
+                  transition: 'transform 0.1s ease-out'
                 }}
               >
                 {firstWord}
-              </motion.h2>
-              <motion.h2
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none"
+              </h2>
+              <h2
+                className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200"
                 style={{
-                  transform: !initialPhase
-                    ? `translateX(${textTranslateX}vw)`
-                    : 'none'
+                  transform: `translateX(${textTranslateX}px)`,
+                  transition: 'transform 0.1s ease-out'
                 }}
               >
                 {restOfTitle}
-              </motion.h2>
-            </motion.div>
-          )}
-
-          {/* Regular Hero Content (visible when ScrollExpandMedia is disabled or media has exited) */}
-          {(!data.useScrollExpandMedia || (scrollProgress >= EXIT_END && !contentSectionsVisible)) && (
-            <div className="text-center px-4">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4">
-                {data.heroHeading}
-              </h1>
-              <p className="text-xl md:text-2xl max-w-2xl mx-auto">
-                {data.heroSubheading}
-              </p>
-              {scrollProgress >= EXIT_END && !contentSectionsVisible && (
-                <motion.p
-                  className="text-blue-200 mt-8 animate-bounce"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  Scroll up to go back
-                </motion.p>
-              )}
+              </h2>
             </div>
           )}
-
-          {/* Integrated Content Sections */}
-          <motion.div
-            ref={scrollableContainerRef}
-            className="absolute inset-0 z-20"
-            style={{
-              transform: `translateY(${finalContentSectionsTranslateY}vh)`,
-              opacity: contentSectionsOpacity,
-              pointerEvents: contentSectionsVisible ? 'auto' : 'none',
-              overflowY: contentSectionsVisible && !animationCompleted ? 'scroll' : 'hidden',
-              scrollBehavior: 'smooth',
-              overscrollBehavior: animationCompleted ? 'auto' : 'contain',
-            }}
-          >
-            <div
-              ref={contentSectionsRef}
-              className="relative"
-            >
-              {data.contentSections?.map((section, index) => (
-                <ContentSection
-                  key={section._key}
-                  section={section}
-                  index={index}
-                  scrollYProgress={scrollYProgress}
-                />
-              ))}
-            </div>
-          </motion.div>
         </div>
       </div>
+
+      {/* Static Content Sections */}
+      {data.contentSections && data.contentSections.length > 0 && (
+        <div className="content-section">
+          {data.contentSections.map((section, index) => (
+            <StaticContentSection
+              key={section._key}
+              section={section}
+              index={index}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-// Content Section Component (original scrolling homepage logic)
-const ContentSection = ({
+/**
+ * StaticContentSection - Static content section component
+ */
+const StaticContentSection = ({
   section,
-  index,
-  scrollYProgress
+  index
 }: {
   section: SanityContentSection;
   index: number;
-  scrollYProgress: any;
 }) => {
-  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
-
   const sectionImage = section.image ? urlFor(section.image).url() : '';
 
   return (
-    <motion.section
-      style={{ scale, rotate }}
-      className='relative h-screen bg-gradient-to-t to-[#1a1919] from-[#06060e] text-white flex items-center justify-center'
+    <section
+      className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
+      style={{
+        position: 'relative',
+        zIndex: 20,
+        padding: index === 0 ? '2rem 0 4rem' : '4rem 0' // Less padding for first section
+      }}
     >
-      {sectionImage && (
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={sectionImage}
-            alt={section.heading || 'Content Image'}
-            fill
-            className='object-cover'
-          />
-          <div className="absolute inset-0 bg-black/50" />
+      <div className="container mx-auto px-4">
+        <div className={`flex flex-col items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+          {/* Image */}
+          <div className="md:w-1/2">
+            {sectionImage && (
+              <div className="relative rounded-lg overflow-hidden shadow-lg">
+                <Image
+                  src={sectionImage}
+                  alt={section.heading || 'Content Image'}
+                  width={600}
+                  height={400}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="md:w-1/2 text-center md:text-left">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+              {section.heading}
+            </h2>
+            {section.subheading && (
+              <h3 className="text-xl md:text-2xl mb-6 text-gray-600">
+                {section.subheading}
+              </h3>
+            )}
+            <div className="prose prose-lg max-w-none text-gray-700 mb-6">
+              {section.text && <PortableText value={section.text} />}
+            </div>
+            {section.buttonText && section.buttonLink && (
+              <a
+                href={section.buttonLink}
+                className="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              >
+                {section.buttonText}
+              </a>
+            )}
+          </div>
         </div>
-      )}
-      <div className='absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]'></div>
-      <article className='container mx-auto relative z-10 text-center px-4'>
-        <h1 className='text-5xl md:text-6xl leading-[100%] py-10 font-semibold tracking-tight'>{section.heading}</h1>
-        {section.subheading && (
-          <h2 className='text-2xl md:text-3xl mb-6'>{section.subheading}</h2>
-        )}
-        <div className='prose prose-lg max-w-none text-white'>
-          {section.text && <PortableText value={section.text} />}
-        </div>
-        {section.buttonText && section.buttonLink && (
-          <a
-            href={section.buttonLink}
-            className='mt-8 inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
-          >
-            {section.buttonText}
-          </a>
-        )}
-      </article>
-    </motion.section>
+      </div>
+    </section>
   );
 };
 
