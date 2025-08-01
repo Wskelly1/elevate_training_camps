@@ -7,11 +7,11 @@ export interface TextareaProps
 
 /**
  * Textarea - Styled multiline text input component
- * 
+ *
  * This component provides a styled textarea field that matches the site's design system.
  * It extends the native HTML textarea element with consistent styling while maintaining
  * all standard functionality and accessibility features.
- * 
+ *
  * Features:
  * - Consistent styling with the site's design system
  * - Supports all standard HTML textarea attributes
@@ -35,4 +35,4 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 )
 Textarea.displayName = "Textarea"
 
-export { Textarea } 
+export { Textarea }

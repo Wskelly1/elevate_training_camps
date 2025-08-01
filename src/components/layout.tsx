@@ -51,37 +51,39 @@ async function getAboutSections(): Promise<AboutSection[]> {
 function scrollToSection(sectionId: string, e: React.MouseEvent<HTMLAnchorElement>) {
   // Get current path
   const currentPath = window.location.pathname;
-  
+
   // For same-page navigation, handle it directly
   if (currentPath === '/about') {
     e.preventDefault();
-    
+
     // Find the section
     const section = document.getElementById(sectionId);
     if (section) {
       // Get header height for offset
       const headerHeight = document.querySelector('header')?.getBoundingClientRect().height || 80;
-      
-      // Calculate the top position
-      const targetPosition = section.offsetTop - headerHeight - 40;
-      
+
+      // Calculate the top position - position section exactly at the top after header
+      const targetPosition = section.offsetTop - headerHeight;
+
       // Scroll to the section
       window.scrollTo({
         top: targetPosition,
         behavior: 'smooth'
       });
-      
+
       // For debugging
       console.log(`In-page scroll to: ${sectionId}, position: ${targetPosition}`);
     }
+  } else {
+    // For cross-page navigation, prevent default and let the link work normally
+    // The about page will handle the scroll after loading via useEffect
+    // Don't prevent default here - let the link navigate to the page with hash
   }
-  // For cross-page navigation, let the link work normally
-  // The about page will handle the scroll after loading
 }
 
 const customColors = {
   primary: '#755f4f',
-  secondary: '#a89885', 
+  secondary: '#a89885',
   muted: '#cbccb5',
   darkAccent: '#7f6f51',
   headerFooterBg: '#f0ead6', // Richer cream for header/footer
@@ -103,19 +105,19 @@ interface LayoutProps {
 
 /**
  * Main layout component for the Elevate Training Camps website.
- * 
+ *
  * This component provides the consistent layout structure for all pages including:
  * - Header with responsive navigation (desktop and mobile versions)
  * - Main content area
  * - Footer with contact information and newsletter signup
- * 
+ *
  * Features:
  * - Dynamic navigation based on Sanity CMS data
  * - Scroll-aware header that hides/shows based on scroll direction
  * - Mobile-responsive design with hamburger menu
  * - Custom color theming from Sanity settings
  * - Smooth scroll functionality for anchor links
- * 
+ *
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - Page content to render within the layout
  */
@@ -136,13 +138,13 @@ const Layout: React.FC<LayoutProps> = ({
 
   useEffect(() => {
     setMounted(true);
-    
+
     const handleScroll = () => {
       // For homepage, let the IntegratedHomepage component control nav visibility
       if (pathname === '/') {
         return;
       }
-      
+
       // For other pages, use default scroll behavior
       const currentScrollY = window.scrollY;
       if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
@@ -203,9 +205,9 @@ const Layout: React.FC<LayoutProps> = ({
 
   // Generate navigation items dynamically
   const navigationItems = [
-    { 
-      title: "About", 
-      icon: User, 
+    {
+      title: "About",
+      icon: User,
       subItems: [
         // Always include "Our Team" first
         { title: "Our Team", href: "/about#our-team", icon: Users },
@@ -229,10 +231,10 @@ const Layout: React.FC<LayoutProps> = ({
   }
 
   return (
-    <div 
-      className="min-h-screen flex flex-col" 
-      style={{ 
-        backgroundColor: customColors.mainBg, 
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        backgroundColor: customColors.mainBg,
         color: customColors.foreground,
         '--nav-bar-color': customColors.elevateGreen,
         '--nav-bar-hover-color': customColors.hoverBrown,
@@ -262,9 +264,9 @@ const Layout: React.FC<LayoutProps> = ({
                         {item.subItems ? (
                           <>
                             <div className="flex items-center relative nav-item-with-bar nav-hover-bg">
-                              <NavigationMenuTrigger 
-                                style={{ 
-                                  color: customColors.navText, 
+                              <NavigationMenuTrigger
+                                style={{
+                                  color: customColors.navText,
                                   fontWeight: 'bold',
                                   fontSize: '16px',
                                   padding: '0.5rem 0.75rem',
@@ -353,10 +355,10 @@ const Layout: React.FC<LayoutProps> = ({
                             </NavigationMenuContent>
                           </>
                         ) : (
-                          <NavigationMenuLink 
-                            href={item.href} 
-                            style={{ 
-                              color: customColors.navText, 
+                          <NavigationMenuLink
+                            href={item.href}
+                            style={{
+                              color: customColors.navText,
                               fontWeight: 'bold',
                               fontSize: '16px',
                               padding: '0.5rem 0.75rem',
@@ -566,7 +568,7 @@ const Layout: React.FC<LayoutProps> = ({
           </div>
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#e6dfd3] pt-8 text-center md:flex-row">
             <p className="text-sm" style={{ color: customColors.primary }}>
-              © 2024 Summit Flagstaff. All rights reserved.
+              © 2025 Elevate Training Camps. All rights reserved.
             </p>
             <nav className="flex gap-4 text-sm">
               <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>

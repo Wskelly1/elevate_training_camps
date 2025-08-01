@@ -13,20 +13,20 @@ interface IntegratedHomepageProps {
 
 /**
  * IntegratedHomepage - Advanced interactive homepage component with scroll animations
- * 
+ *
  * This component creates a dynamic, scroll-driven homepage experience with:
  * - Animated hero section with expandable media (video or image)
  * - Scroll-based animations and transitions
  * - Content sections that appear as the user scrolls
  * - Responsive navigation visibility based on scroll position
- * 
+ *
  * Features:
  * - Multi-phase animation sequence (entry, expand, exit)
  * - Custom scroll handling for both mouse wheel and touch events
  * - Dynamic navigation visibility control via custom events
  * - Smooth transitions between animation states
  * - Support for both video and image media types
- * 
+ *
  * @param {Object} props - Component props
  * @param {SanityHomePage} props.data - Homepage data from Sanity CMS
  */
@@ -35,16 +35,16 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const [initialPhase, setInitialPhase] = useState<boolean>(true); // Initial phase (media not visible yet)
   const [entryProgress, setEntryProgress] = useState<number>(0); // Progress of entry animation (0 to 1)
   const [entryComplete, setEntryComplete] = useState<boolean>(false); // Entry animation complete
-  
+
   // Scroll-expand functionality states
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [scrollStarted, setScrollStarted] = useState<boolean>(false);
   const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
-  
+
   // Content sections integration states
   const [contentSectionsVisible, setContentSectionsVisible] = useState<boolean>(false);
   const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
-  
+
   // Refs for the different sections
   const heroSectionRef = useRef<HTMLDivElement>(null);
   const contentSectionsRef = useRef<HTMLDivElement>(null);
@@ -66,24 +66,24 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         setScrollStarted(true);
         setContentSectionsVisible(true);
         setAnimationCompleted(true);
-        
+
         // Also make sure video is in correct state if it's a video
         if (videoRef.current && data.expandMediaType === 'video') {
           videoRef.current.currentTime = 0;
           setVideoLoaded(true);
         }
-        
+
         // Allow normal page scrolling
         document.body.style.overflow = 'auto';
       }
     };
-    
+
     // Run on initial load
     handleInitialScrollPosition();
-    
+
     // Also run when page is resized (in case user resizes while scrolled down)
     window.addEventListener('resize', handleInitialScrollPosition);
-    
+
     return () => {
       window.removeEventListener('resize', handleInitialScrollPosition);
     };
@@ -107,10 +107,10 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const mediaWidth = 300 + expansionProgress * 1250;
   const mediaHeight = 400 + expansionProgress * 400;
   const textTranslateX = expansionProgress * 150;
-  
+
   // Entry animation positions (for sliding up from bottom)
   const entryTranslateY = initialPhase ? 100 - (entryProgress * 100) : 0;
-  
+
   // Media position based on exit progress (for scrolling up and off screen)
   const mediaTranslateY = -100 * exitProgress;
 
@@ -120,7 +120,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     : hasStartedExiting
     ? 100 - exitProgress * 100
     : 100;
-  
+
   const contentSectionsOpacity = contentSectionsVisible
     ? 1
     : hasStartedExiting
@@ -180,7 +180,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           } else if (scrollDelta < 0 && scrollTop <= 0) {
             e.preventDefault();
             setContentSectionsVisible(false);
-            setScrollProgress(EXIT_END); 
+            setScrollProgress(EXIT_END);
           } else {
             // Allow normal scrolling within the container
             return;
@@ -188,7 +188,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         }
         return;
       }
-      
+
       e.preventDefault();
 
       // 3. Main Animation Sequence (Entry -> Expand -> Stick -> Exit)
@@ -210,7 +210,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         }
 
         const newProgress = scrollProgress + scrollDelta * 0.0007; // Faster synchronized speed
-        
+
         if (newProgress >= EXIT_END) {
           setScrollProgress(EXIT_END);
           setContentSectionsVisible(true);
@@ -277,9 +277,9 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         touchStartY = touchY;
         return;
       }
-      
+
       e.preventDefault();
-      
+
       // 3. Main Animation Sequence (Entry -> Expand -> Stick -> Exit)
       if (initialPhase) {
         // Handle entry
@@ -299,7 +299,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         }
 
         const newProgress = scrollProgress + scrollDelta * 0.0007; // Faster synchronized speed
-        
+
         if (newProgress >= EXIT_END) {
           setScrollProgress(EXIT_END);
           setContentSectionsVisible(true);
@@ -314,13 +314,13 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       }
       touchStartY = touchY;
     };
-    
+
     // --- Add Listeners ---
     const options = { passive: false };
     window.addEventListener('wheel', handleWheel, options);
     window.addEventListener('touchstart', handleTouchStart, options);
     window.addEventListener('touchmove', handleTouchMove, options);
-    
+
     // --- Cleanup ---
     return () => {
       window.removeEventListener('wheel', handleWheel);
@@ -328,15 +328,15 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       window.removeEventListener('touchmove', handleTouchMove);
     };
   }, [
-    scrollProgress, 
-    scrollStarted, 
-    data.useScrollExpandMedia, 
+    scrollProgress,
+    scrollStarted,
+    data.useScrollExpandMedia,
     initialPhase,
     entryProgress,
     contentSectionsVisible,
     animationCompleted,
   ]);
-  
+
   // Effect to lock body scroll during animation
   useEffect(() => {
     if (!animationCompleted) {
@@ -359,7 +359,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           setVideoLoaded(true);
         } catch (err) {
           console.error('Video play failed:', err);
-          
+
           // Try again after a short delay
           setTimeout(async () => {
             try {
@@ -371,11 +371,11 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           }, 300);
         }
       };
-      
+
       playVideo();
     }
   }, [scrollStarted, data.expandMediaType]);
-  
+
   // Control navigation visibility based on scroll state
   useEffect(() => {
     // Create custom event for nav visibility
@@ -385,19 +385,19 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       });
       window.dispatchEvent(event);
     };
-    
+
     // Determine scroll direction
     const isScrollingUp = scrollProgress < previousScrollProgressRef.current;
-    
+
     // Function to check content section scroll direction
     const checkContentSectionScroll = () => {
       if (contentSectionsVisible && scrollableContainerRef.current) {
         const currentScrollTop = scrollableContainerRef.current.scrollTop;
         const isScrollingUpInContent = currentScrollTop < lastContentScrollTopRef.current;
-        
+
         // Update last scroll position
         lastContentScrollTopRef.current = currentScrollTop;
-        
+
         // Show navbar when scrolling up in content sections
         if (isScrollingUpInContent) {
           createNavVisibilityEvent(true);
@@ -406,11 +406,11 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         }
       }
     };
-    
+
     // Add scroll event listener to content sections container
     if (contentSectionsVisible && scrollableContainerRef.current) {
       scrollableContainerRef.current.addEventListener('scroll', checkContentSectionScroll);
-      
+
       // Clean up
       return () => {
         if (scrollableContainerRef.current) {
@@ -418,7 +418,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         }
       };
     }
-    
+
     // Initial state - show navbar
     if (initialPhase) {
       createNavVisibilityEvent(true);
@@ -443,23 +443,23 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     else if (animationCompleted) {
       createNavVisibilityEvent(true);
     }
-    
+
     // Update the previous scroll position after all checks
     previousScrollProgressRef.current = scrollProgress;
-    
+
   }, [initialPhase, entryProgress, hasStartedExiting, exitProgress, scrollProgress, contentSectionsVisible, animationCompleted, EXPAND_END, EXIT_END]);
-  
+
   // Handle navigation visibility for the main page scroll
   useEffect(() => {
     if (!animationCompleted) return;
-    
+
     // Track window scroll for the main page
     let lastWindowScrollY = window.scrollY;
-    
+
     const handleWindowScroll = () => {
       const currentScrollY = window.scrollY;
       const isScrollingUp = currentScrollY < lastWindowScrollY;
-      
+
       // Create custom event for nav visibility
       const createNavVisibilityEvent = (visible: boolean) => {
         const event = new CustomEvent('navVisibility', {
@@ -467,33 +467,33 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         });
         window.dispatchEvent(event);
       };
-      
+
       // Show navbar when scrolling up, hide when scrolling down
       if (isScrollingUp) {
         createNavVisibilityEvent(true);
       } else if (currentScrollY > 100) { // Only hide when scrolled down a bit
         createNavVisibilityEvent(false);
       }
-      
+
       lastWindowScrollY = currentScrollY;
     };
-    
+
     window.addEventListener('scroll', handleWindowScroll, { passive: true });
-    
+
     return () => {
       window.removeEventListener('scroll', handleWindowScroll);
     };
   }, [animationCompleted]);
-  
+
   // Calculate current media dimensions based on animation state
   const currentMediaWidth = mediaWidth;
-    
+
   const currentMediaHeight = mediaHeight;
 
   return (
     <div className="relative">
       {/* Hero Section with integrated content sections */}
-      <div 
+      <div
         ref={heroSectionRef}
         className="relative h-screen overflow-hidden"
       >
@@ -508,7 +508,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           />
           <div className="absolute inset-0 bg-black/30" />
         </div>
-        
+
         {/* Hero Content */}
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-white">
           {/* Initial instruction to scroll */}
@@ -524,7 +524,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               </p>
             </motion.div>
           )}
-          
+
           {/* Media Container */}
           {data.useScrollExpandMedia && (
             <motion.div
@@ -557,10 +557,10 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     disablePictureInPicture
                     disableRemotePlayback
                   />
-                  
+
                   {/* Poster Image */}
                   {(!scrollStarted || !videoLoaded) && data.expandPosterSrc && (
-                    <motion.div 
+                    <motion.div
                       className="absolute inset-0"
                       initial={{ opacity: 1 }}
                       animate={{ opacity: scrollStarted && videoLoaded ? 0 : 1 }}
@@ -575,13 +575,13 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                       />
                     </motion.div>
                   )}
-                  
+
                   {/* Overlay */}
                   <motion.div
                     className="absolute inset-0 bg-black/30 rounded-xl"
                     initial={{ opacity: 0.7 }}
-                    animate={{ 
-                      opacity: 0.5 - expansionProgress * 0.3 
+                    animate={{
+                      opacity: 0.5 - expansionProgress * 0.3
                     }}
                     transition={{ duration: 0.2 }}
                   />
@@ -594,26 +594,26 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     fill
                     className="w-full h-full object-cover rounded-xl"
                   />
-                  
+
                   <motion.div
                     className="absolute inset-0 bg-black/50 rounded-xl"
                     initial={{ opacity: 0.7 }}
-                    animate={{ 
-                      opacity: 0.7 - expansionProgress * 0.3 
+                    animate={{
+                      opacity: 0.7 - expansionProgress * 0.3
                     }}
                     transition={{ duration: 0.2 }}
                   />
                 </div>
               )}
-              
+
               {/* Media Text */}
               <div className="flex flex-col items-center text-center relative z-10 mt-4 transition-none">
                 {data.expandSubtitle && (
                   <motion.p
                     className="text-2xl text-blue-200"
-                    style={{ 
-                      transform: initialPhase 
-                        ? `translateY(${entryTranslateY * 0.5}vh)` 
+                    style={{
+                      transform: initialPhase
+                        ? `translateY(${entryTranslateY * 0.5}vh)`
                         : `translateX(-${textTranslateX}vw)`,
                       opacity: initialPhase ? entryProgress : 1
                     }}
@@ -645,24 +645,24 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               </div>
             </motion.div>
           )}
-          
+
           {/* Title Animation for ScrollExpandMedia */}
           {data.useScrollExpandMedia && (
             <motion.div
               className="flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col mix-blend-difference"
               style={{
                 opacity: initialPhase ? entryProgress : (1 - exitProgress),
-                transform: initialPhase 
-                  ? `translateY(${entryTranslateY * 0.5}vh)` 
+                transform: initialPhase
+                  ? `translateY(${entryTranslateY * 0.5}vh)`
                   : 'none',
                 display: (scrollProgress >= EXIT_END || animationCompleted) ? 'none' : 'flex'
               }}
             >
               <motion.h2
                 className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none"
-                style={{ 
-                  transform: !initialPhase 
-                    ? `translateX(-${textTranslateX}vw)` 
+                style={{
+                  transform: !initialPhase
+                    ? `translateX(-${textTranslateX}vw)`
                     : 'none'
                 }}
               >
@@ -670,9 +670,9 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               </motion.h2>
               <motion.h2
                 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none"
-                style={{ 
-                  transform: !initialPhase 
-                    ? `translateX(${textTranslateX}vw)` 
+                style={{
+                  transform: !initialPhase
+                    ? `translateX(${textTranslateX}vw)`
                     : 'none'
                 }}
               >
@@ -680,7 +680,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               </motion.h2>
             </motion.div>
           )}
-          
+
           {/* Regular Hero Content (visible when ScrollExpandMedia is disabled or media has exited) */}
           {(!data.useScrollExpandMedia || (scrollProgress >= EXIT_END && !contentSectionsVisible)) && (
             <div className="text-center px-4">
@@ -691,7 +691,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                 {data.heroSubheading}
               </p>
               {scrollProgress >= EXIT_END && !contentSectionsVisible && (
-                <motion.p 
+                <motion.p
                   className="text-blue-200 mt-8 animate-bounce"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -702,7 +702,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               )}
             </div>
           )}
-          
+
           {/* Integrated Content Sections */}
           <motion.div
             ref={scrollableContainerRef}
@@ -716,16 +716,16 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               overscrollBehavior: animationCompleted ? 'auto' : 'contain',
             }}
           >
-            <div 
+            <div
               ref={contentSectionsRef}
               className="relative"
             >
               {data.contentSections?.map((section, index) => (
-                <ContentSection 
-                  key={section._key} 
-                  section={section} 
-                  index={index} 
-                  scrollYProgress={scrollYProgress} 
+                <ContentSection
+                  key={section._key}
+                  section={section}
+                  index={index}
+                  scrollYProgress={scrollYProgress}
                 />
               ))}
             </div>
@@ -737,11 +737,11 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
 };
 
 // Content Section Component (original scrolling homepage logic)
-const ContentSection = ({ 
-  section, 
-  index, 
-  scrollYProgress 
-}: { 
+const ContentSection = ({
+  section,
+  index,
+  scrollYProgress
+}: {
   section: SanityContentSection;
   index: number;
   scrollYProgress: any;
@@ -777,8 +777,8 @@ const ContentSection = ({
           {section.text && <PortableText value={section.text} />}
         </div>
         {section.buttonText && section.buttonLink && (
-          <a 
-            href={section.buttonLink} 
+          <a
+            href={section.buttonLink}
             className='mt-8 inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
           >
             {section.buttonText}
@@ -789,4 +789,4 @@ const ContentSection = ({
   );
 };
 
-export default IntegratedHomepage; 
+export default IntegratedHomepage;

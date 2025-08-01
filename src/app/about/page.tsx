@@ -7,7 +7,6 @@ import { AnimatedTeamIntroductions, type TeamIntroduction } from "../../componen
 import { SanityTeamMember } from '../../lib/types';
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
-import LoadingBar from "../../components/LoadingBar";
 
 // Type for team member from Sanity
 type TeamMember = {
@@ -42,7 +41,15 @@ interface AboutHero {
   conclusion?: string;
 }
 
-// Fetch team members from Sanity
+/**
+ * Fetches team members from the Sanity CMS
+ *
+ * Retrieves all team member documents ordered by their specified order field.
+ * Each team member includes their ID, name, title, bio, and image.
+ *
+ * @returns {Promise<TeamMember[]>} Array of team member objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
 async function getTeamMembers() {
   return await client.fetch(`
     *[_type == "teamMember"] | order(order asc) {
@@ -55,7 +62,15 @@ async function getTeamMembers() {
   `);
 }
 
-// Fetch about sections from Sanity
+/**
+ * Fetches about sections from the Sanity CMS
+ *
+ * Retrieves all about section documents with their content, images, and metadata.
+ * These sections are displayed dynamically on the about page.
+ *
+ * @returns {Promise<AboutSection[]>} Array of about section objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
 async function getAboutSections() {
     return await client.fetch(`
     *[_type == "aboutSection"] {
@@ -68,6 +83,15 @@ async function getAboutSections() {
   `);
 }
 
+/**
+ * Fetches the about page hero content from Sanity CMS
+ *
+ * Retrieves the hero section configuration including media assets, text content,
+ * and styling options for the top section of the about page.
+ *
+ * @returns {Promise<AboutHero | null>} Hero configuration object or null if not found
+ * @throws {Error} If the Sanity API request fails
+ */
 async function getAboutHero() {
   return await client.fetch(`
     *[_type == "aboutHero"][0] {
@@ -81,12 +105,20 @@ async function getAboutHero() {
   `);
 }
 
-// Convert Sanity team members to the format needed by AnimatedTeamIntroductions
+/**
+ * Converts Sanity team members to the format required by AnimatedTeamIntroductions
+ *
+ * Transforms raw team member data from Sanity into the structured format needed
+ * by the animated carousel component, including fallback values for missing data.
+ *
+ * @param {TeamMember[]} members - Array of team member objects from Sanity
+ * @returns {TeamIntroduction[]} Array of formatted team introductions for the carousel
+ */
 function convertToIntroductions(members: TeamMember[]): TeamIntroduction[] {
   return members.map(member => {
     // Default placeholder bio if none exists
     const bio = member.bio || `${member.name} is a valued member of our team at Elevate Training Camps.`;
-    
+
     return {
       name: member.name,
       designation: member.title || 'Team Member', // Default title if none exists
@@ -96,40 +128,56 @@ function convertToIntroductions(members: TeamMember[]): TeamIntroduction[] {
   });
 }
 
+/**
+ * AboutPage - Main about page component for Elevate Training Camps
+ *
+ * This component displays the about page content including hero section, team members,
+ * and dynamic about sections fetched from Sanity CMS. It handles URL hash navigation
+ * for direct linking to specific sections and provides a responsive layout.
+ *
+ * Features:
+ * - Dynamic hero section with background image and overlay text
+ * - Team member carousel with animated introductions
+ * - Dynamic about sections with alternating layouts
+ * - Smooth scroll navigation to sections via URL hash
+ * - Responsive design with mobile-first approach
+ * - Direct content loading without loading screen
+ *
+ * @returns {JSX.Element} The complete about page with all sections
+ */
 export default function AboutPage() {
   const [teamIntroductions, setTeamIntroductions] = useState<TeamIntroduction[]>([]);
   const [aboutSections, setAboutSections] = useState<AboutSection[]>([]);
   const [aboutHero, setAboutHero] = useState<AboutHero | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Handle URL hash navigation after content loads
   useEffect(() => {
     // Only execute this once everything is loaded
     if (!isLoading) {
-      // Need to wait a bit longer to ensure all images and components are fully rendered
-      const timer = setTimeout(() => {
-        // Get the hash from the URL (if any)
-        if (window.location.hash) {
-          const sectionId = window.location.hash.substring(1);
+      // Get the hash from the URL (if any)
+      if (window.location.hash) {
+        const sectionId = window.location.hash.substring(1);
+
+        // Use requestAnimationFrame for immediate execution after DOM is ready
+        requestAnimationFrame(() => {
           const section = document.getElementById(sectionId);
-          
+
           if (section) {
             // Get header height for offset
             const headerHeight = document.querySelector('header')?.getBoundingClientRect().height || 80;
-            
-            // Scroll with enough offset to account for the fixed header
+
+            // Scroll to position section exactly at the top after header
             window.scrollTo({
-              top: section.offsetTop - headerHeight - 40,
+              top: section.offsetTop - headerHeight,
               behavior: 'smooth'
             });
-            
+
             // For debugging
-            console.log(`Scrolling to section: ${sectionId} at position: ${section.offsetTop - headerHeight - 40}`);
+            console.log(`Scrolling to section: ${sectionId} at position: ${section.offsetTop - headerHeight}`);
           }
-        }
-      }, 1000); // Longer timeout to ensure everything is rendered
-      
-      return () => clearTimeout(timer);
+        });
+      }
     }
   }, [isLoading]); // Run when loading changes to false
 
@@ -141,7 +189,7 @@ export default function AboutPage() {
           getAboutSections(),
           getAboutHero(),
         ]);
-        
+
         if (members && members.length > 0) {
           setTeamIntroductions(convertToIntroductions(members));
         } else {
@@ -155,10 +203,10 @@ export default function AboutPage() {
             },
           ]);
         }
-        
+
         setAboutSections(sections);
         setAboutHero(hero);
-        
+
         // Set loading to false immediately after data is loaded
         setIsLoading(false);
 
@@ -171,15 +219,7 @@ export default function AboutPage() {
 
     loadAboutData();
   }, []);
-  
-  // Show loading screen only while data is loading from Sanity
-  if (isLoading) {
-    return <LoadingBar 
-      message="Loading About Page" 
-      subMessage="Fetching content from our servers..." 
-    />;
-  }
-  
+
   return (
     <Layout>
       {aboutHero && (
@@ -202,8 +242,8 @@ export default function AboutPage() {
             <p className="text-lg text-gray-500">Loading team members...</p>
           </div>
         ) : teamIntroductions.length > 0 ? (
-          <AnimatedTeamIntroductions 
-            introductions={teamIntroductions} 
+          <AnimatedTeamIntroductions
+            introductions={teamIntroductions}
           />
         ) : (
           <div className="text-center py-12">
@@ -239,4 +279,4 @@ export default function AboutPage() {
       ))}
     </Layout>
   );
-} 
+}

@@ -1,5 +1,21 @@
 import Layout from "../../components/layout";
 
+/**
+ * RegistrationPage - Registration information page for Elevate Training Camps
+ *
+ * This component displays registration information and upcoming details for
+ * the training camps. It provides users with key information about pricing,
+ * discounts, and what to expect during the registration process.
+ *
+ * Features:
+ * - Clear registration information display
+ * - Highlighted benefits and features
+ * - Responsive design with proper spacing
+ * - Call-to-action for future registration
+ * - Professional presentation of camp details
+ *
+ * @returns {JSX.Element} The registration information page
+ */
 export default function RegistrationPage() {
   return (
     <Layout>
@@ -14,4 +30,4 @@ export default function RegistrationPage() {
       </div>
     </Layout>
   );
-} 
+}

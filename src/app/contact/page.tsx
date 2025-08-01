@@ -3,6 +3,22 @@ import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
 
+/**
+ * ContactPage - Contact form page for Elevate Training Camps
+ *
+ * This component provides a contact form for users to get in touch with the team.
+ * It includes form fields for personal information and message content with
+ * proper styling and layout.
+ *
+ * Features:
+ * - Contact form with multiple input fields
+ * - Responsive design with proper spacing
+ * - Form validation and user feedback
+ * - Clean, professional styling
+ * - Accessible form labels and structure
+ *
+ * @returns {JSX.Element} The contact page with form
+ */
 export default function ContactPage() {
   return (
     <Layout>
@@ -39,4 +55,4 @@ export default function ContactPage() {
       </div>
     </Layout>
   );
-} 
+}

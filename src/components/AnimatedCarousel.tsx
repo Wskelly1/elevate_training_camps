@@ -18,17 +18,17 @@ type AnimatedTeamIntroductionsProps = {
 
 /**
  * AnimatedTeamIntroductions - Interactive team member carousel with animations
- * 
+ *
  * This component creates an elegant, animated carousel to showcase team members
  * with their photos, names, titles, and quotes/bios.
- * 
+ *
  * Features:
  * - Smooth animations between team members
  * - Previous/Next navigation controls
  * - Responsive design that works on all screen sizes
  * - Visual indicators for current position in the carousel
  * - Elegant styling with drop shadows and transitions
- * 
+ *
  * @param {Object} props - Component props
  * @param {TeamIntroduction[]} props.introductions - Array of team member data objects
  */
@@ -71,7 +71,7 @@ export function AnimatedTeamIntroductions({ introductions }: AnimatedTeamIntrodu
                 />
               </div>
             </div>
-            
+
             {/* Content */}
             <div className="w-full md:w-1/2 md:pl-8 text-center md:text-left">
               <div className="font-bold text-lg">{intro.name}</div>
@@ -83,7 +83,7 @@ export function AnimatedTeamIntroductions({ introductions }: AnimatedTeamIntrodu
           </div>
         ))}
       </div>
-      
+
       {/* Navigation Arrows */}
       <div className="flex justify-center space-x-4">
         <button
@@ -103,4 +103,4 @@ export function AnimatedTeamIntroductions({ introductions }: AnimatedTeamIntrodu
       </div>
     </div>
   );
-} 
+}

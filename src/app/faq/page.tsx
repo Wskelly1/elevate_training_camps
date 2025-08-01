@@ -65,7 +65,7 @@ export default function FAQPage() {
   return (
     <Layout>
       {/* Top colored box with heading and intro, full width */}
-      <div className="bg-muted rounded-none px-8 pt-40 pb-20 mb-10 w-full">
+      <div className="bg-muted rounded-none px-8 pt-40 pb-8 mb-10 w-full">
         <div className="container mx-auto flex items-center">
           <div className="w-1/2">
             <h1 className="text-4xl font-bold mb-4">{settings.title || 'Frequently Asked Questions'}</h1>
@@ -113,4 +113,4 @@ export default function FAQPage() {
       </div>
     </Layout>
   );
-} 
+}

@@ -1,5 +1,21 @@
 import Layout from "../../components/layout";
 
+/**
+ * MediaPage - Media gallery page for Elevate Training Camps
+ *
+ * This component displays photos and videos from past training camps, allowing
+ * users to see the experience and atmosphere of the camps. It showcases the
+ * beautiful Flagstaff scenery and camp activities.
+ *
+ * Features:
+ * - Media gallery with photos and videos
+ * - Descriptive content for each media item
+ * - Responsive design with proper spacing
+ * - Showcase of camp activities and scenery
+ * - Professional presentation of media content
+ *
+ * @returns {JSX.Element} The media gallery page
+ */
 export default function MediaPage() {
   return (
     <Layout>
@@ -14,4 +30,4 @@ export default function MediaPage() {
       </div>
     </Layout>
   );
-} 
+}

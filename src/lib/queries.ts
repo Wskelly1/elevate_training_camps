@@ -1,7 +1,23 @@
 import { client } from './sanity'
 import { groq } from 'next-sanity';
 
-// Type for site settings
+/**
+ * SiteSettings - Type definition for site configuration data
+ *
+ * This type defines the structure of site settings data retrieved from Sanity CMS,
+ * including branding elements, contact information, and social media links.
+ *
+ * @property {string} title - The main site title
+ * @property {string} [description] - Optional site description
+ * @property {any} [logo] - Main site logo image
+ * @property {any} [footerLogo] - Footer-specific logo image
+ * @property {any} [aboutUsImage] - Image for the about us section
+ * @property {any} [favicon] - Site favicon
+ * @property {string} [contactEmail] - Contact email address
+ * @property {string} [contactPhone] - Contact phone number
+ * @property {string} [address] - Physical address
+ * @property {Array<{platform: string, url: string}>} [socialLinks] - Social media links
+ */
 export type SiteSettings = {
   title: string;
   description?: string;
@@ -18,7 +34,15 @@ export type SiteSettings = {
   }>;
 }
 
-// Fetch site settings
+/**
+ * Fetches site settings from Sanity CMS
+ *
+ * Retrieves the main site configuration including branding, contact information,
+ * and social media links. Returns default values if no settings are found.
+ *
+ * @returns {Promise<SiteSettings>} Site settings object with branding and contact info
+ * @throws {Error} If the Sanity API request fails
+ */
 export async function getSiteSettings(): Promise<SiteSettings> {
   // Get the first (and only) site settings document
   const settings = await client.fetch(`
@@ -50,13 +74,21 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       }
     }
   `);
-  
+
   return settings || {
     title: 'Summit Flagstaff',
   };
 }
 
-// Fetch team members
+/**
+ * Fetches team members from Sanity CMS
+ *
+ * Retrieves all team member documents ordered by their specified order field.
+ * Each team member includes their ID, name, title, bio, and image.
+ *
+ * @returns {Promise<Array>} Array of team member objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
 export async function getTeamMembers() {
   return await client.fetch(`
     *[_type == "teamMember"] | order(order asc) {
@@ -67,9 +99,17 @@ export async function getTeamMembers() {
       image
     }
   `);
-} 
+}
 
-// Fetch home hero data
+/**
+ * Fetches home hero data from Sanity CMS
+ *
+ * Retrieves the hero section configuration for the homepage including media assets,
+ * text content, and styling options.
+ *
+ * @returns {Promise<Object>} Hero configuration object or null if not found
+ * @throws {Error} If the Sanity API request fails
+ */
 export async function getHomeHero() {
   return await client.fetch(`
     *[_type == "homeHero"][0] {
@@ -89,6 +129,14 @@ export async function getHomeHero() {
   `);
 }
 
+/**
+ * Homepage query for Sanity CMS
+ *
+ * GROQ query that retrieves all homepage content including hero section,
+ * testimonials, and content sections. This is the main query for the homepage.
+ *
+ * @type {string} GROQ query string for homepage data
+ */
 export const homePageQuery = groq`
   *[_type == "homePage"][0] {
     _id,
@@ -156,4 +204,4 @@ export const homePageQuery = groq`
       buttonLink
     }
   }
-`; 
+`;
