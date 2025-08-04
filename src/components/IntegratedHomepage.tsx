@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { SanityHomePage, SanityContentSection } from '../lib/types';
@@ -54,6 +54,28 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Force scroll to top on component mount/page load - using useLayoutEffect for immediate execution
+  useLayoutEffect(() => {
+    // Reset to top of page on load - this runs synchronously before browser paint
+    window.scrollTo(0, 0);
+
+    // Reset all scroll-related states
+    setInitialPhase(true);
+    setVideoExpanded(false);
+    setScrollProgress(0);
+    setVirtualScrollY(0);
+    setCanScrollPage(false);
+
+    // Also handle beforeunload to store position state
+    const handleBeforeUnload = () => {
+      // This ensures the next page load starts fresh
+      sessionStorage.removeItem('scrollPosition');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
   // Handle wheel and touch events to control scrolling
