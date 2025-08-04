@@ -318,18 +318,22 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
 
   // Video dimensions based on scroll progress
   const navBarHeight = 80; // Approximate height of nav bar
+  const navBarMargin = 16; // Top margin (4 units = 16px)
+  const totalNavSpace = navBarHeight + navBarMargin; // Total space taken by navbar
   const sideMargin = 32; // Side margins
-  const topMargin = 48; // Top margin
+  const topMargin = 48 + totalNavSpace; // Top margin including navbar space
   const bottomMargin = 32; // Bottom margin
 
-  const maxVideoWidth = windowDimensions.width - (sideMargin * 2);
-  const maxVideoHeight = windowDimensions.height - navBarHeight - topMargin - bottomMargin;
+  // Calculate maximum dimensions while maintaining aspect ratio
+  const aspectRatio = 16 / 9; // Standard 16:9 video aspect ratio
+  const maxVideoWidth = Math.min(windowDimensions.width - (sideMargin * 2), windowDimensions.height * aspectRatio * 0.8);
+  const maxVideoHeight = maxVideoWidth / aspectRatio;
 
-  // Calculate video dimensions
-  const initialVideoWidth = 300;
-  const initialVideoHeight = 400;
+  // Calculate video dimensions maintaining aspect ratio
+  const initialVideoWidth = 320;
+  const initialVideoHeight = initialVideoWidth / aspectRatio; // Approx 180 for 16:9
   const videoWidth = initialVideoWidth + (scrollProgress * (maxVideoWidth - initialVideoWidth));
-  const videoHeight = initialVideoHeight + (scrollProgress * (maxVideoHeight - initialVideoHeight));
+  const videoHeight = videoWidth / aspectRatio; // Maintain aspect ratio
 
   // Text animation based on scroll progress
   const textTranslateX = scrollProgress * 150;
@@ -347,6 +351,9 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         .hero-section {
           height: 100vh; /* Just 100vh for the hero section */
           position: relative;
+        }
+        .video-container {
+          padding-top: ${totalNavSpace}px; /* Add padding to account for navbar */
         }
       `}</style>
       <div ref={containerRef} className="relative">
@@ -367,7 +374,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
             </div>
 
             {/* Layer 2: All content that appears over the background */}
-            <div className="relative z-10 h-full flex flex-col items-center justify-center">
+            <div className="relative z-10 h-full flex flex-col items-center justify-center video-container">
               {/* Initial Hero Text - visible before scroll */}
               {initialPhase && (
                 <div className="text-center px-4 text-white pointer-events-none">
@@ -401,6 +408,11 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                       width: videoWidth,
                       height: videoHeight,
                       overflow: 'hidden',
+                      top: `calc(50% + ${totalNavSpace/2}px)`, // Center vertically, adjusted for navbar
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      maxWidth: '90vw', // Ensure it doesn't go beyond screen width
+                      maxHeight: `calc(90vh - ${totalNavSpace}px)`, // Ensure it doesn't go beyond screen height minus navbar
                     }}
                   >
                     {data.expandMediaType === 'video' ? (
