@@ -13,20 +13,15 @@ interface IntegratedHomepageProps {
 
 /**
  * IntegratedHomepage - Advanced interactive homepage component with scroll animations
- *
- * This component creates a dynamic, scroll-driven homepage experience with:
- * - Full-screen background image
- * - Video that expands on scroll
- * - Static content sections below
  */
 const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   // Animation states
-  const [initialPhase, setInitialPhase] = useState<boolean>(true); // Initial phase (video not visible yet)
-  const [videoExpanded, setVideoExpanded] = useState<boolean>(false); // Whether video has reached full screen
-  const [videoLoaded, setVideoLoaded] = useState<boolean>(false); // Whether video has loaded
-  const [scrollProgress, setScrollProgress] = useState<number>(0); // 0 to 1 for video expansion
-  const [canScrollPage, setCanScrollPage] = useState<boolean>(false); // Whether regular page scrolling is enabled
-  const [virtualScrollY, setVirtualScrollY] = useState<number>(0); // Virtual scroll position
+  const [initialPhase, setInitialPhase] = useState<boolean>(true);
+  const [videoExpanded, setVideoExpanded] = useState<boolean>(false);
+  const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const [canScrollPage, setCanScrollPage] = useState<boolean>(false);
+  const [virtualScrollY, setVirtualScrollY] = useState<number>(0);
 
   // Refs
   const heroSectionRef = useRef<HTMLDivElement>(null);
@@ -34,17 +29,17 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentSectionRef = useRef<HTMLDivElement>(null);
 
-  // Window dimensions for responsive sizing
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0
-  });
-
   // Track last scroll position for direction detection
   const prevScrollY = useRef(0);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
   const navDebounceTimer = useRef<NodeJS.Timeout | null>(null);
   const lastNavVisibility = useRef(true);
+
+  // Window dimensions for responsive sizing
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0
+  });
 
   // Function to emit custom event for navbar visibility
   const updateNavVisibility = (visible: boolean) => {
@@ -79,7 +74,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         // For showing navbar (scrolling up), debounce to prevent flicker
         navDebounceTimer.current = setTimeout(() => {
           updateNavVisibility(true);
-        }, 150); // Short delay before showing navbar
+        }, 150);
       }
     } else if (scrollY <= 60) {
       // Always show navbar at the top of the page
@@ -89,6 +84,16 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
 
     // Update previous scroll position
     prevScrollY.current = scrollY;
+  };
+
+  // Add explicit check for control elements to prevent scroll handling from interfering
+  const isControlElement = (element: HTMLElement | null): boolean => {
+    if (!element) return false;
+    return element.tagName === 'VIDEO' ||
+           element.classList.contains('video-control') ||
+           element.closest('video') !== null ||
+           element.tagName === 'BUTTON' ||
+           element.tagName === 'INPUT';
   };
 
   // Update window dimensions on resize
@@ -134,6 +139,11 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     let ticking = false;
 
     const handleWheelEvent = (e: WheelEvent) => {
+      // Don't interfere with video controls
+      if (isControlElement(e.target as HTMLElement)) {
+        return;
+      }
+
       if (!canScrollPage && !videoExpanded) {
         e.preventDefault();
 
@@ -150,10 +160,6 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         if (progress >= 1 && !videoExpanded) {
           setVideoExpanded(true);
           setCanScrollPage(true);
-          if (videoRef.current) {
-            videoRef.current.play().catch(err => console.error('Video play failed:', err));
-          }
-          // Reset scroll position to top of page when video is fully expanded
           window.scrollTo(0, 0);
           updateNavVisibility(true);
         }
@@ -211,10 +217,17 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     let ticking = false;
 
     const handleTouchStart = (e: TouchEvent) => {
+      if (isControlElement(e.target as HTMLElement)) {
+        return;
+      }
       touchStartY = e.touches[0].clientY;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      if (isControlElement(e.target as HTMLElement)) {
+        return;
+      }
+
       if (!canScrollPage && !videoExpanded) {
         // Calculate touch movement
         const touchY = e.touches[0].clientY;
@@ -234,10 +247,6 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         if (progress >= 1 && !videoExpanded) {
           setVideoExpanded(true);
           setCanScrollPage(true);
-          if (videoRef.current) {
-            videoRef.current.play().catch(err => console.error('Video play failed:', err));
-          }
-          // Reset scroll position to top of page when video is fully expanded
           window.scrollTo(0, 0);
           updateNavVisibility(true);
         }
@@ -296,23 +305,32 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     };
   }, []);
 
-  // Preload video
+  // Preload video - with better error handling
   useEffect(() => {
     if (videoRef.current && data.expandMediaType === 'video' && data.expandMediaSrc?.asset.url) {
-      videoRef.current.preload = 'auto';
-      videoRef.current.load();
+      try {
+        videoRef.current.preload = 'auto';
+        videoRef.current.load();
 
-      const handleCanPlayThrough = () => {
-        setVideoLoaded(true);
-      };
+        const handleCanPlayThrough = () => {
+          setVideoLoaded(true);
+          console.log('Video preloaded successfully');
+        };
 
-      videoRef.current.addEventListener('canplaythrough', handleCanPlayThrough, { once: true });
+        videoRef.current.addEventListener('canplaythrough', handleCanPlayThrough, { once: true });
 
-      return () => {
-        if (videoRef.current) {
-          videoRef.current.removeEventListener('canplaythrough', handleCanPlayThrough);
-        }
-      };
+        return () => {
+          if (videoRef.current) {
+            try {
+              videoRef.current.removeEventListener('canplaythrough', handleCanPlayThrough);
+            } catch (err) {
+              console.error('Error removing canplaythrough listener:', err);
+            }
+          }
+        };
+      } catch (err) {
+        console.error('Error preloading video:', err);
+      }
     }
   }, [data.expandMediaType, data.expandMediaSrc?.asset.url]);
 
@@ -356,6 +374,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           padding-top: ${totalNavSpace}px; /* Add padding to account for navbar */
         }
       `}</style>
+
       <div ref={containerRef} className="relative">
         {/* Hero Section */}
         <div className="hero-section" ref={heroSectionRef}>
@@ -416,35 +435,38 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     }}
                   >
                     {data.expandMediaType === 'video' ? (
-                      <div className="relative w-full h-full pointer-events-none overflow-hidden rounded-xl">
+                      <div className="relative w-full h-full overflow-hidden rounded-xl">
                         <video
                           ref={videoRef}
                           src={data.expandMediaSrc?.asset.url}
                           poster={data.expandPosterSrc ? urlFor(data.expandPosterSrc).url() : undefined}
-                          muted
+                          muted={!videoExpanded} // Only muted until expanded
                           loop
                           playsInline
                           preload="auto"
+                          autoPlay={videoExpanded} // Autoplay when expanded
+                          controls={videoExpanded} // Show native controls when expanded
                           className={`w-full h-full object-cover rounded-xl ${
                             videoExpanded ? 'opacity-100' : 'opacity-80'
                           }`}
-                          controls={false}
-                          disablePictureInPicture
-                          disableRemotePlayback
+                          disablePictureInPicture={false}
+                          disableRemotePlayback={false}
                           style={{
                             objectFit: 'cover',
                             transition: 'opacity 0.3s ease-in-out',
                           }}
                         />
                         <div
-                          className="absolute inset-0 bg-black/30 rounded-xl"
+                          className="absolute inset-0 bg-black/30 rounded-xl pointer-events-none"
                           style={{
                             opacity: 0.5 - scrollProgress * 0.3,
                             transition: 'opacity 0.1s ease-out',
+                            display: videoExpanded ? 'none' : 'block', // Hide overlay when video is expanded
                           }}
                         />
                       </div>
                     ) : (
+                      // Existing image rendering code...
                       <div className="relative w-full h-full">
                         <Image
                           src={urlFor(data.expandMediaImage || data.heroImage).url()}
@@ -463,7 +485,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     )}
 
                     {/* Text on top of the media */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white z-20">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white z-20 pointer-events-none">
                       {data.expandSubtitle && (
                         <p
                           className="text-2xl text-blue-200"
@@ -488,7 +510,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                           {data.scrollToExpandText}
                         </p>
                       )}
-                      {videoExpanded && (
+                      {videoExpanded && data.expandMediaType !== 'video' && (
                         <p className="text-blue-200 font-medium text-center animate-pulse">
                           Continue scrolling to explore
                         </p>
