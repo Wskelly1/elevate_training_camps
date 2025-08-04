@@ -40,6 +40,57 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     height: typeof window !== 'undefined' ? window.innerHeight : 0
   });
 
+  // Track last scroll position for direction detection
+  const prevScrollY = useRef(0);
+  const [isScrollingDown, setIsScrollingDown] = useState(false);
+  const navDebounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const lastNavVisibility = useRef(true);
+
+  // Function to emit custom event for navbar visibility
+  const updateNavVisibility = (visible: boolean) => {
+    // Only dispatch if there's a change to avoid unnecessary events
+    if (lastNavVisibility.current !== visible) {
+      const event = new CustomEvent('navVisibility', {
+        detail: { visible }
+      });
+      window.dispatchEvent(event);
+      lastNavVisibility.current = visible;
+    }
+  };
+
+  // Debounced scroll direction handler
+  const handleScrollDirectionChange = (scrollY: number) => {
+    // Clear existing timer
+    if (navDebounceTimer.current) {
+      clearTimeout(navDebounceTimer.current);
+    }
+
+    // Get scroll direction
+    const currentIsScrollingDown = scrollY > prevScrollY.current;
+
+    // Only update if direction changed and we're not at the very top
+    if (currentIsScrollingDown !== isScrollingDown && scrollY > 60) {
+      setIsScrollingDown(currentIsScrollingDown);
+
+      // For hiding the navbar (scrolling down), apply immediately
+      if (currentIsScrollingDown) {
+        updateNavVisibility(false);
+      } else {
+        // For showing navbar (scrolling up), debounce to prevent flicker
+        navDebounceTimer.current = setTimeout(() => {
+          updateNavVisibility(true);
+        }, 150); // Short delay before showing navbar
+      }
+    } else if (scrollY <= 60) {
+      // Always show navbar at the top of the page
+      updateNavVisibility(true);
+      setIsScrollingDown(false);
+    }
+
+    // Update previous scroll position
+    prevScrollY.current = scrollY;
+  };
+
   // Update window dimensions on resize
   useEffect(() => {
     const handleResize = () => {
@@ -80,7 +131,6 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
 
   // Handle wheel and touch events to control scrolling
   useEffect(() => {
-    let lastScrollY = 0;
     let ticking = false;
 
     const handleWheelEvent = (e: WheelEvent) => {
@@ -105,11 +155,22 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           }
           // Reset scroll position to top of page when video is fully expanded
           window.scrollTo(0, 0);
+          updateNavVisibility(true);
         }
 
         // Update initial phase
         if (initialPhase && newVirtualScrollY > 10) {
           setInitialPhase(false);
+        }
+      } else if (canScrollPage) {
+        // When regular scrolling is enabled, handle nav visibility
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const currentScrollY = window.scrollY;
+            handleScrollDirectionChange(currentScrollY);
+            ticking = false;
+          });
+          ticking = true;
         }
       }
     };
@@ -120,14 +181,12 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
 
-          // If we're in the initial video expansion phase, we don't do anything
           if (canScrollPage) {
-            // Normal scrolling behavior after video is expanded
+            handleScrollDirectionChange(currentScrollY);
           }
 
           ticking = false;
         });
-
         ticking = true;
       }
     };
@@ -140,12 +199,16 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     return () => {
       window.removeEventListener('wheel', handleWheelEvent);
       window.removeEventListener('scroll', handleScrollEvent);
+      if (navDebounceTimer.current) {
+        clearTimeout(navDebounceTimer.current);
+      }
     };
-  }, [initialPhase, videoExpanded, canScrollPage, virtualScrollY, windowDimensions.height]);
+  }, [initialPhase, videoExpanded, canScrollPage, virtualScrollY, windowDimensions.height, isScrollingDown]);
 
   // Handle touch events for mobile
   useEffect(() => {
     let touchStartY = 0;
+    let ticking = false;
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY;
@@ -176,6 +239,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           }
           // Reset scroll position to top of page when video is fully expanded
           window.scrollTo(0, 0);
+          updateNavVisibility(true);
         }
 
         // Update initial phase
@@ -185,18 +249,52 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
 
         // Prevent default to disable page scrolling during expansion
         e.preventDefault();
+      } else if (canScrollPage) {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const currentScrollY = window.scrollY;
+            handleScrollDirectionChange(currentScrollY);
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (canScrollPage) {
+        // Handle any scroll momentum after touch ends
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const currentScrollY = window.scrollY;
+            handleScrollDirectionChange(currentScrollY);
+            ticking = false;
+          });
+          ticking = true;
+        }
       }
     };
 
     // Add touch event listeners
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [initialPhase, videoExpanded, canScrollPage, virtualScrollY, windowDimensions.height]);
+  }, [initialPhase, videoExpanded, canScrollPage, virtualScrollY, windowDimensions.height, isScrollingDown]);
+
+  // Force navbar to be visible initially
+  useEffect(() => {
+    updateNavVisibility(true);
+    return () => {
+      // Make sure navbar is visible when component unmounts
+      updateNavVisibility(true);
+    };
+  }, []);
 
   // Preload video
   useEffect(() => {
