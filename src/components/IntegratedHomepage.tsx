@@ -89,11 +89,23 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   // Add explicit check for control elements to prevent scroll handling from interfering
   const isControlElement = (element: HTMLElement | null): boolean => {
     if (!element) return false;
-    return element.tagName === 'VIDEO' ||
-           element.classList.contains('video-control') ||
-           element.closest('video') !== null ||
-           element.tagName === 'BUTTON' ||
-           element.tagName === 'INPUT';
+
+    // Check if element is a navigation link or control
+    const isNavLink = element.tagName === 'A' ||
+                     element.closest('a') !== null ||
+                     element.closest('[role="menuitem"]') !== null ||
+                     element.closest('[data-radix-navigation-menu-item]') !== null;
+
+    const isVideoControl = element.tagName === 'VIDEO' ||
+                          element.classList.contains('video-control') ||
+                          element.closest('video') !== null ||
+                          element.tagName === 'BUTTON' ||
+                          element.tagName === 'INPUT';
+
+    const isHeaderElement = element.closest('header') !== null ||
+                           element.closest('[role="banner"]') !== null;
+
+    return isNavLink || isVideoControl || isHeaderElement;
   };
 
   // Update window dimensions on resize
@@ -139,7 +151,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     let ticking = false;
 
     const handleWheelEvent = (e: WheelEvent) => {
-      // Don't interfere with video controls
+      // Don't interfere with navigation or controls
       if (isControlElement(e.target as HTMLElement)) {
         return;
       }
@@ -211,6 +223,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     let lastTouchY = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
+      // Don't interfere with navigation or controls
       if (isControlElement(e.target as HTMLElement)) {
         return;
       }
@@ -219,6 +232,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      // Don't interfere with navigation or controls
       if (isControlElement(e.target as HTMLElement)) {
         return;
       }
@@ -386,16 +400,6 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                   <p className="text-xl md:text-2xl max-w-2xl mx-auto">
                     An elevated training experience for all athletes
                   </p>
-                  <motion.div
-                    className="absolute bottom-10 left-0 right-0 text-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <p className="text-white text-xl font-medium animate-bounce pointer-events-auto">
-                      Scroll to begin
-                    </p>
-                  </motion.div>
                 </div>
               )}
 
@@ -533,6 +537,20 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                 </>
               )}
             </div>
+
+            {/* Scroll to begin text - positioned at bottom of hero image */}
+            {initialPhase && (
+              <motion.div
+                className="absolute bottom-8 left-0 right-0 text-center z-20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <p className="text-white text-xl font-medium animate-bounce pointer-events-auto">
+                  Scroll to begin
+                </p>
+              </motion.div>
+            )}
           </div>
         </div>
 
