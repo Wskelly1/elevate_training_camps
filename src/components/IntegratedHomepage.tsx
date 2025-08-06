@@ -144,7 +144,8 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         return;
       }
 
-      if (!canScrollPage && !videoExpanded) {
+      // If video isn't fully expanded, handle video expansion
+      if (!videoExpanded) {
         e.preventDefault();
 
         // Update virtual scroll position
@@ -156,20 +157,19 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         const progress = Math.min(1, newVirtualScrollY / expansionThreshold);
         setScrollProgress(progress);
 
-        // Set video expanded when progress reaches 1
-        if (progress >= 1 && !videoExpanded) {
-          setVideoExpanded(true);
-          setCanScrollPage(true);
-          window.scrollTo(0, 0);
-          updateNavVisibility(true);
-        }
-
         // Update initial phase
         if (initialPhase && newVirtualScrollY > 10) {
           setInitialPhase(false);
         }
-      } else if (canScrollPage) {
-        // When regular scrolling is enabled, handle nav visibility
+
+        // Set video expanded when progress reaches 1
+        if (progress >= 1) {
+          setVideoExpanded(true);
+          setCanScrollPage(true);
+          updateNavVisibility(true);
+        }
+      } else {
+        // Video is expanded, allow normal scrolling with navbar management
         if (!ticking) {
           window.requestAnimationFrame(() => {
             const currentScrollY = window.scrollY;
@@ -181,27 +181,21 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       }
     };
 
-    // Handle regular scroll events (for after video is expanded)
+    // Handle regular scroll events - just for navbar control when video is expanded
     const handleScrollEvent = () => {
-      if (!ticking) {
+      if (videoExpanded && !ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
-
-          if (canScrollPage) {
-            handleScrollDirectionChange(currentScrollY);
-          }
-
+          handleScrollDirectionChange(currentScrollY);
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    // Passive: false is important to be able to prevent default scroll behavior
     window.addEventListener('wheel', handleWheelEvent, { passive: false });
     window.addEventListener('scroll', handleScrollEvent, { passive: true });
 
-    // Clean up
     return () => {
       window.removeEventListener('wheel', handleWheelEvent);
       window.removeEventListener('scroll', handleScrollEvent);
@@ -209,18 +203,19 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         clearTimeout(navDebounceTimer.current);
       }
     };
-  }, [initialPhase, videoExpanded, canScrollPage, virtualScrollY, windowDimensions.height, isScrollingDown]);
+  }, [initialPhase, videoExpanded, virtualScrollY, windowDimensions.height, isScrollingDown]);
 
   // Handle touch events for mobile
   useEffect(() => {
     let touchStartY = 0;
-    let ticking = false;
+    let lastTouchY = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
       if (isControlElement(e.target as HTMLElement)) {
         return;
       }
       touchStartY = e.touches[0].clientY;
+      lastTouchY = touchStartY;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -228,11 +223,13 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         return;
       }
 
-      if (!canScrollPage && !videoExpanded) {
-        // Calculate touch movement
-        const touchY = e.touches[0].clientY;
-        const deltaY = touchStartY - touchY;
-        touchStartY = touchY;
+      const currentTouchY = e.touches[0].clientY;
+      const deltaY = lastTouchY - currentTouchY;
+      lastTouchY = currentTouchY;
+
+      // If video isn't fully expanded, handle video expansion
+      if (!videoExpanded) {
+        e.preventDefault();
 
         // Update virtual scroll position
         const newVirtualScrollY = Math.max(0, virtualScrollY + deltaY);
@@ -243,58 +240,44 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         const progress = Math.min(1, newVirtualScrollY / expansionThreshold);
         setScrollProgress(progress);
 
-        // Set video expanded when progress reaches 1
-        if (progress >= 1 && !videoExpanded) {
-          setVideoExpanded(true);
-          setCanScrollPage(true);
-          window.scrollTo(0, 0);
-          updateNavVisibility(true);
-        }
-
         // Update initial phase
         if (initialPhase && newVirtualScrollY > 10) {
           setInitialPhase(false);
         }
 
-        // Prevent default to disable page scrolling during expansion
-        e.preventDefault();
-      } else if (canScrollPage) {
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            const currentScrollY = window.scrollY;
-            handleScrollDirectionChange(currentScrollY);
-            ticking = false;
-          });
-          ticking = true;
+        // Set video expanded when progress reaches 1
+        if (progress >= 1) {
+          setVideoExpanded(true);
+          setCanScrollPage(true);
+          updateNavVisibility(true);
         }
       }
     };
 
-    const handleTouchEnd = () => {
-      if (canScrollPage) {
-        // Handle any scroll momentum after touch ends
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            const currentScrollY = window.scrollY;
-            handleScrollDirectionChange(currentScrollY);
-            ticking = false;
-          });
-          ticking = true;
-        }
-      }
-    };
-
-    // Add touch event listeners
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [initialPhase, videoExpanded, canScrollPage, virtualScrollY, windowDimensions.height, isScrollingDown]);
+  }, [initialPhase, videoExpanded, virtualScrollY, windowDimensions.height]);
+
+  // Simple effect to prevent page scrolling during video expansion
+  useEffect(() => {
+    if (!videoExpanded) {
+      // Prevent any scroll during video expansion
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Allow scrolling when video is expanded
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [videoExpanded]);
 
   // Force navbar to be visible initially
   useEffect(() => {
