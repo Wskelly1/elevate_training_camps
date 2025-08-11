@@ -35,6 +35,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --radius: 0.5rem; /* Add this line to define the base radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -59,7 +60,8 @@
   }
 
   /* Optimize animations for better performance */
-  * {
+  /* Modified to be more selective and not affect rounded corners */
+  .animate-element {
     /* Enable hardware acceleration for transforms */
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -72,25 +74,6 @@
     @media (prefers-reduced-motion: reduce) {
       scroll-behavior: auto;
     }
-  }
-
-  /* Video expansion scroll behavior */
-  .video-expanding {
-    overflow: hidden !important;
-  }
-
-  .video-expanding body {
-    overflow: hidden !important;
-    position: fixed !important;
-    width: 100% !important;
-    height: 100% !important;
-    top: 0 !important;
-  }
-
-  /* Smooth transitions for video expansion */
-  .media-container {
-    transition: width 0.1s ease-out, height 0.1s ease-out;
-    z-index: 50 !important; /* Ensure it's above other content during expansion */
   }
 
   /* Prevent scroll during video expansion */
@@ -163,22 +146,6 @@
   height: 100%;
 }
 
-/* Pill-style navigation bar */
-@media (min-width: 768px) {
-  .nav-content-wrapper {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-}
-
-/* Performance optimizations for animations */
-.smooth-animation {
-  will-change: transform, opacity;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
 /* Hero section styling */
 .hero-section {
   height: 100vh;
@@ -186,32 +153,6 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-}
-
-.hero-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-/* Media container for video/image */
-.media-container {
-  max-width: calc(100vw - 64px) !important; /* 32px margin on each side */
-  max-height: calc(100vh - 160px) !important; /* 80px navbar + 48px top margin + 32px bottom margin */
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  border-radius: 0.75rem !important;
-}
-
-.media-container video,
-.media-container img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  border-radius: 0.75rem !important;
 }
 
 /* Content section styling */
@@ -227,6 +168,31 @@
 .content-section section:first-child {
   padding-top: 2rem;
   margin-top: 0;
+}
+
+/* Custom styles for FAQ accordion */
+.faq-summary {
+  list-style: none; /* Hide the default marker */
+  position: relative;
+}
+
+.faq-summary::-webkit-details-marker {
+  display: none; /* Hide the default marker for Safari/Chrome */
+}
+
+.faq-summary::before {
+  content: '▸';
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease-in-out;
+  font-size: 1em;
+  color: #755f4f; /* Match the text color */
+}
+
+details[open] > .faq-summary::before {
+  transform: translateY(-50%) rotate(90deg);
 }
 
 /* Reduce motion for users who prefer it */

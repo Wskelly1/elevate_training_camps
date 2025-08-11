@@ -64,12 +64,18 @@ export default function FAQPage() {
 
   return (
     <Layout>
-      {/* Top colored box with heading and intro, full width */}
-      <div className="bg-muted rounded-none px-8 pt-40 pb-8 mb-10 w-full">
-        <div className="container mx-auto flex items-center">
-          <div className="w-1/2">
+      <div className="relative">
+        {/* Brown background container */}
+        <div
+          className="absolute top-0 left-0 w-full h-[460px]"
+          style={{ backgroundColor: '#a89885', zIndex: -1 }}
+        />
+
+        {/* Header Section */}
+        <div className="container mx-auto px-8 pt-28 pb-8 mb-10 flex items-center">
+          <div className="w-1/2 text-black">
             <h1 className="text-4xl font-bold mb-4">{settings.title || 'Frequently Asked Questions'}</h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg opacity-90">
               {settings.introduction || 'At Elevate Training Camps, we believe that high-altitude training should be accessible, fun, and safe for all athletes. Below you\'ll find answers to common questions about our camp, registration, and what to expect in Flagstaff, AZ.'}
             </p>
           </div>
@@ -86,6 +92,7 @@ export default function FAQPage() {
           </div>
         </div>
       </div>
+
       {/* Main content centered and constrained */}
       <div className="max-w-3xl mx-auto">
         {/* Section heading */}
@@ -96,9 +103,11 @@ export default function FAQPage() {
             <p>Loading FAQs...</p>
           ) : (
             faqs.map((faq) => (
-              <details key={faq._id} className="border rounded-md">
-                <summary className="cursor-pointer px-4 py-3 font-medium text-lg">{faq.question}</summary>
-                <div className="px-4 pb-4 text-muted-foreground">
+              <details key={faq._id} className="group border border-[#d3c7b4] rounded-lg bg-[#f0ead6] shadow-sm overflow-hidden">
+                <summary className="faq-summary cursor-pointer pl-10 pr-4 py-3 font-medium text-lg text-[#755f4f] rounded-lg group-open:rounded-b-none focus:outline-none">
+                  {faq.question}
+                </summary>
+                <div className="px-10 pb-4 text-black bg-[#f0ead6]">
                   {faq.answer}
                 </div>
               </details>

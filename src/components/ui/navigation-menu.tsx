@@ -7,17 +7,17 @@ import { cn } from "../../lib/utils"
 
 /**
  * NavigationMenu - Accessible navigation menu component
- * 
+ *
  * This component provides a fully accessible navigation menu system based on Radix UI.
  * It supports dropdown menus, keyboard navigation, and proper ARIA attributes.
- * 
+ *
  * Features:
  * - Dropdown menus with smooth animations
  * - Keyboard navigation support
  * - Mobile-responsive design
  * - Accessible by default with proper ARIA attributes
  * - Consistent styling with the site's design system
- * 
+ *
  * The component is composed of several subcomponents:
  * - NavigationMenu: The root container
  * - NavigationMenuList: Container for navigation items
@@ -107,7 +107,7 @@ const NavigationMenuViewport = React.forwardRef<
   <div className={cn("absolute left-0 top-full flex justify-center")}>
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
+        "origin-top-center relative mt-5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-lg border-0 bg-popover text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
         className
       )}
       ref={ref}

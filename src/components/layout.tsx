@@ -135,6 +135,25 @@ const Layout: React.FC<LayoutProps> = ({
   const lastScrollY = useRef(0);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    // Add a click listener to the header to handle navigation link clicks
+    const handleNavLinkClick = () => {
+      // When a nav link is clicked, ensure the body scroll is not locked
+      document.body.style.overflow = 'auto';
+    };
+
+    const headerElement = headerRef.current;
+    if (headerElement) {
+      const navLinks = headerElement.querySelectorAll('a');
+      navLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
+
+      return () => {
+        navLinks.forEach(link => link.removeEventListener('click', handleNavLinkClick));
+      };
+    }
+  }, [mounted]); // Rerun when mounted state changes
 
   useEffect(() => {
     setMounted(true);
@@ -243,6 +262,7 @@ const Layout: React.FC<LayoutProps> = ({
     >
       {/* Header */}
       <header
+        ref={headerRef}
         className={`sticky top-4 z-50 w-full transition-opacity duration-300 px-4 ${
           mounted && isNavVisible ? 'opacity-100' : 'opacity-0 invisible'
         }`}
