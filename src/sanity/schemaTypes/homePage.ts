@@ -35,44 +35,11 @@ export default defineType({
       hidden: ({document}) => !document?.useScrollExpandMedia,
     }),
     defineField({
-      name: 'expandMediaSrc',
-      title: 'Video File',
-      description: 'Upload a video file (for video type)',
-      type: 'file',
-      options: {
-        accept: 'video/*',
-      },
+      name: 'expandMuxVideo',
+      title: 'Mux Video',
+      description: 'Preferred for adaptive streaming (HLS). Configure credentials via the plug icon when using this field.',
+      type: 'mux.video',
       hidden: ({document}) => !document?.useScrollExpandMedia || document?.expandMediaType !== 'video',
-    }),
-    defineField({
-      name: 'expandMediaImage',
-      title: 'Media Image',
-      description: 'Upload an image (for image type)',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      hidden: ({document}) => !document?.useScrollExpandMedia || document?.expandMediaType !== 'image',
-    }),
-    defineField({
-      name: 'expandPosterSrc',
-      title: 'Video Poster Image',
-      description: 'Image to show before video plays and as the sliding image in the intro sequence',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      hidden: ({document}) => !document?.useScrollExpandMedia || document?.expandMediaType !== 'video',
-    }),
-    defineField({
-      name: 'expandBgImageSrc',
-      title: 'Background Image',
-      description: 'Image shown behind the media and as the initial full-screen image',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      hidden: ({document}) => !document?.useScrollExpandMedia,
     }),
     defineField({
       name: 'expandTitle',

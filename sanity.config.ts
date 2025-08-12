@@ -4,8 +4,9 @@
  * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
  */
 
-import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
+import {muxInput} from 'sanity-plugin-mux-input'
+import {visionTool} from '@sanity/vision'
 import {structureTool} from 'sanity/structure'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
@@ -24,5 +25,6 @@ export default defineConfig({
     // Vision is for querying with GROQ from inside the Studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),
+    muxInput({mp4_support: 'standard'}), // enables upload, and a Mux settings tool in Studio
   ],
 })

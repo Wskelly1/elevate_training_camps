@@ -89,10 +89,7 @@ export interface SanityHomePage {
   title: string;
   useScrollExpandMedia?: boolean;
   expandMediaType?: 'video' | 'image';
-  expandMediaSrc?: SanityImage;
-  expandMediaImage?: SanityImage;
-  expandPosterSrc?: SanityImage;
-  expandBgImageSrc?: SanityImage;
+  expandMuxVideo?: { asset?: { playbackId?: string; status?: string } };
   expandTitle?: string;
   expandSubtitle?: string;
   scrollToExpandText?: string;

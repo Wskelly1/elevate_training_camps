@@ -25,7 +25,6 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
 
   // Debug log the video data
   console.log('Homepage data:', data);
-  console.log('Video source data:', data.expandMediaSrc);
   console.log('Video type:', data.expandMediaType);
 
   // Refs
@@ -421,6 +420,10 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const firstWord = data.expandTitle ? data.expandTitle.split(' ')[0] : '';
   const restOfTitle = data.expandTitle ? data.expandTitle.split(' ').slice(1).join(' ') : '';
 
+  // Construct Mux HLS URL if available
+  const playbackId = data.expandMuxVideo?.asset?.playbackId;
+  const muxHlsUrl = playbackId ? `https://stream.mux.com/${playbackId}.m3u8` : undefined;
+
   return (
     <>
       <style jsx global>{`
@@ -488,17 +491,16 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     {data.expandMediaType === 'video' ? (
                       <div className="relative w-full h-full overflow-hidden rounded-xl">
                         <SanityVideo
-                          videoSrc={data.expandMediaSrc}
-                          posterSrc={data.expandPosterSrc}
+                          hlsSrc={muxHlsUrl}
                           fallbackImage={data.heroImage}
                           title={data.expandTitle || 'Training Camp Video'}
                           autoPlay={false}
                           muted={!isVideoExpanded} // Muted until expanded
                           loop={true}
                           controls={isVideoExpanded} // Show controls when expanded
-                          lazy={true}
+                          lazy={false}
                           objectFit="cover"
-                          className="!pb-0 !h-full !w-full"
+                          fillContainer
                           onLoadedData={() => {
                             console.log('Video loaded data successfully');
                           }}
@@ -522,7 +524,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                       // Existing image rendering code...
                       <div className="relative w-full h-full">
                         <Image
-                          src={urlFor(data.expandMediaImage || data.heroImage).url()}
+                          src={urlFor(data.heroImage).url()}
                           alt={data.expandTitle || 'Media content'}
                           fill
                           className="w-full h-full object-cover rounded-xl"

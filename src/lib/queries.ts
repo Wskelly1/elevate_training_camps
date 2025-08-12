@@ -143,28 +143,10 @@ export const homePageQuery = groq`
     title,
     useScrollExpandMedia,
     expandMediaType,
-    expandMediaSrc {
+    expandMuxVideo {
       asset->{
-        _id,
-        url
-      }
-    },
-    expandMediaImage {
-      asset->{
-        _id,
-        url
-      }
-    },
-    expandPosterSrc {
-      asset->{
-        _id,
-        url
-      }
-    },
-    expandBgImageSrc {
-      asset->{
-        _id,
-        url
+        playbackId,
+        status
       }
     },
     expandTitle,

@@ -20,6 +20,8 @@ import { urlFor } from '../lib/sanity';
  * @property {'cover' | 'contain' | 'fill'} [objectFit='cover'] - How the video should fit its container
  * @property {string} [className] - Additional CSS classes
  * @property {string} [captionSrc] - URL to WebVTT captions file
+ * @property {boolean} [fillContainer] - Whether to fill the parent container instead of using aspect-ratio padding
+ * @property {boolean} [pauseWhenOutOfView] - Whether to pause the video when it's out of view or the page is hidden
  * @property {function} [onPlay] - Callback when video starts playing
  * @property {function} [onPause] - Callback when video is paused
  * @property {function} [onEnded] - Callback when video playback ends
@@ -27,12 +29,14 @@ import { urlFor } from '../lib/sanity';
  * @property {function} [onLoadedData] - Callback when video data is loaded
  */
 interface SanityVideoProps {
-  videoSrc: {
+  videoSrc?: {
     asset: {
       _id: string;
       url: string;
     };
   };
+  lowQualitySrc?: { asset: { _id: string; url: string } } | null;
+  hlsSrc?: string;
   posterSrc?: any;
   fallbackImage?: any;
   title?: string;
@@ -45,6 +49,8 @@ interface SanityVideoProps {
   objectFit?: 'cover' | 'contain' | 'fill';
   className?: string;
   captionSrc?: string;
+  fillContainer?: boolean;
+  pauseWhenOutOfView?: boolean;
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
@@ -66,6 +72,8 @@ interface SanityVideoProps {
  */
 const SanityVideo: React.FC<SanityVideoProps> = ({
   videoSrc,
+  lowQualitySrc,
+  hlsSrc,
   posterSrc,
   fallbackImage,
   title = '',
@@ -78,6 +86,8 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
   objectFit = 'cover',
   className = '',
   captionSrc,
+  fillContainer = false,
+  pauseWhenOutOfView = true,
   onPlay,
   onPause,
   onEnded,
@@ -97,6 +107,7 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
 
   // Determine video sources - try to extract WebM URL if available
   const mp4Url = videoSrc?.asset?.url || '';
+  const lowUrl = lowQualitySrc?.asset?.url || '';
 
   // Log the video URL for debugging
   console.log('Video source:', videoSrc);
@@ -104,17 +115,22 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
 
   // Check if the URL is valid and exists
   const hasValidUrl = mp4Url && mp4Url.startsWith('http');
+  const hasLowUrl = lowUrl && lowUrl.startsWith('http');
 
   // If no valid URL, show error
   useEffect(() => {
-    if (!hasValidUrl && mp4Url !== '') {
-      console.error('Invalid video URL:', mp4Url);
-      setHasError(true);
+    if (!hlsSrc) {
+      if (!videoSrc) {
+        console.error('SanityVideo: videoSrc prop is missing');
+      }
+      if (!hasValidUrl) {
+        console.warn('SanityVideo: Missing or invalid video URL. Falling back to sample video. Provided url:', mp4Url);
+      }
     }
-  }, [mp4Url, hasValidUrl]);
+  }, [videoSrc, mp4Url, hasValidUrl, hlsSrc]);
 
-  // Extract WebM URL if available (assuming Sanity might provide alternative formats)
-  const webmUrl = hasValidUrl ? mp4Url.replace(/\.mp4$/, '.webm') : '';
+  // Do not guess alternate formats. Use the provided URL only.
+  const webmUrl = '';
 
   // Poster image URL
   const posterUrl = posterSrc ? urlFor(posterSrc).url() : '';
@@ -125,6 +141,10 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
 
   // Effect to handle autoplay capability detection
   useEffect(() => {
+    if (!autoPlay) {
+      setCanAutoPlay(false);
+      return;
+    }
     // Function to check if autoplay is supported
     const checkAutoplaySupport = async () => {
       if (!videoRef.current) return;
@@ -134,39 +154,74 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
         const video = document.createElement('video');
         video.muted = true;
         video.setAttribute('playsinline', '');
-        video.src = 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbWF2YzEAAATKbW9vdgAAAGxtdmhkAAAAANLEP5XSxD+VAAB1MAAAdU4AAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAACFpb2RzAAAAABCAgIAQAE////9//w6AgIAEAAAAAQAABDV0cmFrAAAAXHRraGQAAAAH0sQ/ldLEP5UAAAABAAAAAAAAdU4AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAFsAAABLAAAAAAAJGVkdHMAAAAcZWxzdAAAAAAAAAABAAABdQAABQAAAAABtG1kaWEAAAAgbWRoZAAAAADSxD+V0sQ/lQAAVcQAAEuVVcQAAAAAADdoZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAAThtaW5mAAAAFHZtaGQAAAABAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAAD4c3RibAAAAJhzdHNkAAAAAAAAAAEAAACIYXZjMQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAFsASwBIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAXmF2Y0MBQsAN/+EAFWdCwArZCXnnhAAAD6QAAu4APEiZIAEABWjLg8sgAAAAHHV1aWRraEDyXYlAs0BAQFkIEQAAABhzdHRzAAAAAAAAAAEAAAAeAAAD6QAAABRzdHNzAAAAAAAAAAEAAAABAAAAEHN0c2MAAAAAAAAAAgAAAAEAAAABAAAAAQAAAIxzdHN6AAAAAAAAAAAAAAAeAAADDwAAAAsAAAALAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAUc3RjbwAAAAAAAAAeAAAF4gAABCcAAAQ3AAAE0wAAA+gAAAO5AAADdgAAA7kAAAQIAAAD5wAAA+gAAAFAAAAAFHN0c3oAAAAAAAAAAAAAAADFAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABRzdGNvAAAAAAAAAB4AAAOA////7gAAAOb///+7////5gAAAO7///+7////5gAAAPj////SAAAA0gAAALv////mAAAA9v///+YAAADm////u////9IAAAAeAAAAHgAAAB4AAAA8AAAAWQAAADwAAAA8AAAAmQAAADwAAABkAAAAkgAAAEkAAABJAAAAWQAAAHcAAAB3AAAAnAAAAFkAAABkAAAAqQAAAIcAAACHAAAAaQAAAKkAAABSAAAAhwAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAJIAAACSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAFIAAABSAAAAUgAAAMUAAADF';
+        // A tiny silent mp4 data URI
+        video.src = 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbWF2YzEAAATKbW9vdgAAAGxtdmhkAAAAANLEP5XSxD+VAAB1MAAAdU4AAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAACFpb2RzAAAAABCAgIAQAE////9//w6AgIAEAAAAAQAABDV0cmFrAAAAXHRraGQAAAAH0sQ/ldLEP5UAAAABAAAAAAAAdU4AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAFsAAABLAAAAAAAJGVkdHMAAAAcZWxzdAAAAAAAAAABAAABdQAABQAAAAABtG1kaWEAAAAgbWRoZAAAAADSxD+V0sQ/lQAAVcQAAEuVVcQAAAAAADdoZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAATg=';
 
-        // Try to play the test video
         await video.play();
-
-        // If we get here, autoplay is supported
         setCanAutoPlay(true);
       } catch (error) {
-        // Autoplay is not supported
         console.log('Autoplay not supported by this browser/device');
         setCanAutoPlay(false);
       }
     };
 
     checkAutoplaySupport();
-  }, []);
+  }, [autoPlay]);
 
   // Effect to handle initial video setup
   useEffect(() => {
     if (!videoRef.current) return;
 
     const video = videoRef.current;
+    let stallCount = 0;
+    let usingLow = false;
+    let hls: any | null = null;
 
     // Set initial attributes
     video.muted = muted;
-
-    // For Safari compatibility
-    video.playsInline = true;
-
-    // Preload strategy based on lazy loading preference
+    video.playsInline = true; // Safari compatibility
     video.preload = lazy ? 'metadata' : 'auto';
+    video.crossOrigin = 'anonymous';
 
     // Event handlers
+    const handleWaitingOrStalled = () => {
+      stallCount += 1;
+      console.warn('Video stall/waiting detected. Count:', stallCount);
+      // If we have a low-quality source and we stalled twice early, switch
+      if (!hlsSrc && !usingLow && hasLowUrl && stallCount >= 2) {
+        usingLow = true;
+        const currentTime = video.currentTime || 0;
+        console.warn('Switching to low-quality source due to stalls');
+        // Swap source to low
+        const sources = Array.from(video.querySelectorAll('source')) as HTMLSourceElement[];
+        sources.forEach(s => video.removeChild(s));
+        const s = document.createElement('source');
+        s.src = lowUrl;
+        s.type = 'video/mp4';
+        video.appendChild(s);
+        // Reload and resume near the same time
+        video.load();
+        video.currentTime = currentTime;
+        const p = video.play();
+        if (p) {
+          p.catch(err => console.warn('Play after low-quality switch failed:', err));
+        }
+      }
+    };
+
+    const handleLoadedMetadata = () => {
+      setIsLoaded(true);
+      onLoadedData && onLoadedData();
+    };
+
+    const handleCanPlay = () => {
+      setIsLoaded(true);
+    };
+
+    const handleCanPlayThrough = () => {
+      setIsLoaded(true);
+    };
+
     const handleLoadedData = () => {
       setIsLoaded(true);
       if (onLoadedData) onLoadedData();
@@ -175,7 +230,7 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
     const handleError = (e: Event) => {
       console.error('Video error:', e);
       console.error('Video element:', videoRef.current);
-      console.error('Video source:', mp4Url);
+      console.error('Video source:', mp4Url || hlsSrc);
       setHasError(true);
       if (onError) onError(e);
     };
@@ -198,30 +253,54 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
       if (onEnded) onEnded();
     };
 
-    // Attach event listeners
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
     video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('waiting', handleWaitingOrStalled);
+    video.addEventListener('stalled', handleWaitingOrStalled);
     video.addEventListener('error', handleError);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('ended', handleEnded);
 
+    // Initialize HLS if provided
+    const setupHls = async () => {
+      if (!hlsSrc) return;
+      try {
+        if (video.canPlayType('application/vnd.apple.mpegURL')) {
+          // Native HLS (Safari)
+          video.src = hlsSrc;
+          video.load();
+        } else {
+          const mod = await import('hls.js');
+          const Hls = mod.default;
+          if (Hls?.isSupported()) {
+            hls = new Hls({ capLevelToPlayerSize: true });
+            hls.loadSource(hlsSrc);
+            hls.attachMedia(video);
+          } else {
+            console.warn('HLS is not supported; falling back to MP4 sources if available');
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to initialize HLS:', err);
+      }
+    };
+
+    setupHls();
+
     // Handle autoplay with browser compatibility
     if (autoPlay && canAutoPlay) {
-      // Try to play with muted as fallback for browser policies
       const playPromise = video.play();
-
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            // Autoplay started successfully
             setIsPlaying(true);
             setShowPlayButton(false);
           })
           .catch(error => {
-            // Autoplay was prevented
             console.warn('Autoplay prevented:', error);
-
-            // If not already muted, try again with muted
             if (!muted) {
               video.muted = true;
               video.play().catch(e => {
@@ -235,34 +314,36 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
       }
     }
 
-    // Cleanup function
     return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('canplaythrough', handleCanPlayThrough);
       video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('waiting', handleWaitingOrStalled);
+      video.removeEventListener('stalled', handleWaitingOrStalled);
       video.removeEventListener('error', handleError);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('ended', handleEnded);
 
-      // Ensure video is paused when component unmounts
       if (!video.paused) {
         video.pause();
       }
+      if (hls && typeof hls.destroy === 'function') {
+        try { hls.destroy(); } catch {}
+      }
     };
-  }, [autoPlay, canAutoPlay, muted, lazy, onLoadedData, onError, onPlay, onPause, onEnded]);
+  }, [autoPlay, canAutoPlay, muted, lazy, onLoadedData, onError, onPlay, onPause, onEnded, mp4Url, lowUrl, hasLowUrl, hlsSrc]);
 
   // Function to handle play button click
   const handlePlayClick = () => {
     if (!videoRef.current) return;
 
     if (videoRef.current.paused) {
-      // Try to play the video
       const playPromise = videoRef.current.play();
-
       if (playPromise !== undefined) {
         playPromise.catch(error => {
           console.error('Play failed:', error);
-
-          // If autoplay is blocked, try with muted
           if (error.name === 'NotAllowedError' && !videoRef.current!.muted) {
             videoRef.current!.muted = true;
             videoRef.current!.play().catch(e => {
@@ -283,10 +364,44 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
     height: '100%',
   };
 
+  // Pause when out of view or page hidden (without resetting currentTime)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !pauseWhenOutOfView) return;
+
+    let observer: IntersectionObserver | null = null;
+
+    const handleVisibility = () => {
+      if (document.hidden && !video.paused) {
+        try { video.pause(); } catch {}
+      }
+    };
+
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting && !video.paused) {
+              try { video.pause(); } catch {}
+            }
+          });
+        },
+        { threshold: 0.25 }
+      );
+      observer.observe(video);
+    } catch {}
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      if (observer) observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [pauseWhenOutOfView]);
+
   return (
     <div
       ref={containerRef}
-      className={`sanity-video-container relative w-full h-0 pb-[56.25%] ${className}`}
+      className={`sanity-video-container relative w-full ${fillContainer ? 'h-full' : 'h-0 pb-[56.25%]'} ${className}`}
       style={{ overflow: 'hidden' }}
       aria-labelledby={title ? 'video-title' : undefined}
       aria-describedby={description ? 'video-description' : undefined}
@@ -366,6 +481,7 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
 
       {/* Video element */}
       <video
+        key={mp4Url || 'fallback-video'}
         ref={videoRef}
         className="absolute inset-0 w-full h-full"
         poster={posterUrl || undefined}
@@ -375,16 +491,20 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
         playsInline
         style={videoStyle}
         aria-hidden={!isLoaded || hasError}
+        crossOrigin="anonymous"
+        onWaiting={() => console.log('Video event: waiting')}
+        onStalled={() => console.warn('Video event: stalled')}
+        onProgress={() => console.log('Video event: progress', videoRef.current?.buffered?.length)}
+        onSuspend={() => console.log('Video event: suspend')}
+        onAbort={() => console.warn('Video event: abort')}
       >
-        {/* WebM source for browsers that support it */}
-        {webmUrl && <source src={webmUrl} type="video/webm" />}
+        {/* Only include MP4 sources when not using HLS */}
+        {!hlsSrc && hasValidUrl && <source src={mp4Url} type="video/mp4" />}
+        {!hlsSrc && hasLowUrl && <source data-low src={lowUrl} type="video/mp4" />}
 
-        {/* MP4 source as fallback */}
-        {hasValidUrl ? (
-          <source src={mp4Url} type="video/mp4" />
-        ) : (
-          // Fallback to a known working video if no valid URL is provided
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
+        {/* Secondary fallback source to ensure playback during debugging */}
+        {!hlsSrc && (
+          <source data-debug-fallback src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
         )}
 
         {/* Captions if available */}
