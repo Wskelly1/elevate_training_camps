@@ -255,7 +255,7 @@ const TestimonialCard = ({
 							exit={{opacity: 0}}
 							ref={containerRef}
 							layoutId={layout ? `card-${testimonial.name}` : undefined}
-							className="max-w-5xl mx-auto bg-gradient-to-b from-[#f2f0eb] to-[#fff9eb] h-full z-[10000] p-4 md:p-10 rounded-3xl relative md:mt-10"
+							className="max-w-5xl mx-auto bg-[#fff9eb] h-full z-[10000] p-4 md:p-10 rounded-3xl relative md:mt-10"
 						>
 							<button
 								className="sticky top-4 h-8 w-8 right-0 ml-auto rounded-full flex items-center justify-center bg-[#4b3f33]"
@@ -265,18 +265,18 @@ const TestimonialCard = ({
 							</button>
 							<motion.p
 								layoutId={layout ? `category-${testimonial.name}` : undefined}
-								className="px-0 md:px-20 text-[rgba(31, 27, 29, 0.7)] text-lg dark:text-white font-thin font-tiemposHeadline underline underline-offset-8"
+								className="px-0 md:px-20 text-black text-lg font-thin font-sans underline underline-offset-8"
 							>
 								{testimonial.designation}
 							</motion.p>
 							<motion.p
 								layoutId={layout ? `title-${testimonial.name}` : undefined}
-								className="px-0 md:px-20 text-2xl md:text-4xl font-normal italic text-[rgba(31, 27, 29, 0.7)] mt-4 dark:text-white font-tiemposHeadline lowercase"
+								className="px-0 md:px-20 text-2xl md:text-4xl font-normal italic text-black mt-4 font-sans lowercase"
 							>
 								{testimonial.name}
 							</motion.p>
-							<div className="py-8 text-[rgba(31, 27, 29, 0.7)] px-0 md:px-20 text-3xl lowercase font-thin font-tiemposHeadline leading-snug tracking-wide">
-								<Quote className="h-6 w-6 text-[rgba(31, 27, 29, 0.7)] dark:text-neutral-900" />
+							<div className="py-8 text-black px-0 md:px-20 text-3xl lowercase font-thin font-sans leading-snug tracking-wide">
+								<Quote className="h-6 w-6 text-black" />
 								{testimonial.description}
 							</div>
 						</motion.div>
@@ -296,7 +296,7 @@ const TestimonialCard = ({
 				}}
 			>
 				<div
-					className={`${index % 2 === 0 ? "rotate-0" : "-rotate-0"} rounded-3xl bg-gradient-to-b from-[#f2f0eb] to-[#fff9eb] h-[500px] md:h-[550px] w-80 md:w-96 overflow-hidden flex flex-col items-center justify-center relative z-10 shadow-md`}
+					className={`${index % 2 === 0 ? "rotate-0" : "-rotate-0"} rounded-3xl bg-[#fff9eb] h-[500px] md:h-[550px] w-80 md:w-96 overflow-hidden flex flex-col items-center justify-center relative z-10 shadow-md`}
 				>
 					<div className="absolute opacity-30" style={{inset: "-1px 0 0"}}>
 						<div className="absolute inset-0">
@@ -312,7 +312,7 @@ const TestimonialCard = ({
 					<ProfileImage src={testimonial.profileImage} alt={testimonial.name} />
 					<motion.p
 						layoutId={layout ? `title-${testimonial.name}` : undefined}
-						className="text-[rgba(31, 27, 29, 0.7)] text-2xl md:text-2xl font-normal text-center [text-wrap:balance] font-tiemposHeadline mt-4 lowercase px-3"
+						className="text-black text-2xl md:text-2xl font-normal text-center [text-wrap:balance] font-sans mt-4 lowercase px-3"
 					>
 						{testimonial.description.length > 100
 							? `${testimonial.description.slice(0, 100)}...`
@@ -320,13 +320,13 @@ const TestimonialCard = ({
 					</motion.p>
 					<motion.p
 						layoutId={layout ? `category-${testimonial.name}` : undefined}
-						className="text-[rgba(31, 27, 29, 0.7)] text-xl md:text-2xl font-thin font-tiemposHeadline italic text-center mt-5 lowercase"
+						className="text-black text-xl md:text-2xl font-thin font-sans italic text-center mt-5 lowercase"
 					>
 						{testimonial.name}.
 					</motion.p>
 					<motion.p
 						layoutId={layout ? `category-${testimonial.name}` : undefined}
-						className="text-[rgba(31, 27, 29, 0.7)] text-base md:text-base font-thin font-tiemposHeadline italic text-center mt-1 lowercase underline underline-offset-8 decoration-1"
+						className="text-black text-base md:text-base font-thin font-sans italic text-center mt-1 lowercase underline underline-offset-8 decoration-1"
 					>
 						{testimonial.designation.length > 25
 							? `${testimonial.designation.slice(0, 25)}...`
@@ -342,7 +342,7 @@ const ProfileImage = ({src, alt, ...rest}: ImageProps) => {
 	const [isLoading, setLoading] = useState(true);
 
 	return (
-		<div className="w-[90px] h-[90px] md:w-[150px] md:h-[150px] opacity-80 overflow-hidden rounded-[1000px] border-[3px] border-solid border-[rgba(59,59,59,0.6)] aspect-[1/1] flex-none saturate-[0.2] sepia-[0.46] relative">
+		<div className="w-[90px] h-[90px] md:w-[150px] md:h-[150px] overflow-hidden rounded-[1000px] border-[3px] border-solid border-[rgba(59,59,59,0.6)] aspect-[1/1] flex-none relative">
 			<Image
 				className={cn(
 					"transition duration-300 absolute top-0 inset-0 rounded-inherit object-cover z-50",
