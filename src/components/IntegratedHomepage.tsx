@@ -19,8 +19,8 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const [initialPhase, setInitialPhase] = useState<boolean>(true);
   const [videoExpanded, setVideoExpanded] = useState<boolean>(false);
   const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
+  const [videoError, setVideoError] = useState<boolean>(false);
   const [scrollProgress, setScrollProgress] = useState<number>(0);
-  const [canScrollPage, setCanScrollPage] = useState<boolean>(false);
   const [virtualScrollY, setVirtualScrollY] = useState<number>(0);
 
   // Refs
@@ -28,6 +28,9 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentSectionRef = useRef<HTMLDivElement>(null);
+  const lastScrollDeltaRef = useRef<number>(0);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isScrollingRef = useRef<boolean>(false);
 
   // Track last scroll position for direction detection
   const prevScrollY = useRef(0);
@@ -134,7 +137,6 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
     setVideoExpanded(false);
     setScrollProgress(0);
     setVirtualScrollY(0);
-    setCanScrollPage(false);
 
     // Also handle beforeunload to store position state
     const handleBeforeUnload = () => {
@@ -160,6 +162,17 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       if (!videoExpanded) {
         e.preventDefault();
 
+        // Mark that we're actively scrolling
+        isScrollingRef.current = true;
+
+        // Clear any existing timeout
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+
+        // Store the direction and magnitude of scroll
+        lastScrollDeltaRef.current = e.deltaY;
+
         // Update virtual scroll position
         const newVirtualScrollY = Math.max(0, virtualScrollY + e.deltaY);
         setVirtualScrollY(newVirtualScrollY);
@@ -177,9 +190,15 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         // Set video expanded when progress reaches 1
         if (progress >= 1) {
           setVideoExpanded(true);
-          setCanScrollPage(true);
           updateNavVisibility(true);
+          // Reset scroll position to top when video is fully expanded
+          window.scrollTo(0, 0);
         }
+
+        // Set a timeout to detect when scrolling stops
+        scrollTimeoutRef.current = setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 150);
       } else {
         // Video is expanded, allow normal scrolling with navbar management
         if (!ticking) {
@@ -245,6 +264,17 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       if (!videoExpanded) {
         e.preventDefault();
 
+        // Mark that we're actively scrolling
+        isScrollingRef.current = true;
+
+        // Clear any existing timeout
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+
+        // Store the direction and magnitude of scroll
+        lastScrollDeltaRef.current = deltaY;
+
         // Update virtual scroll position
         const newVirtualScrollY = Math.max(0, virtualScrollY + deltaY);
         setVirtualScrollY(newVirtualScrollY);
@@ -262,9 +292,15 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         // Set video expanded when progress reaches 1
         if (progress >= 1) {
           setVideoExpanded(true);
-          setCanScrollPage(true);
           updateNavVisibility(true);
+          // Reset scroll position to top when video is fully expanded
+          window.scrollTo(0, 0);
         }
+
+        // Set a timeout to detect when scrolling stops
+        scrollTimeoutRef.current = setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 150);
       }
     };
 
@@ -276,6 +312,53 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
       window.removeEventListener('touchmove', handleTouchMove);
     };
   }, [initialPhase, videoExpanded, virtualScrollY, windowDimensions.height]);
+
+  // Add an effect to handle auto-continuation of expansion if scrolling stops midway
+  useEffect(() => {
+    // Only run this effect if video is not yet expanded and we're past initial phase
+    if (!videoExpanded && !initialPhase && scrollProgress > 0 && scrollProgress < 1) {
+      // Set up a check to see if scrolling has stopped but expansion isn't complete
+      const continueExpansionTimeout = setTimeout(() => {
+        if (!isScrollingRef.current && scrollProgress < 1) {
+          // If we were scrolling down (positive delta), continue expanding
+          if (lastScrollDeltaRef.current > 0) {
+            // Calculate how much more virtual scroll is needed to complete
+            const expansionThreshold = windowDimensions.height;
+            const remainingScroll = expansionThreshold - virtualScrollY;
+
+            // Animate the remaining expansion over time
+            const animateExpansion = () => {
+              setVirtualScrollY(prev => {
+                const newValue = prev + 10; // Increment by small amount each frame
+                const progress = Math.min(1, newValue / expansionThreshold);
+                setScrollProgress(progress);
+
+                // Check if we're done expanding
+                if (progress >= 1) {
+                  setVideoExpanded(true);
+                  updateNavVisibility(true);
+                  window.scrollTo(0, 0);
+                  return newValue;
+                }
+
+                // Continue animation if not done
+                if (newValue < expansionThreshold) {
+                  requestAnimationFrame(animateExpansion);
+                }
+
+                return newValue;
+              });
+            };
+
+            // Start the animation
+            requestAnimationFrame(animateExpansion);
+          }
+        }
+      }, 500); // Wait a bit to ensure user has actually stopped scrolling
+
+      return () => clearTimeout(continueExpansionTimeout);
+    }
+  }, [videoExpanded, initialPhase, scrollProgress, virtualScrollY, windowDimensions.height]);
 
   // Simple effect to prevent page scrolling during video expansion
   useEffect(() => {
@@ -306,12 +389,30 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   useEffect(() => {
     if (videoRef.current && data.expandMediaType === 'video' && data.expandMediaSrc?.asset.url) {
       try {
-        videoRef.current.preload = 'auto';
+        // Set multiple sources for better browser compatibility
+        videoRef.current.preload = 'metadata'; // Start with metadata only to speed up initial load
+
+        // Add error handling for video loading
+        const handleError = (e: ErrorEvent) => {
+          console.error('Video loading error:', e);
+          setVideoLoaded(false);
+          setVideoError(true); // Set videoError to true on error
+        };
+
+        // Listen for video errors
+        videoRef.current.addEventListener('error', handleError as EventListener);
+
+        // Start loading the video
         videoRef.current.load();
 
         const handleCanPlayThrough = () => {
           setVideoLoaded(true);
           console.log('Video preloaded successfully');
+
+          // Once metadata is loaded, we can switch to auto preload for the full video
+          if (videoRef.current) {
+            videoRef.current.preload = 'auto';
+          }
         };
 
         videoRef.current.addEventListener('canplaythrough', handleCanPlayThrough, { once: true });
@@ -320,16 +421,111 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
           if (videoRef.current) {
             try {
               videoRef.current.removeEventListener('canplaythrough', handleCanPlayThrough);
+              videoRef.current.removeEventListener('error', handleError as EventListener);
             } catch (err) {
-              console.error('Error removing canplaythrough listener:', err);
+              console.error('Error removing video event listeners:', err);
             }
           }
         };
       } catch (err) {
         console.error('Error preloading video:', err);
+        setVideoLoaded(false);
       }
     }
   }, [data.expandMediaType, data.expandMediaSrc?.asset.url]);
+
+  // Handle video playback when expanded
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    // Reset video when component mounts
+    videoRef.current.currentTime = 0;
+
+    if (videoExpanded && !videoError) {
+      try {
+        // Set video quality options to reduce glitches
+        if ('mediaSettings' in videoRef.current) {
+          try {
+            // @ts-ignore - This is a non-standard property
+            videoRef.current.mediaSettings = {
+              preferredVideoQuality: 'standard'
+            };
+          } catch (e) {
+            console.log('Media settings not supported');
+          }
+        }
+
+        // Unmute when expanded
+        videoRef.current.muted = false;
+
+        // Try to play the video when expanded
+        const playPromise = videoRef.current.play();
+
+        // Handle the play promise properly
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('Video playback started successfully');
+              setVideoLoaded(true);
+            })
+            .catch(err => {
+              console.error('Error playing video:', err);
+
+              // If autoplay is prevented, we'll try again with muted
+              if (err.name === 'NotAllowedError') {
+                console.log('Autoplay prevented. Trying with muted option...');
+                videoRef.current!.muted = true;
+                videoRef.current!.play().catch(e => {
+                  console.error('Failed to play even with muted option:', e);
+                  setVideoError(true);
+                });
+              } else {
+                setVideoError(true);
+              }
+            });
+        }
+      } catch (err) {
+        console.error('Exception during video playback:', err);
+        setVideoError(true);
+      }
+    } else {
+      // When not expanded, ensure video is muted and paused if needed
+      if (videoRef.current) {
+        videoRef.current.muted = true;
+
+        // Only pause if it's actually playing
+        if (!videoRef.current.paused) {
+          videoRef.current.pause();
+        }
+      }
+    }
+
+    // Cleanup function
+    return () => {
+      if (videoRef.current && !videoRef.current.paused) {
+        videoRef.current.pause();
+      }
+    };
+  }, [videoExpanded, videoError]);
+
+  // Ensure loading indicator is hidden when video is playing
+  useEffect(() => {
+    if (videoRef.current) {
+      const checkVideoPlaying = () => {
+        if (videoRef.current && !videoRef.current.paused && videoRef.current.currentTime > 0) {
+          setVideoLoaded(true);
+        }
+      };
+
+      // Check immediately
+      checkVideoPlaying();
+
+      // Set up periodic checks
+      const intervalId = setInterval(checkVideoPlaying, 500);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [videoExpanded]);
 
   // Video dimensions based on scroll progress
   const navBarHeight = 80; // Approximate height of nav bar
@@ -423,9 +619,30 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                   >
                     {data.expandMediaType === 'video' ? (
                       <div className="relative w-full h-full overflow-hidden rounded-xl">
+                        {!videoLoaded && !videoError && !videoRef.current?.currentTime && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+                            <div className="text-white text-center">
+                              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto mb-2"></div>
+                              <p>Loading video...</p>
+                            </div>
+                          </div>
+                        )}
+                        {videoError && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+                            <div className="text-white text-center">
+                              <p>Failed to load video. Showing poster.</p>
+                              <Image
+                                src={data.expandPosterSrc ? urlFor(data.expandPosterSrc).url() : urlFor(data.heroImage).url()}
+                                alt="Video Poster"
+                                width={300}
+                                height={200}
+                                className="mt-4 rounded-lg"
+                              />
+                            </div>
+                          </div>
+                        )}
                         <video
                           ref={videoRef}
-                          src={data.expandMediaSrc?.asset.url}
                           poster={data.expandPosterSrc ? urlFor(data.expandPosterSrc).url() : undefined}
                           muted={!videoExpanded} // Only muted until expanded
                           loop
@@ -442,7 +659,25 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                             objectFit: 'cover',
                             transition: 'opacity 0.3s ease-in-out',
                           }}
-                        />
+                          onLoadedData={() => {
+                            setVideoLoaded(true);
+                            console.log('Video loaded data successfully');
+                          }}
+                          onCanPlay={() => {
+                            setVideoLoaded(true);
+                            console.log('Video can play now');
+                          }}
+                          onError={(e) => {
+                            console.error('Video error event:', e);
+                            setVideoLoaded(false);
+                            setVideoError(true); // Set videoError to true on error
+                          }}
+                        >
+                          {/* Add source elements for better browser compatibility */}
+                          <source src={data.expandMediaSrc?.asset.url} type="video/mp4" />
+                          {/* Fallback text if video fails */}
+                          Your browser does not support the video tag.
+                        </video>
                         <div
                           className="absolute inset-0 bg-black/30 rounded-xl pointer-events-none"
                           style={{
@@ -557,10 +792,10 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         {/* Static Content Sections */}
         <div
           ref={contentSectionRef}
-          className={`content-section bg-white relative z-20 ${!canScrollPage ? 'opacity-0' : 'opacity-100'}`}
+          className={`content-section bg-white relative z-20 ${!videoExpanded ? 'opacity-0' : 'opacity-100'}`}
           style={{
             transition: 'opacity 0.5s ease-in-out',
-            pointerEvents: canScrollPage ? 'auto' : 'none'
+            pointerEvents: videoExpanded ? 'auto' : 'none'
           }}
         >
           {data.contentSections && data.contentSections.length > 0 && (
