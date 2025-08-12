@@ -82,6 +82,11 @@
     position: fixed;
     width: 100%;
   }
+
+  /* Hide navbar when modal is open */
+  body.modal-open header {
+    display: none !important;
+  }
 }
 
 /* Navigation item hover effect */

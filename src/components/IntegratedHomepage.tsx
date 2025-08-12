@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { SanityHomePage, SanityContentSection } from '../lib/types';
 import { urlFor } from '../lib/sanity';
 import { PortableText } from '@portabletext/react';
+import TestimonialsSection from './TestimonialsSection';
 
 interface IntegratedHomepageProps {
   data: SanityHomePage;
@@ -809,6 +810,9 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               ))}
             </>
           )}
+
+          {/* Testimonials Section */}
+          <TestimonialsSection testimonials={data.testimonials} />
         </div>
       </div>
     </>

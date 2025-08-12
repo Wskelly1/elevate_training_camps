@@ -148,11 +148,17 @@ export default defineType({
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
+            defineField({
+              name: 'designation',
+              title: 'Designation/Role',
+              type: 'string',
+              description: 'e.g., "Professional Runner", "Cross Country Coach", "Marathon Runner"',
+            }),
           ],
           preview: {
             select: {
               title: 'name',
-              subtitle: 'text',
+              subtitle: 'designation',
               media: 'image',
             },
           },
@@ -227,4 +233,4 @@ export default defineType({
       media: 'heroImage',
     },
   },
-}) 
+})

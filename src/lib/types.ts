@@ -24,12 +24,14 @@ export interface SanityImage {
  * @property {string} _key - Unique key for the testimonial
  * @property {string} name - Name of the person giving the testimonial
  * @property {string} text - The testimonial quote text
+ * @property {string} [designation] - Role or designation of the person (optional for backward compatibility)
  * @property {SanityImage} image - Profile image of the person
  */
 export interface SanityTestimonial {
   _key: string;
   name: string;
   text: string;
+  designation?: string;
   image: SanityImage;
 }
 
