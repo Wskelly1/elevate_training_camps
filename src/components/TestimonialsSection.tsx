@@ -34,13 +34,13 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
   }
 
   return (
-    <section className="py-16 bg-[#fff9eb]">
+    <section className="py-1 md:py-2 bg-[#fff9eb]">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-2 md:mb-3">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-1">
             What Our Athletes Say
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-1">
             Hear from the athletes who have transformed their performance through our high-altitude training programs in Flagstaff, Arizona.
           </p>
         </div>

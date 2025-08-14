@@ -296,7 +296,7 @@ const TestimonialCard = ({
 				}}
 			>
 				<div
-					className={`${index % 2 === 0 ? "rotate-0" : "-rotate-0"} rounded-3xl bg-[#fff9eb] h-[500px] md:h-[550px] w-80 md:w-96 overflow-hidden flex flex-col items-center justify-center relative z-10 shadow-md`}
+					className={`${index % 2 === 0 ? "rotate-0" : "-rotate-0"} rounded-3xl bg-[#fff9eb] h-[420px] md:h-[460px] w-72 md:w-80 overflow-hidden flex flex-col items-center justify-center relative z-10 shadow-md`}
 				>
 					<div className="absolute opacity-30" style={{inset: "-1px 0 0"}}>
 						<div className="absolute inset-0">
@@ -312,7 +312,7 @@ const TestimonialCard = ({
 					<ProfileImage src={testimonial.profileImage} alt={testimonial.name} />
 					<motion.p
 						layoutId={layout ? `title-${testimonial.name}` : undefined}
-						className="text-black text-2xl md:text-2xl font-normal text-center [text-wrap:balance] font-sans mt-4 lowercase px-3"
+						className="text-black text-xl md:text-2xl font-normal text-center [text-wrap:balance] font-sans mt-3 lowercase px-3"
 					>
 						{testimonial.description.length > 100
 							? `${testimonial.description.slice(0, 100)}...`
@@ -320,13 +320,13 @@ const TestimonialCard = ({
 					</motion.p>
 					<motion.p
 						layoutId={layout ? `category-${testimonial.name}` : undefined}
-						className="text-black text-xl md:text-2xl font-thin font-sans italic text-center mt-5 lowercase"
+						className="text-black text-lg md:text-xl font-thin font-sans italic text-center mt-3 lowercase"
 					>
 						{testimonial.name}.
 					</motion.p>
 					<motion.p
 						layoutId={layout ? `category-${testimonial.name}` : undefined}
-						className="text-black text-base md:text-base font-thin font-sans italic text-center mt-1 lowercase underline underline-offset-8 decoration-1"
+						className="text-black text-sm md:text-base font-thin font-sans italic text-center mt-1 lowercase underline underline-offset-8 decoration-1"
 					>
 						{testimonial.designation.length > 25
 							? `${testimonial.designation.slice(0, 25)}...`
@@ -342,7 +342,7 @@ const ProfileImage = ({src, alt, ...rest}: ImageProps) => {
 	const [isLoading, setLoading] = useState(true);
 
 	return (
-		<div className="w-[90px] h-[90px] md:w-[150px] md:h-[150px] overflow-hidden rounded-[1000px] border-[3px] border-solid border-[rgba(59,59,59,0.6)] aspect-[1/1] flex-none relative">
+		<div className="w-[80px] h-[80px] md:w-[130px] md:h-[130px] overflow-hidden rounded-[1000px] border-[3px] border-solid border-[rgba(59,59,59,0.6)] aspect-[1/1] flex-none relative">
 			<Image
 				className={cn(
 					"transition duration-300 absolute top-0 inset-0 rounded-inherit object-cover z-50",
@@ -352,8 +352,8 @@ const ProfileImage = ({src, alt, ...rest}: ImageProps) => {
 					return setLoading(false);
 				}}
 				src={src}
-				width={150}
-				height={150}
+				width={130}
+				height={130}
 				loading="lazy"
 				decoding="async"
 				blurDataURL={typeof src === "string" ? src : undefined}
