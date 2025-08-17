@@ -28,18 +28,7 @@ interface AboutSection {
   image: any;
 }
 
-interface AboutHero {
-  mediaType: 'video' | 'image';
-  mediaSrc?: { asset: { url: string } };
-  mediaImage?: any;
-  posterSrc?: any;
-  bgImageSrc: any;
-  title?: string;
-  date?: string;
-  scrollToExpand?: string;
-  overview?: string;
-  conclusion?: string;
-}
+
 
 /**
  * Fetches team members from the Sanity CMS
@@ -83,27 +72,7 @@ async function getAboutSections() {
   `);
 }
 
-/**
- * Fetches the about page hero content from Sanity CMS
- *
- * Retrieves the hero section configuration including media assets, text content,
- * and styling options for the top section of the about page.
- *
- * @returns {Promise<AboutHero | null>} Hero configuration object or null if not found
- * @throws {Error} If the Sanity API request fails
- */
-async function getAboutHero() {
-  return await client.fetch(`
-    *[_type == "aboutHero"][0] {
-      ...,
-      mediaSrc {
-        asset-> {
-          url
-        }
-      }
-    }
-  `);
-}
+
 
 /**
  * Converts Sanity team members to the format required by AnimatedTeamIntroductions
@@ -148,7 +117,7 @@ function convertToIntroductions(members: TeamMember[]): TeamIntroduction[] {
 export default function AboutPage() {
   const [teamIntroductions, setTeamIntroductions] = useState<TeamIntroduction[]>([]);
   const [aboutSections, setAboutSections] = useState<AboutSection[]>([]);
-  const [aboutHero, setAboutHero] = useState<AboutHero | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
 
   // Handle URL hash navigation after content loads
@@ -184,10 +153,9 @@ export default function AboutPage() {
   useEffect(() => {
     async function loadAboutData() {
       try {
-        const [members, sections, hero] = await Promise.all([
+        const [members, sections] = await Promise.all([
           getTeamMembers(),
           getAboutSections(),
-          getAboutHero(),
         ]);
 
         if (members && members.length > 0) {
@@ -205,7 +173,6 @@ export default function AboutPage() {
         }
 
         setAboutSections(sections);
-        setAboutHero(hero);
 
         // Set loading to false immediately after data is loaded
         setIsLoading(false);
@@ -222,19 +189,6 @@ export default function AboutPage() {
 
   return (
     <Layout>
-      {aboutHero && (
-        <div className="relative h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: `url(${urlFor(aboutHero.bgImageSrc).url()})` }}>
-          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-          <div className="z-10 text-white text-center px-4 max-w-4xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">{aboutHero.title}</h1>
-            <p className="text-lg md:text-xl mb-6">{aboutHero.overview}</p>
-            {aboutHero.conclusion && (
-              <p className="text-xl md:text-2xl font-bold">{aboutHero.conclusion}</p>
-            )}
-          </div>
-        </div>
-      )}
-
       <section id="our-team" className="py-12 bg-[#f0ead6] scroll-mt-32">
         <h2 className="text-5xl font-bold text-center mb-4">Our Team</h2>
         {isLoading ? (
