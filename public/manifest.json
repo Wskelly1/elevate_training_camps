@@ -1,0 +1,16 @@
+{
+  "name": "Elevate Training Camps",
+  "short_name": "Elevate",
+  "description": "High Altitude Training in Flagstaff, Arizona",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#427b4d",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

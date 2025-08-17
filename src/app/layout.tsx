@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getSiteSettings } from "../lib/queries";
+import { urlFor } from "../lib/sanity";
+import FaviconProvider from "../components/FaviconProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +32,16 @@ export async function generateMetadata(): Promise<Metadata> {
     title: settings.title || "Elevate Training Camps",
     description: settings.description || "Elevate Training Camps - High Altitude Training in Flagstaff",
     icons: {
-      icon: '/favicon.svg',
+      icon: settings.favicon ? [
+        { url: urlFor(settings.favicon).url(), type: 'image/png' },
+      ] : [
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/favicon.ico', sizes: 'any' },
+      ],
+      apple: [
+        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+        { url: '/apple-touch-icon-precomposed.png', sizes: '180x180', type: 'image/png' },
+      ],
     },
   };
 }
@@ -60,11 +71,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" />
+        <link rel="manifest" href="/api/manifest" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <FaviconProvider />
         {children}
       </body>
     </html>
