@@ -139,18 +139,36 @@ const Layout: React.FC<LayoutProps> = ({
 
   useEffect(() => {
     // Add a click listener to the header to handle navigation link clicks
-    const handleNavLinkClick = () => {
-      // When a nav link is clicked, ensure the body scroll is not locked
-      document.body.style.overflow = 'auto';
+    const handleNavLinkClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a');
+
+      if (link) {
+        // When a nav link is clicked, ensure the body scroll is not locked
+        document.body.style.overflow = 'auto';
+
+        // Dispatch a custom event to signal navigation
+        const navEvent = new CustomEvent('navigationClick', {
+          detail: { href: link.href }
+        });
+        window.dispatchEvent(navEvent);
+
+        // For debugging
+        console.log('Navigation link clicked:', link.href);
+      }
     };
 
     const headerElement = headerRef.current;
     if (headerElement) {
       const navLinks = headerElement.querySelectorAll('a');
-      navLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
+      navLinks.forEach(link => {
+        link.addEventListener('click', handleNavLinkClick, true); // Use capture phase
+      });
 
       return () => {
-        navLinks.forEach(link => link.removeEventListener('click', handleNavLinkClick));
+        navLinks.forEach(link => {
+          link.removeEventListener('click', handleNavLinkClick, true);
+        });
       };
     }
   }, [mounted]); // Rerun when mounted state changes
@@ -306,7 +324,7 @@ const Layout: React.FC<LayoutProps> = ({
                                 {/* Left: Learn About Us fills full height */}
                                 <div className="flex flex-col h-full">
                                   <NavigationMenuLink asChild>
-                                    <a
+                                    <Link
                                       className="flex flex-1 flex-col justify-end rounded-md px-6 pt-6 pb-4 m-4 no-underline outline-none focus:shadow-md relative overflow-hidden hover-scale-effect hover:shadow-lg transform transition-all duration-300 hover:scale-[1.03] cursor-pointer group"
                                       style={{ backgroundColor: customColors.muted, minHeight: 0 }}
                                       href="/about"
@@ -341,7 +359,7 @@ const Layout: React.FC<LayoutProps> = ({
                                       <p className="text-sm leading-tight relative z-10" style={{ color: customColors.foreground }}>
                                         Discover our story, meet our team, and understand our mission.
                                       </p>
-                                    </a>
+                                    </Link>
                                   </NavigationMenuLink>
                                 </div>
                                 {/* Right: Links stacked at top */}
@@ -349,7 +367,7 @@ const Layout: React.FC<LayoutProps> = ({
                                   <div>
                                     {item.subItems.map((subItem) => (
                                       <NavigationMenuLink key={subItem.title} asChild>
-                                        <a
+                                        <Link
                                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors focus:text-accent-foreground"
                                           href={subItem.href}
                                           onClick={(e) => {
@@ -366,7 +384,7 @@ const Layout: React.FC<LayoutProps> = ({
                                           <p className="text-sm leading-snug" style={{ color: customColors.darkAccent }}>
                                             {getDescriptionForSection(subItem.title)}
                                           </p>
-                                        </a>
+                                        </Link>
                                       </NavigationMenuLink>
                                     ))}
                                   </div>
@@ -375,21 +393,23 @@ const Layout: React.FC<LayoutProps> = ({
                             </NavigationMenuContent>
                           </>
                         ) : (
-                          <NavigationMenuLink
-                            href={item.href}
-                            style={{
-                              color: customColors.navText,
-                              fontWeight: 'bold',
-                              fontSize: '16px',
-                              padding: '0.5rem 0.75rem',
-                              position: 'relative',
-                              display: 'flex',
-                              alignItems: 'center',
-                            }}
-                            className="relative nav-item-with-bar nav-hover-bg"
-                          >
-                            <span>{item.title}</span>
-                            <span className="hover-bar"></span>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={item.href}
+                              style={{
+                                color: customColors.navText,
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                padding: '0.5rem 0.75rem',
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                              }}
+                              className="relative nav-item-with-bar nav-hover-bg"
+                            >
+                              <span>{item.title}</span>
+                              <span className="hover-bar"></span>
+                            </Link>
                           </NavigationMenuLink>
                         )}
                       </NavigationMenuItem>
