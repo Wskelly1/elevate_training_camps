@@ -145,3 +145,183 @@ export interface HomeHero {
   date?: string;
   scrollToExpand?: string;
 }
+
+/**
+ * SanityCoachingProgram - Type definition for coaching program data from Sanity
+ *
+ * Represents coaching program information including pricing, features,
+ * and program details for display on the coaching page.
+ *
+ * @property {string} _id - Unique identifier for the coaching program
+ * @property {string} name - Name of the coaching program
+ * @property {string} description - Brief description of the program
+ * @property {number} price - Current price of the program
+ * @property {number} [originalPrice] - Original price for strikethrough display
+ * @property {string} duration - Duration of the program
+ * @property {string[]} features - Array of program features
+ * @property {boolean} popular - Whether this is marked as most popular
+ * @property {number} order - Display order for sorting
+ * @property {string} icon - Icon identifier for the program
+ * @property {string} color - Color theme for the program
+ * @property {boolean} active - Whether the program is active
+ */
+export interface SanityCoachingProgram {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  duration: string;
+  features: string[];
+  popular: boolean;
+  order: number;
+  icon: string;
+  color: string;
+  active: boolean;
+}
+
+/**
+ * SanityCoachingBenefit - Type definition for coaching benefit data from Sanity
+ *
+ * Represents benefits of coaching services for display on the coaching page.
+ *
+ * @property {string} _id - Unique identifier for the benefit
+ * @property {string} title - Title of the benefit
+ * @property {string} description - Description of the benefit
+ * @property {string} icon - Icon identifier for the benefit
+ * @property {number} order - Display order for sorting
+ * @property {boolean} active - Whether the benefit is active
+ */
+export interface SanityCoachingBenefit {
+  _id: string;
+  title: string;
+  description: string;
+  icon: string;
+  order: number;
+  active: boolean;
+}
+
+/**
+ * SanityCoachingTestimonial - Type definition for coaching testimonial data from Sanity
+ *
+ * Represents athlete testimonials for coaching services.
+ *
+ * @property {string} _id - Unique identifier for the testimonial
+ * @property {string} name - Name of the athlete
+ * @property {string} sport - Sport the athlete participates in
+ * @property {string} quote - Testimonial quote
+ * @property {number} rating - Star rating (1-5)
+ * @property {Object} [program] - Reference to the coaching program attended
+ * @property {SanityImage} [image] - Optional photo of the athlete
+ * @property {number} order - Display order for sorting
+ * @property {boolean} active - Whether the testimonial is active
+ */
+export interface SanityCoachingTestimonial {
+  _id: string;
+  name: string;
+  sport: string;
+  quote: string;
+  rating: number;
+  program?: { _ref: string };
+  image?: SanityImage;
+  order: number;
+  active: boolean;
+}
+
+/**
+ * SanityTrainingPackage - Type definition for training package data from Sanity
+ *
+ * Represents training package information for the registration page.
+ *
+ * @property {string} _id - Unique identifier for the training package
+ * @property {string} name - Name of the training package
+ * @property {string} description - Brief description of the package
+ * @property {number} price - Current price of the package
+ * @property {number} [originalPrice] - Original price for strikethrough display
+ * @property {string} duration - Duration of the package
+ * @property {string[]} features - Array of package features
+ * @property {boolean} popular - Whether this is marked as most popular
+ * @property {number} order - Display order for sorting
+ * @property {boolean} active - Whether the package is active
+ */
+export interface SanityTrainingPackage {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  duration: string;
+  features: string[];
+  popular: boolean;
+  order: number;
+  active: boolean;
+}
+
+/**
+ * SanityUpcomingCamp - Type definition for upcoming camp data from Sanity
+ *
+ * Represents upcoming training camp information for the registration page.
+ *
+ * @property {string} _id - Unique identifier for the upcoming camp
+ * @property {string} date - Camp date (e.g., "March 15-19, 2025")
+ * @property {string} type - Type of camp (Basic, Premium, Elite, etc.)
+ * @property {string} spots - Spots remaining (e.g., "8 spots remaining")
+ * @property {string} location - Camp location
+ * @property {boolean} earlyBird - Whether early bird pricing is available
+ * @property {string} [earlyBirdEnds] - When early bird pricing ends
+ * @property {number} order - Display order for sorting
+ * @property {boolean} active - Whether the camp is active
+ */
+export interface SanityUpcomingCamp {
+  _id: string;
+  date: string;
+  type: string;
+  spots: string;
+  location: string;
+  earlyBird: boolean;
+  earlyBirdEnds?: string;
+  order: number;
+  active: boolean;
+}
+
+/**
+ * SanityPaymentOption - Type definition for payment option data from Sanity
+ *
+ * Represents payment plan options for the registration page.
+ *
+ * @property {string} _id - Unique identifier for the payment option
+ * @property {string} name - Name of the payment plan
+ * @property {string} description - Description of the payment plan
+ * @property {string} discount - Discount or payment details
+ * @property {number} order - Display order for sorting
+ * @property {boolean} active - Whether the payment option is active
+ */
+export interface SanityPaymentOption {
+  _id: string;
+  name: string;
+  description: string;
+  discount: string;
+  order: number;
+  active: boolean;
+}
+
+/**
+ * SanityWhatsIncluded - Type definition for what's included data from Sanity
+ *
+ * Represents categories of what's included in training packages.
+ *
+ * @property {string} _id - Unique identifier for the category
+ * @property {string} category - Category name (e.g., "Training & Coaching")
+ * @property {string[]} items - Array of included items
+ * @property {string} icon - Icon identifier for the category
+ * @property {number} order - Display order for sorting
+ * @property {boolean} active - Whether the category is active
+ */
+export interface SanityWhatsIncluded {
+  _id: string;
+  category: string;
+  items: string[];
+  icon: string;
+  order: number;
+  active: boolean;
+}

@@ -100,9 +100,9 @@ const Carousel = ({items, initialScroll = 0}: iCarouselProps) => {
 	}, [initialScroll]);
 
 	return (
-		<div className="relative w-full mt-10">
+		<div className="relative w-full mt-6">
 			<div
-				className="flex w-full overflow-x-scroll overscroll-x-auto scroll-smooth [scrollbar-width:none] py-5"
+				className="flex w-full overflow-x-scroll overscroll-x-auto scroll-smooth [scrollbar-width:none] py-4"
 				ref={carouselRef}
 				onScroll={checkScrollability}
 			>
@@ -113,7 +113,7 @@ const Carousel = ({items, initialScroll = 0}: iCarouselProps) => {
 				/>
 				<div
 					className={cn(
-						"flex flex-row justify-start gap-4 pl-3",
+						"flex flex-row justify-start gap-6 pl-4",
 						"max-w-5xl mx-auto",
 					)}
 				>
@@ -143,16 +143,16 @@ const Carousel = ({items, initialScroll = 0}: iCarouselProps) => {
 					})}
 				</div>
 			</div>
-			<div className="flex justify-end gap-2 mt-4">
+			<div className="flex justify-end gap-3 mt-8 mr-4">
 				<button
-					className="relative z-40 h-10 w-10 rounded-full bg-[#4b3f33] flex items-center justify-center disabled:opacity-50 hover:bg-[#4b3f33]/80 transition-colors duration-200"
+					className="relative z-40 h-12 w-12 rounded-full bg-[#4b3f33] flex items-center justify-center disabled:opacity-50 hover:bg-[#4b3f33]/80 transition-colors duration-200"
 					onClick={handleScrollLeft}
 					disabled={!canScrollLeft}
 				>
 					<ArrowLeft className="h-6 w-6 text-[#f2f0eb]" />
 				</button>
 				<button
-					className="relative z-40 h-10 w-10 rounded-full bg-[#4b3f33] flex items-center justify-center disabled:opacity-50 hover:bg-[#4b3f33]/80 transition-colors duration-200"
+					className="relative z-40 h-12 w-12 rounded-full bg-[#4b3f33] flex items-center justify-center disabled:opacity-50 hover:bg-[#4b3f33]/80 transition-colors duration-200"
 					onClick={handleScrollRight}
 					disabled={!canScrollRight}
 				>

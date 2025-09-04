@@ -187,3 +187,178 @@ export const homePageQuery = groq`
     }
   }
 `;
+
+/**
+ * Fetches coaching programs from Sanity CMS
+ *
+ * Retrieves all active coaching programs ordered by their display order.
+ * Each program includes pricing, features, and program details.
+ *
+ * @returns {Promise<Array>} Array of coaching program objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
+export async function getCoachingPrograms() {
+  return await client.fetch(`
+    *[_type == "coachingProgram" && active == true] | order(order asc) {
+      _id,
+      name,
+      description,
+      price,
+      originalPrice,
+      duration,
+      features,
+      popular,
+      order,
+      icon,
+      color,
+      active
+    }
+  `);
+}
+
+/**
+ * Fetches coaching benefits from Sanity CMS
+ *
+ * Retrieves all active coaching benefits ordered by their display order.
+ * Each benefit includes title, description, and icon information.
+ *
+ * @returns {Promise<Array>} Array of coaching benefit objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
+export async function getCoachingBenefits() {
+  return await client.fetch(`
+    *[_type == "coachingBenefit" && active == true] | order(order asc) {
+      _id,
+      title,
+      description,
+      icon,
+      order,
+      active
+    }
+  `);
+}
+
+/**
+ * Fetches coaching testimonials from Sanity CMS
+ *
+ * Retrieves all active coaching testimonials ordered by their display order.
+ * Each testimonial includes athlete information, quotes, and ratings.
+ *
+ * @returns {Promise<Array>} Array of coaching testimonial objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
+export async function getCoachingTestimonials() {
+  return await client.fetch(`
+    *[_type == "coachingTestimonial" && active == true] | order(order asc) {
+      _id,
+      name,
+      sport,
+      quote,
+      rating,
+      program,
+      image {
+        asset->{
+          _id,
+          url
+        }
+      },
+      order,
+      active
+    }
+  `);
+}
+
+/**
+ * Fetches training packages from Sanity CMS
+ *
+ * Retrieves all active training packages ordered by their display order.
+ * Each package includes pricing, features, and package details.
+ *
+ * @returns {Promise<Array>} Array of training package objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
+export async function getTrainingPackages() {
+  return await client.fetch(`
+    *[_type == "trainingPackage" && active == true] | order(order asc) {
+      _id,
+      name,
+      description,
+      price,
+      originalPrice,
+      duration,
+      features,
+      popular,
+      order,
+      active
+    }
+  `);
+}
+
+/**
+ * Fetches upcoming training camps from Sanity CMS
+ *
+ * Retrieves all active upcoming camps ordered by their display order.
+ * Each camp includes date, type, spots remaining, and early bird information.
+ *
+ * @returns {Promise<Array>} Array of upcoming camp objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
+export async function getUpcomingCamps() {
+  return await client.fetch(`
+    *[_type == "upcomingCamp" && active == true] | order(order asc) {
+      _id,
+      date,
+      type,
+      spots,
+      location,
+      earlyBird,
+      earlyBirdEnds,
+      order,
+      active
+    }
+  `);
+}
+
+/**
+ * Fetches payment options from Sanity CMS
+ *
+ * Retrieves all active payment options ordered by their display order.
+ * Each option includes name, description, and discount details.
+ *
+ * @returns {Promise<Array>} Array of payment option objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
+export async function getPaymentOptions() {
+  return await client.fetch(`
+    *[_type == "paymentOption" && active == true] | order(order asc) {
+      _id,
+      name,
+      description,
+      discount,
+      order,
+      active
+    }
+  `);
+}
+
+/**
+ * Fetches what's included categories from Sanity CMS
+ *
+ * Retrieves all active what's included categories ordered by their display order.
+ * Each category includes items and icon information.
+ *
+ * @returns {Promise<Array>} Array of what's included objects from Sanity
+ * @throws {Error} If the Sanity API request fails
+ */
+export async function getWhatsIncluded() {
+  return await client.fetch(`
+    *[_type == "whatsIncluded" && active == true] | order(order asc) {
+      _id,
+      category,
+      items,
+      icon,
+      order,
+      active
+    }
+  `);
+}

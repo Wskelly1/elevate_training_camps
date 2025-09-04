@@ -7,6 +7,7 @@ import { AnimatedTeamIntroductions, type TeamIntroduction } from "../../componen
 import { SanityTeamMember } from '../../lib/types';
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
+import { User } from "lucide-react";
 
 // Type for team member from Sanity
 type TeamMember = {
@@ -189,6 +190,35 @@ export default function AboutPage() {
 
   return (
     <Layout>
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#427b4d]/10 to-[#755f4f]/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mb-8">
+            <User className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              About Elevate Training Camps
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Discover the story behind our commitment to excellence in high-altitude training.
+              We're dedicated to helping athletes reach their peak performance through innovative
+              training methods and world-class facilities in the heart of Flagstaff, Arizona.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
+              <p className="text-lg font-semibold text-gray-900">Established 2020</p>
+            </div>
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
+              <p className="text-lg font-semibold text-gray-900">Flagstaff, Arizona</p>
+            </div>
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
+              <p className="text-lg font-semibold text-gray-900">7,000 ft Elevation</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="our-team" className="py-12 bg-[#f0ead6] scroll-mt-32">
         <h2 className="text-5xl font-bold text-center mb-4">Our Team</h2>
         {isLoading ? (
@@ -206,7 +236,9 @@ export default function AboutPage() {
         )}
       </section>
 
-      {aboutSections.map((section, index) => (
+      {aboutSections
+        .filter(section => !section.title.toLowerCase().includes('pricing'))
+        .map((section, index) => (
         <section key={section._id} id={section.slug.current} className={`py-12 ${index % 2 !== 0 ? 'bg-[#f0ead6]' : 'bg-transparent'} scroll-mt-32`}>
           <div className="container mx-auto px-4">
             <div className={`flex flex-col items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>

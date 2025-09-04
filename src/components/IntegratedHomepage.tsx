@@ -453,18 +453,18 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-black/10" />
             </div>
 
             {/* Layer 2: All content that appears over the background */}
             <div className="relative z-10 h-full flex flex-col items-center justify-center video-container">
-              {/* Initial Hero Text - visible before scroll */}
+              {/* Initial Hero Text - visible before scroll, positioned lower to avoid nav bar */}
               {initialPhase && (
-                <div className="text-center px-4 text-white pointer-events-none">
-                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4">
+                <div className="text-center px-4 text-black pointer-events-none mt-32 md:mt-36 lg:mt-40">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
                     Elevate Training Camps
                   </h1>
-                  <p className="text-xl md:text-2xl max-w-2xl mx-auto">
+                  <p className="text-lg md:text-xl max-w-2xl mx-auto">
                     An elevated training experience for all athletes
                   </p>
                 </div>
@@ -642,15 +642,8 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
             ))}
             </>
           )}
-          {/* Testimonials Section wrapped with alternating cream background */}
-          <section
-            className="bg-[#fff9eb]"
-            style={{ position: 'relative', zIndex: 20, padding: '4rem 0' }}
-          >
-            <div className="container mx-auto px-4">
-              <TestimonialsSection testimonials={data.testimonials} />
-            </div>
-          </section>
+          {/* Testimonials Section */}
+          <TestimonialsSection testimonials={data.testimonials} />
           </div>
       </div>
     </>

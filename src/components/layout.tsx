@@ -248,15 +248,18 @@ const Layout: React.FC<LayoutProps> = ({
       subItems: [
         // Always include "Our Team" first
         { title: "Our Team", href: "/about#our-team", icon: Users },
-        // Add dynamic sections from Sanity
-        ...aboutSections.map(section => ({
-          title: section.title,
-          href: `/about#${section.slug.current}`,
-          icon: getIconForSection(section.title)
-        }))
+        // Add dynamic sections from Sanity (excluding pricing)
+        ...aboutSections
+          .filter(section => !section.title.toLowerCase().includes('pricing'))
+          .map(section => ({
+            title: section.title,
+            href: `/about#${section.slug.current}`,
+            icon: getIconForSection(section.title)
+          }))
       ],
       href: "/about"
     },
+    { title: "Coaching", href: "/coaching", icon: Target },
     { title: "Registration", href: "/registration", icon: ClipboardList },
     { title: "Media", href: "/media", icon: ImageIcon },
     { title: "FAQ", href: "/faq", icon: HelpCircle },
@@ -314,6 +317,15 @@ const Layout: React.FC<LayoutProps> = ({
                                   height: 'auto',
                                 }}
                                 className="bg-transparent border-none shadow-none"
+                                onClick={(e) => {
+                                  // Navigate to About when the text is clicked
+                                  if (pathname === '/about') {
+                                    e.preventDefault();
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                  } else {
+                                    window.location.href = '/about';
+                                  }
+                                }}
                               >
                                 {item.title}
                               </NavigationMenuTrigger>
@@ -536,6 +548,9 @@ const Layout: React.FC<LayoutProps> = ({
                   </a>
                   <a href="/about" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     About Us
+                  </a>
+                  <a href="/coaching" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    Coaching
                   </a>
                   <a href="/registration" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Registration
