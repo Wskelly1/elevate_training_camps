@@ -65,7 +65,8 @@ export default function CoachingPage() {
   // Fallback data if Sanity is empty
   const fallbackPrograms = [
     {
-      title: "Individual Performance Coaching",
+      _id: "fallback-program-1",
+      name: "Individual Performance Coaching",
       description: "One-on-one coaching sessions tailored to your specific athletic goals and needs.",
       features: [
         "Personalized training plans",
@@ -76,11 +77,14 @@ export default function CoachingPage() {
       ],
       duration: "60-90 minutes per session",
       price: "Starting at $150/session",
-      icon: Target,
-      popular: true
+      icon: "target",
+      popular: true,
+      order: 0,
+      active: true
     },
     {
-      title: "Group Training Programs",
+      _id: "fallback-program-2",
+      name: "Group Training Programs",
       description: "Small group coaching sessions for athletes looking to train with peers.",
       features: [
         "Small group sizes (4-6 athletes)",
@@ -91,11 +95,14 @@ export default function CoachingPage() {
       ],
       duration: "90 minutes per session",
       price: "Starting at $75/session",
-      icon: Users,
-      popular: false
+      icon: "users",
+      popular: false,
+      order: 1,
+      active: true
     },
     {
-      title: "High-Altitude Training Camps",
+      _id: "fallback-program-3",
+      name: "High-Altitude Training Camps",
       description: "Intensive multi-day training camps at our Flagstaff location.",
       features: [
         "3-7 day intensive programs",
@@ -106,11 +113,14 @@ export default function CoachingPage() {
       ],
       duration: "3-7 days",
       price: "Starting at $1,200/camp",
-      icon: MapPin,
-      popular: true
+      icon: "mappin",
+      popular: true,
+      order: 2,
+      active: true
     },
     {
-      title: "Virtual Coaching Programs",
+      _id: "fallback-program-4",
+      name: "Virtual Coaching Programs",
       description: "Remote coaching services for athletes who can't attend in-person sessions.",
       features: [
         "Video analysis and feedback",
@@ -121,52 +131,75 @@ export default function CoachingPage() {
       ],
       duration: "Ongoing monthly programs",
       price: "Starting at $200/month",
-      icon: Zap,
-      popular: false
+      icon: "zap",
+      popular: false,
+      order: 3,
+      active: true
     }
   ];
 
   const fallbackBenefits = [
     {
+      _id: "fallback-benefit-1",
       title: "Expert Guidance",
       description: "Learn from certified coaches with years of experience in high-performance athletics.",
-      icon: Award
+      icon: "award",
+      order: 0,
+      active: true
     },
     {
+      _id: "fallback-benefit-2",
       title: "Proven Results",
       description: "Our athletes consistently achieve personal bests and reach their competitive goals.",
-      icon: TrendingUp
+      icon: "trendingup",
+      order: 1,
+      active: true
     },
     {
+      _id: "fallback-benefit-3",
       title: "Personalized Approach",
       description: "Every program is tailored to your specific needs, goals, and current fitness level.",
-      icon: Heart
+      icon: "heart",
+      order: 2,
+      active: true
     },
     {
+      _id: "fallback-benefit-4",
       title: "High-Altitude Advantage",
       description: "Train at 7,000 feet elevation for natural performance enhancement and adaptation.",
-      icon: MapPin
+      icon: "mappin",
+      order: 3,
+      active: true
     }
   ];
 
   const fallbackTestimonials = [
     {
+      _id: "fallback-testimonial-1",
       name: "Sarah Johnson",
       sport: "Track & Field",
       quote: "The individual coaching program transformed my performance. I shaved 15 seconds off my 5K time in just 3 months!",
-      rating: 5
+      rating: 5,
+      order: 0,
+      active: true
     },
     {
+      _id: "fallback-testimonial-2",
       name: "Mike Chen",
       sport: "Cycling",
       quote: "The high-altitude training camp was incredible. I felt stronger and more confident in my races after just one week.",
-      rating: 5
+      rating: 5,
+      order: 1,
+      active: true
     },
     {
+      _id: "fallback-testimonial-3",
       name: "Emma Rodriguez",
       sport: "Swimming",
       quote: "The virtual coaching program kept me on track during the pandemic. My coach's guidance was invaluable.",
-      rating: 5
+      rating: 5,
+      order: 2,
+      active: true
     }
   ];
 
