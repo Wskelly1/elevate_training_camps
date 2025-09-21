@@ -21,6 +21,7 @@ import { getSiteSettings, SiteSettings } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
 import { usePathname } from "next/navigation";
 import { client } from "../lib/sanity";
+import { subscribeToNewsletter, validateEmail } from "../lib/newsletter";
 
 // Interface for about sections from Sanity
 interface AboutSection {
@@ -137,6 +138,12 @@ const Layout: React.FC<LayoutProps> = ({
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
 
+  // Newsletter form state
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false);
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
+
   useEffect(() => {
     // Add a click listener to the header to handle navigation link clicks
     const handleNavLinkClick = (e: Event) => {
@@ -239,6 +246,52 @@ const Layout: React.FC<LayoutProps> = ({
     if (lowerTitle.includes('team') || lowerTitle.includes('staff') || lowerTitle.includes('people')) return "Meet the people behind Elevate.";
     return "Learn more about us."; // Default description
   }
+
+  // Newsletter form handlers
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newsletterEmail.trim()) {
+      setNewsletterStatus('error');
+      setNewsletterMessage('Please enter your email address');
+      return;
+    }
+
+    if (!validateEmail(newsletterEmail)) {
+      setNewsletterStatus('error');
+      setNewsletterMessage('Please enter a valid email address');
+      return;
+    }
+
+    setIsNewsletterSubmitting(true);
+    setNewsletterStatus('idle');
+
+    try {
+      const result = await subscribeToNewsletter(newsletterEmail);
+
+      if (result.success) {
+        setNewsletterStatus('success');
+        setNewsletterMessage(result.message || 'Thank you for subscribing!');
+        setNewsletterEmail('');
+      } else {
+        setNewsletterStatus('error');
+        setNewsletterMessage(result.error || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      setNewsletterStatus('error');
+      setNewsletterMessage('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsNewsletterSubmitting(false);
+    }
+  };
+
+  const handleNewsletterEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewsletterEmail(e.target.value);
+    // Clear error when user starts typing
+    if (newsletterStatus === 'error') {
+      setNewsletterStatus('idle');
+    }
+  };
 
   // Generate navigation items dynamically
   const navigationItems = [
@@ -519,21 +572,54 @@ const Layout: React.FC<LayoutProps> = ({
               <p className="mb-6" style={{ color: customColors.primary }}>
                 Join our newsletter for the latest updates and exclusive offers.
               </p>
-              <form className="relative">
+
+              {/* Newsletter Status Messages */}
+              {newsletterStatus === 'success' && (
+                <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md text-sm">
+                  {newsletterMessage}
+                </div>
+              )}
+
+              {newsletterStatus === 'error' && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+                  {newsletterMessage}
+                </div>
+              )}
+
+              <form onSubmit={handleNewsletterSubmit} className="relative">
                 <Input
                   type="email"
                   placeholder="Enter your email"
+                  value={newsletterEmail}
+                  onChange={handleNewsletterEmailChange}
+                  disabled={isNewsletterSubmitting}
                   className="pr-12 backdrop-blur-sm"
-                  style={{ background: 'rgba(255, 255, 255, 0.6)', borderColor: customColors.primary, color: customColors.foreground }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    borderColor: newsletterStatus === 'error' ? '#ef4444' : customColors.primary,
+                    color: customColors.foreground,
+                    opacity: isNewsletterSubmitting ? 0.7 : 1
+                  }}
                 />
                 <Button
                   type="submit"
                   size="icon"
+                  disabled={isNewsletterSubmitting}
                   className="absolute right-1 top-1 h-8 w-8 rounded-full"
-                  style={{ backgroundColor: customColors.primary, color: '#fff' }}
+                  style={{
+                    backgroundColor: isNewsletterSubmitting ? '#9ca3af' : customColors.primary,
+                    color: '#fff',
+                    cursor: isNewsletterSubmitting ? 'not-allowed' : 'pointer'
+                  }}
                 >
-                  <Send className="h-4 w-4" />
-                  <span className="sr-only">Subscribe</span>
+                  {isNewsletterSubmitting ? (
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {isNewsletterSubmitting ? 'Subscribing...' : 'Subscribe'}
+                  </span>
                 </Button>
               </form>
               <div className="absolute -right-4 top-0 h-24 w-24 rounded-full" style={{ backgroundColor: customColors.primary, opacity: 0.1, filter: 'blur(32px)' }} />
