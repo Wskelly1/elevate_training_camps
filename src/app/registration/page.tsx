@@ -1,6 +1,7 @@
 'use client';
 
 import Layout from "../../components/layout";
+import Link from "next/link";
 import { Calendar, Clock, MapPin, Users, CheckCircle, Star, CreditCard, Gift, Zap, Award, Target, Heart } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useEffect, useState } from "react";
@@ -287,24 +288,26 @@ export default function RegistrationPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
+                asChild
                 size="lg"
                 className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
               >
-                Register Now
+                <a href="#packages">Register Now</a>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 size="lg"
                 className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
               >
-                Download Brochure
+                <Link href="/contact">Download Brochure</Link>
               </Button>
             </div>
           </div>
         </section>
 
         {/* Pricing Section */}
-        <section className="py-20 bg-white">
+        <section id="packages" className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -360,13 +363,14 @@ export default function RegistrationPage() {
                   </ul>
 
                   <Button
+                    asChild
                     className={`w-full py-4 text-lg font-semibold ${
                       tier.popular
                         ? 'bg-[#427b4d] hover:bg-[#387143] text-white'
                         : 'bg-gray-900 hover:bg-gray-800 text-white'
                     }`}
                   >
-                    Choose {tier.name}
+                    <Link href="/contact">Choose {tier.name}</Link>
                   </Button>
                 </div>
               ))}
@@ -418,8 +422,8 @@ export default function RegistrationPage() {
                     )}
                   </div>
 
-                  <Button className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
-                    Register for This Camp
+                  <Button asChild className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
+                    <Link href="/contact">Register for This Camp</Link>
                   </Button>
                 </div>
               ))}
@@ -584,17 +588,19 @@ export default function RegistrationPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
+                  asChild
                   size="lg"
                   className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
                 >
-                  Register Now
+                  <Link href="/contact">Register Now</Link>
                 </Button>
                 <Button
+                  asChild
                   variant="outline"
                   size="lg"
                   className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
                 >
-                  Call (651) 207-4749
+                  <a href="tel:+16512074749">Call (651) 207-4749</a>
                 </Button>
               </div>
             </div>

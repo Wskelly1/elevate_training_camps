@@ -142,9 +142,6 @@ export default function AboutPage() {
               top: section.offsetTop - headerHeight,
               behavior: 'smooth'
             });
-
-            // For debugging
-            console.log(`Scrolling to section: ${sectionId} at position: ${section.offsetTop - headerHeight}`);
           }
         });
       }

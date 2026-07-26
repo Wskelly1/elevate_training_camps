@@ -23,10 +23,6 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const [virtualScrollY, setVirtualScrollY] = useState<number>(0);
   const [isVideoExpanded, setIsVideoExpanded] = useState<boolean>(false);
 
-  // Debug log the video data
-  console.log('Homepage data:', data);
-  console.log('Video type:', data.expandMediaType);
-
   // Refs
   const heroSectionRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -501,14 +497,8 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                           lazy={false}
                           objectFit="cover"
                           fillContainer
-                          onLoadedData={() => {
-                            console.log('Video loaded data successfully');
-                          }}
                           onError={(e) => {
                             console.error('Video error event:', e);
-                          }}
-                          onPlay={() => {
-                            console.log('Video started playing');
                           }}
                         />
                         <div

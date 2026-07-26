@@ -109,10 +109,6 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
   const mp4Url = videoSrc?.asset?.url || '';
   const lowUrl = lowQualitySrc?.asset?.url || '';
 
-  // Log the video URL for debugging
-  console.log('Video source:', videoSrc);
-  console.log('MP4 URL:', mp4Url);
-
   // Check if the URL is valid and exists
   const hasValidUrl = mp4Url && mp4Url.startsWith('http');
   const hasLowUrl = lowUrl && lowUrl.startsWith('http');
@@ -134,7 +130,6 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
 
   // Poster image URL
   const posterUrl = posterSrc ? urlFor(posterSrc).url() : '';
-  console.log('Poster URL:', posterUrl);
 
   // Fallback image URL
   const fallbackUrl = fallbackImage ? urlFor(fallbackImage).url() : (posterSrc ? urlFor(posterSrc).url() : '');
@@ -159,8 +154,7 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
 
         await video.play();
         setCanAutoPlay(true);
-      } catch (error) {
-        console.log('Autoplay not supported by this browser/device');
+      } catch {
         setCanAutoPlay(false);
       }
     };
@@ -492,11 +486,6 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
         style={videoStyle}
         aria-hidden={!isLoaded || hasError}
         crossOrigin="anonymous"
-        onWaiting={() => console.log('Video event: waiting')}
-        onStalled={() => console.warn('Video event: stalled')}
-        onProgress={() => console.log('Video event: progress', videoRef.current?.buffered?.length)}
-        onSuspend={() => console.log('Video event: suspend')}
-        onAbort={() => console.warn('Video event: abort')}
       >
         {/* Only include MP4 sources when not using HLS */}
         {!hlsSrc && hasValidUrl && <source src={mp4Url} type="video/mp4" />}

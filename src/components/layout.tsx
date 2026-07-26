@@ -71,9 +71,6 @@ function scrollToSection(sectionId: string, e: React.MouseEvent<HTMLAnchorElemen
         top: targetPosition,
         behavior: 'smooth'
       });
-
-      // For debugging
-      console.log(`In-page scroll to: ${sectionId}, position: ${targetPosition}`);
     }
   } else {
     // For cross-page navigation, prevent default and let the link work normally
@@ -159,9 +156,6 @@ const Layout: React.FC<LayoutProps> = ({
           detail: { href: link.href }
         });
         window.dispatchEvent(navEvent);
-
-        // For debugging
-        console.log('Navigation link clicked:', link.href);
       }
     };
 

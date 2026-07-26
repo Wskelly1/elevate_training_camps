@@ -1,6 +1,7 @@
 'use client';
 
 import Layout from "../../components/layout";
+import Link from "next/link";
 import { Target, Users, Clock, MapPin, Star, CheckCircle, Award, TrendingUp, Heart, Zap } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useEffect, useState } from "react";
@@ -227,17 +228,19 @@ export default function CoachingPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
+                asChild
                 size="lg"
                 className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
               >
-                Book a Consultation
+                <Link href="/contact">Book a Consultation</Link>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 size="lg"
                 className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
               >
-                View Programs
+                <a href="#programs">View Programs</a>
               </Button>
             </div>
           </div>
@@ -270,7 +273,7 @@ export default function CoachingPage() {
         </section>
 
         {/* Programs Section */}
-        <section className="py-20 bg-[#fff9eb]">
+        <section id="programs" className="py-20 bg-[#fff9eb]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -320,8 +323,8 @@ export default function CoachingPage() {
                           {program.price ? `$${program.price}` : program.price}
                         </div>
                       </div>
-                      <Button className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
-                        Learn More
+                      <Button asChild className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
+                        <Link href="/contact">Learn More</Link>
                       </Button>
                     </div>
                   </div>
@@ -375,17 +378,19 @@ export default function CoachingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
+                asChild
                 size="lg"
                 className="bg-white text-[#427b4d] hover:bg-gray-100 px-8 py-4 text-lg font-semibold"
               >
-                Book Free Consultation
+                <Link href="/contact">Book Free Consultation</Link>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 size="lg"
                 className="border-white text-white hover:bg-white hover:text-[#427b4d] px-8 py-4 text-lg"
               >
-                Call (651) 207-4749
+                <a href="tel:+16512074749">Call (651) 207-4749</a>
               </Button>
             </div>
           </div>

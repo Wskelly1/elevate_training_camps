@@ -38,46 +38,54 @@ export type SiteSettings = {
  * Fetches site settings from Sanity CMS
  *
  * Retrieves the main site configuration including branding, contact information,
- * and social media links. Returns default values if no settings are found.
+ * and social media links. Returns default values if no settings are found or if
+ * the Sanity request fails — this is called from the root layout's
+ * generateMetadata() on every route, so it must never throw.
  *
  * @returns {Promise<SiteSettings>} Site settings object with branding and contact info
- * @throws {Error} If the Sanity API request fails
  */
 export async function getSiteSettings(): Promise<SiteSettings> {
-  // Get the first (and only) site settings document
-  const settings = await client.fetch(`
-    *[_type == "siteSettings"][0]{
-      title,
-      description,
-      logo {
-        ...,
-        asset->{
-          ...,
-          metadata
-        }
-      },
-      footerLogo {
-        ...,
-        asset->{
-          ...,
-          metadata
-        }
-      },
-      aboutUsImage,
-      favicon,
-      contactEmail,
-      contactPhone,
-      address,
-      "socialLinks": socialLinks[] {
-        platform,
-        url
-      }
-    }
-  `);
-
-  return settings || {
-    title: 'Summit Flagstaff',
+  const fallback: SiteSettings = {
+    title: 'Elevate Training Camps',
   };
+
+  try {
+    // Get the first (and only) site settings document
+    const settings = await client.fetch(`
+      *[_type == "siteSettings"][0]{
+        title,
+        description,
+        logo {
+          ...,
+          asset->{
+            ...,
+            metadata
+          }
+        },
+        footerLogo {
+          ...,
+          asset->{
+            ...,
+            metadata
+          }
+        },
+        aboutUsImage,
+        favicon,
+        contactEmail,
+        contactPhone,
+        address,
+        "socialLinks": socialLinks[] {
+          platform,
+          url
+        }
+      }
+    `);
+
+    return settings || fallback;
+  } catch (error) {
+    console.error('Error fetching site settings:', error);
+    return fallback;
+  }
 }
 
 /**
