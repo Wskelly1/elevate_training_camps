@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react"
-import { Menu, X, User, BookOpen, Users, Target, ClipboardList, Image as ImageIcon, HelpCircle, Mail, MapPin, Facebook, Instagram, Linkedin, Send, Twitter, ChevronDown } from "lucide-react"
+import { Menu, X, User, BookOpen, Users, Target, ClipboardList, Image as ImageIcon, HelpCircle, Mail, MapPin, Facebook, Instagram, Send, Twitter, ChevronDown } from "lucide-react"
 import { Button } from "../components/ui/button"
 import {
   NavigationMenu,
@@ -9,7 +9,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "../components/ui/navigation-menu"
 import { Input } from "../components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
@@ -85,14 +84,13 @@ interface LayoutClientProps {
 const LayoutClient: React.FC<LayoutClientProps> = ({
   children,
   showNavigation = true,
-  footerContent,
   siteSettings,
   aboutSections
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [aboutOpen, setAboutOpen] = React.useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
-  const [navOverridden, setNavOverridden] = useState(false);
+  const [, setNavOverridden] = useState(false);
   const lastScrollY = useRef(0);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -222,7 +220,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
         setNewsletterStatus('error');
         setNewsletterMessage(result.error || 'Something went wrong. Please try again.');
       }
-    } catch (error) {
+    } catch {
       setNewsletterStatus('error');
       setNewsletterMessage('An unexpected error occurred. Please try again.');
     } finally {
@@ -574,27 +572,27 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
               <div>
                 <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Quick Links</h3>
                 <nav className="space-y-2 text-sm">
-                  <a href="/" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Home
-                  </a>
-                  <a href="/about" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  </Link>
+                  <Link href="/about" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     About Us
-                  </a>
-                  <a href="/coaching" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  </Link>
+                  <Link href="/coaching" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Coaching
-                  </a>
-                  <a href="/registration" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  </Link>
+                  <Link href="/registration" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Registration
-                  </a>
-                  <a href="/media" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  </Link>
+                  <Link href="/media" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Media
-                  </a>
-                  <a href="/faq" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  </Link>
+                  <Link href="/faq" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Frequently Asked Questions
-                  </a>
-                  <a href="/contact" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  </Link>
+                  <Link href="/contact" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Contact
-                  </a>
+                  </Link>
                 </nav>
               </div>
               <div>

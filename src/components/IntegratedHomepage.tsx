@@ -325,9 +325,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
         if (!isScrollingRef.current && scrollProgress < 1) {
           // If we were scrolling down (positive delta), continue expanding
           if (lastScrollDeltaRef.current > 0) {
-            // Calculate how much more virtual scroll is needed to complete
             const expansionThreshold = windowDimensions.height;
-            const remainingScroll = expansionThreshold - virtualScrollY;
 
             // Animate the remaining expansion over time
             const animateExpansion = () => {
@@ -395,17 +393,13 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
   const navBarMargin = 16; // Top margin (4 units = 16px)
   const totalNavSpace = navBarHeight + navBarMargin; // Total space taken by navbar
   const sideMargin = 32; // Side margins
-  const topMargin = 48 + totalNavSpace; // Top margin including navbar space
-  const bottomMargin = 32; // Bottom margin
 
   // Calculate maximum dimensions while maintaining aspect ratio
   const aspectRatio = 16 / 9; // Standard 16:9 video aspect ratio
   const maxVideoWidth = Math.min(windowDimensions.width - (sideMargin * 2), windowDimensions.height * aspectRatio * 0.8);
-  const maxVideoHeight = maxVideoWidth / aspectRatio;
 
   // Calculate video dimensions maintaining aspect ratio
   const initialVideoWidth = 320;
-  const initialVideoHeight = initialVideoWidth / aspectRatio; // Approx 180 for 16:9
   const videoWidth = initialVideoWidth + (scrollProgress * (maxVideoWidth - initialVideoWidth));
   const videoHeight = videoWidth / aspectRatio; // Maintain aspect ratio
 

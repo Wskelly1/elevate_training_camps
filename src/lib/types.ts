@@ -1,3 +1,5 @@
+import type { PortableTextBlock } from '@portabletext/types';
+
 /**
  * SanityImage - Type definition for Sanity CMS image assets
  *
@@ -12,6 +14,30 @@ export interface SanityImage {
   asset: {
     _id: string;
     url: string;
+  };
+}
+
+/**
+ * SanityImageRef - Loose shape for raw Sanity image blobs
+ *
+ * Raw image fields coming out of GROQ queries may be un-dereferenced
+ * ({asset:{_ref}}), dereferenced ({asset:{_id,url}}), or expanded with
+ * metadata (Logo uses asset.metadata.dimensions), so every field is
+ * optional. Use SanityImage when the query guarantees _id/url.
+ */
+export interface SanityImageRef {
+  _type?: string;
+  asset?: {
+    _id?: string;
+    _ref?: string;
+    url?: string;
+    metadata?: {
+      dimensions?: {
+        width: number;
+        height: number;
+        aspectRatio?: number;
+      };
+    };
   };
 }
 
@@ -55,7 +81,7 @@ export interface SanityContentSection {
   slug?: string;
   heading: string;
   subheading?: string;
-  text: any; // Typically rich text
+  text: PortableTextBlock[]; // Portable Text rich text
   image: SanityImage;
   buttonText?: string;
   buttonLink?: string;
@@ -116,7 +142,7 @@ export interface SanityTeamMember {
   _id: string;
   name: string;
   title: string;
-  bio: any; // Typically rich text
+  bio: PortableTextBlock[]; // Portable Text rich text
   image: SanityImage;
 }
 
@@ -138,9 +164,9 @@ export interface SanityTeamMember {
 export interface HomeHero {
   mediaType: 'video' | 'image';
   mediaSrc?: { asset: { url: string } };
-  mediaImage?: any;
-  posterSrc?: any;
-  bgImageSrc: any;
+  mediaImage?: SanityImageRef;
+  posterSrc?: SanityImageRef;
+  bgImageSrc: SanityImageRef;
   title?: string;
   date?: string;
   scrollToExpand?: string;

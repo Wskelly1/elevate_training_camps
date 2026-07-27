@@ -38,3 +38,6 @@ media-source/
 
 # Playwright MCP verification artifacts (console logs, page snapshots)
 .playwright-mcp/
+
+# TypeScript incremental build info
+*.tsbuildinfo

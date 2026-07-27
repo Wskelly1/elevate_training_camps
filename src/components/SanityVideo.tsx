@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { urlFor } from '../lib/sanity';
+import type Hls from 'hls.js';
+import type { SanityImageRef } from '../lib/types';
 
 /**
  * SanityVideoProps - Props for the SanityVideo component
@@ -37,8 +39,8 @@ interface SanityVideoProps {
   };
   lowQualitySrc?: { asset: { _id: string; url: string } } | null;
   hlsSrc?: string;
-  posterSrc?: any;
-  fallbackImage?: any;
+  posterSrc?: SanityImageRef;
+  fallbackImage?: SanityImageRef;
   title?: string;
   description?: string;
   autoPlay?: boolean;
@@ -54,7 +56,7 @@ interface SanityVideoProps {
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => void;
   onLoadedData?: () => void;
 }
 
@@ -97,7 +99,7 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
   // State to track loading and error states
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [, setIsPlaying] = useState<boolean>(false);
   const [showPlayButton, setShowPlayButton] = useState<boolean>(!autoPlay);
   const [canAutoPlay, setCanAutoPlay] = useState<boolean>(false);
 
@@ -125,8 +127,6 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
     }
   }, [videoSrc, mp4Url, hasValidUrl, hlsSrc]);
 
-  // Do not guess alternate formats. Use the provided URL only.
-  const webmUrl = '';
 
   // Poster image URL
   const posterUrl = posterSrc ? urlFor(posterSrc).url() : '';
@@ -169,7 +169,7 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
     const video = videoRef.current;
     let stallCount = 0;
     let usingLow = false;
-    let hls: any | null = null;
+    let hls: Hls | null = null;
 
     // Set initial attributes
     video.muted = muted;
@@ -205,7 +205,7 @@ const SanityVideo: React.FC<SanityVideoProps> = ({
 
     const handleLoadedMetadata = () => {
       setIsLoaded(true);
-      onLoadedData && onLoadedData();
+      onLoadedData?.();
     };
 
     const handleCanPlay = () => {

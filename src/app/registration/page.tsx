@@ -1,6 +1,6 @@
 import Layout from "../../components/layout";
 import Link from "next/link";
-import { Calendar, Clock, MapPin, Users, CheckCircle, Star, CreditCard, Gift, Zap, Award, Target, Heart } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, CheckCircle, CreditCard, Zap, Award, Target, Heart, type LucideIcon } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { getTrainingPackages, getUpcomingCamps, getPaymentOptions, getWhatsIncluded } from "../../lib/queries";
 
@@ -24,7 +24,7 @@ import { getTrainingPackages, getUpcomingCamps, getPaymentOptions, getWhatsInclu
 
 // Icon mapping function
 const getIcon = (iconName: string) => {
-  const iconMap: { [key: string]: any } = {
+  const iconMap: Record<string, LucideIcon> = {
     award: Award,
     mappin: MapPin,
     zap: Zap,
@@ -405,7 +405,7 @@ export default async function RegistrationPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                What's Included
+                What&apos;s Included
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Every training camp package includes comprehensive services and amenities

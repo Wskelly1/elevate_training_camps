@@ -2,9 +2,10 @@
 
 import { useEffect } from 'react';
 import { urlFor } from '../lib/sanity';
+import type { SanityImageRef } from '../lib/types';
 
 interface FaviconProviderProps {
-  favicon?: any;
+  favicon?: SanityImageRef;
 }
 
 /**
