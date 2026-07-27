@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sgMail from '@sendgrid/mail';
+import { sendMail } from '../../../lib/email';
 import { Client } from '@hubspot/api-client';
-
-// Initialize SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
 
 // Initialize HubSpot client
 const hubspotClient = new Client({
@@ -39,17 +34,16 @@ export async function POST(request: NextRequest) {
     }
 
     const results = {
-      sendgrid: { success: false, error: null },
+      email: { success: false, error: null },
       hubspot: { success: false, error: null }
     };
 
-    // Send email notification via SendGrid
-    if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_FROM_EMAIL && process.env.SENDGRID_TO_EMAIL) {
+    // Send email notification via Gmail/Workspace
+    if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD && process.env.GMAIL_FROM_EMAIL && process.env.GMAIL_TO_EMAIL) {
       try {
         // Send notification email to admin
         const adminMsg = {
-          to: process.env.SENDGRID_TO_EMAIL,
-          from: process.env.SENDGRID_FROM_EMAIL,
+          to: process.env.GMAIL_TO_EMAIL,
           subject: `New Newsletter Subscription: ${email}`,
           html: `
             <h2>New Newsletter Subscription</h2>
@@ -73,7 +67,6 @@ export async function POST(request: NextRequest) {
         // Send confirmation email to subscriber
         const subscriberMsg = {
           to: email,
-          from: process.env.SENDGRID_FROM_EMAIL,
           subject: `Welcome to Elevate Training Camps Newsletter!`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -138,14 +131,14 @@ export async function POST(request: NextRequest) {
 
         // Send both emails
         await Promise.all([
-          sgMail.send(adminMsg),
-          sgMail.send(subscriberMsg)
+          sendMail(adminMsg),
+          sendMail(subscriberMsg)
         ]);
 
-        results.sendgrid.success = true;
+        results.email.success = true;
       } catch (error) {
-        console.error('SendGrid error:', error);
-        results.sendgrid.error = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Email error:', error);
+        results.email.error = error instanceof Error ? error.message : 'Unknown error';
       }
     }
 
@@ -174,7 +167,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if at least one service succeeded
-    const hasSuccess = results.sendgrid.success || results.hubspot.success;
+    const hasSuccess = results.email.success || results.hubspot.success;
 
     if (!hasSuccess) {
       return NextResponse.json(

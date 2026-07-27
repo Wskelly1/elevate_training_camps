@@ -56,21 +56,17 @@ const ScrollExpandMedia = ({
   // Handle video playback when scrolling starts
   useEffect(() => {
     if (scrollStarted && videoRef.current && mediaType === 'video') {
-      console.log('Attempting to play video...');
-      
       const playVideo = async () => {
         try {
           await videoRef.current?.play();
-          console.log('Video started playing successfully');
           setVideoLoaded(true);
         } catch (err) {
           console.error('Video play failed:', err);
-          
+
           // Try again after a short delay
           setTimeout(async () => {
             try {
               await videoRef.current?.play();
-              console.log('Video started playing on second attempt');
               setVideoLoaded(true);
             } catch (retryErr) {
               console.error('Video play retry failed:', retryErr);
@@ -340,9 +336,6 @@ const ScrollExpandMedia = ({
                         controls={false}
                         disablePictureInPicture
                         disableRemotePlayback
-                        onLoadedData={() => console.log('Video loaded data')}
-                        onCanPlay={() => console.log('Video can play')}
-                        onPlay={() => console.log('Video play event fired')}
                         onError={(e) => console.error('Video error:', e)}
                       />
                       

@@ -2,14 +2,6 @@ import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
 import { apiVersion, dataset, projectId } from '../sanity/env'
 
-// Log configuration
-console.log('Sanity Configuration:', {
-  projectId,
-  dataset,
-  apiVersion,
-  useCdn: true
-});
-
 /**
  * Sanity client instance for data fetching
  *

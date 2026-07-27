@@ -30,4 +30,11 @@ dev-debug.log
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
+
+# Raw sourced media awaiting upload to Sanity (not for version control)
+media-source/
+.vercel
+
+# Playwright MCP verification artifacts (console logs, page snapshots)
+.playwright-mcp/

@@ -1,34 +1,34 @@
 'use client';
 
 import { useEffect } from 'react';
-import { getSiteSettings } from '../lib/queries';
 import { urlFor } from '../lib/sanity';
 
-export default function FaviconProvider() {
+interface FaviconProviderProps {
+  favicon?: any;
+}
+
+/**
+ * FaviconProvider - applies the site favicon client-side.
+ *
+ * The favicon image is fetched server-side (getSiteSettings() is cached
+ * and can't run in the browser) and passed in as a prop.
+ */
+export default function FaviconProvider({ favicon }: FaviconProviderProps) {
   useEffect(() => {
-    const updateFavicon = async () => {
-      try {
-        const settings = await getSiteSettings();
-        if (settings.favicon) {
-          const faviconUrl = urlFor(settings.favicon).url();
+    if (!favicon) return;
 
-          // Update or create favicon link
-          let faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-          if (!faviconLink) {
-            faviconLink = document.createElement('link');
-            faviconLink.rel = 'icon';
-            document.head.appendChild(faviconLink);
-          }
-          faviconLink.href = faviconUrl;
-          faviconLink.type = 'image/png';
-        }
-      } catch (error) {
-        console.error('Error updating favicon:', error);
-      }
-    };
+    const faviconUrl = urlFor(favicon).url();
 
-    updateFavicon();
-  }, []);
+    // Update or create favicon link
+    let faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+    if (!faviconLink) {
+      faviconLink = document.createElement('link');
+      faviconLink.rel = 'icon';
+      document.head.appendChild(faviconLink);
+    }
+    faviconLink.href = faviconUrl;
+    faviconLink.type = 'image/png';
+  }, [favicon]);
 
   return null; // This component doesn't render anything
 }

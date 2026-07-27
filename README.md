@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Elevate Training Camps
 
-## Getting Started
+The marketing site and registration platform for Elevate Training Camps, a
+high-altitude training camp business based in Flagstaff, Arizona.
 
-First, run the development server:
+## Stack
+
+- **Next.js 15** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS 4** for styling, with Radix UI primitives and Framer Motion for animation
+- **Sanity CMS** (embedded Studio at `/studio`) for all editable content — camps, coaching programs, team members, FAQs, site settings, etc.
+- **Mux** (via `sanity-plugin-mux-input`) for homepage video hosting
+- **SendGrid** for contact form / newsletter email
+- **HubSpot** for contact form / newsletter lead capture (CRM)
+
+## Getting started
+
+Install dependencies and run the dev server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) for the site, or
+[http://localhost:3000/studio](http://localhost:3000/studio) for the Sanity Studio
+content editor.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env.local` and fill in real values. See that file for
+the full list (Sanity project id/dataset, SendGrid credentials, HubSpot
+access token, site URL).
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` — start the dev server
+- `npm run build` — production build
+- `npm run start` — run a production build locally
+- `npm run lint` — run ESLint
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Content editing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Non-technical editors can manage all site content (camp details, pricing,
+team bios, FAQs, testimonials) through the Sanity Studio at `/studio` without
+touching code. Schema definitions live in `src/sanity/schemaTypes/`.
