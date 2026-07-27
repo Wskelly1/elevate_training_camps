@@ -129,6 +129,31 @@ touches visuals gets promoted to gated.
    type scale, swatches, and motion demos — excluded from nav/sitemap/robots;
    permanent regression reference.
 
+### A1 decisions (owner, 2026-07-27)
+
+**Locked:**
+- Palette consolidation approved. Green hover revised `#387143` → `#33603c`
+  (the original was only 4% lighter than primary — invisible as a state).
+- Accents: **Red Rock `#b67d5e`** + **Trail Brown `#67563b`**. Alpine Sky,
+  Haze Blue, Golden Trail and Summit Navy dropped.
+- Reference mapping: **Kenya Experience** (Young Athlete Camp page) drives
+  page content, pricing structure and camp information architecture →
+  Phase 6. **Under Canvas** drives the homepage video treatment — note the
+  Mux/Sanity scroll-expanding hero already exists; the work is tuning it
+  toward a calmer, more cinematic feel, not rebuilding. **Tracksmith**
+  drives general aesthetics, typography and layout: retro running-culture,
+  serif headlines, refined rustic — high-end and classy but unmistakably
+  outdoors.
+
+**Open (rendered on `/style-guide` for the owner to pick):**
+- Serif display face: Fraunces (warm, wonky, rustic) vs Instrument Serif
+  (high-contrast, editorial, closest to the inspiration wordmark). Body/UI
+  stays Geist Sans either way.
+- Logo mark: twin peak vs single peak; plus which lockup and colour
+  treatment are primary. Concepts drafted as inline SVG; the approved mark
+  needs redrawing as a standalone optimised SVG asset with the wordmark
+  converted to outlines before it replaces the current Sanity-hosted logo.
+
 ## §6 — Component providers (Magic UI + Aceternity)
 
 Install via shadcn CLI into `src/components/ui/` as owned source; rewrite
