@@ -22,7 +22,7 @@ The SanityVideo component is already included in your project. No additional ins
 ## Usage
 
 ```tsx
-import SanityVideo from './components/SanityVideo';
+import SanityVideo from './SanityVideo';
 
 // Basic usage
 <SanityVideo
@@ -58,7 +58,9 @@ import SanityVideo from './components/SanityVideo';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `videoSrc` | `Object` | Required | Sanity file reference for the video |
+| `videoSrc` | `Object` | `undefined` | Sanity file reference for the video (optional when `hlsSrc` is provided) |
+| `lowQualitySrc` | `Object` | `undefined` | Lower-resolution Sanity file reference, switched to automatically on repeated stalls |
+| `hlsSrc` | `string` | `undefined` | HLS stream URL (e.g. a Mux `stream.mux.com/....m3u8` playback URL); takes precedence over MP4 sources |
 | `posterSrc` | `Object` | `undefined` | Sanity image reference for the poster |
 | `fallbackImage` | `Object` | `undefined` | Sanity image reference for fallback if video fails |
 | `title` | `string` | `''` | Title for the video (used for accessibility) |
@@ -71,6 +73,8 @@ import SanityVideo from './components/SanityVideo';
 | `objectFit` | `'cover' \| 'contain' \| 'fill'` | `'cover'` | How the video should fit its container |
 | `className` | `string` | `''` | Additional CSS classes |
 | `captionSrc` | `string` | `undefined` | URL to WebVTT captions file |
+| `fillContainer` | `boolean` | `false` | Fill the parent container absolutely instead of using the aspect-ratio wrapper |
+| `pauseWhenOutOfView` | `boolean` | `false` | Pause playback when the video scrolls out of view or the page is hidden |
 | `onPlay` | `() => void` | `undefined` | Callback when video starts playing |
 | `onPause` | `() => void` | `undefined` | Callback when video is paused |
 | `onEnded` | `() => void` | `undefined` | Callback when video playback ends |
@@ -127,7 +131,8 @@ When a video fails to load or play, the component:
 
 ## Example Integration
 
-See `VideoExample.tsx` for examples of how to use the SanityVideo component in different scenarios.
+See `IntegratedHomepage.tsx` for the component's real-world usage (the homepage
+scroll-expansion hero, fed by a Mux HLS stream via `hlsSrc`).
 
 ## Troubleshooting
 
