@@ -1,8 +1,6 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Layout from "../../components/layout";
-import { client, urlFor } from "../../lib/sanity";
+import { urlFor } from "../../lib/sanity";
+import { getFAQs, getFAQPageSettings } from "../../lib/queries";
 import Image from "next/image";
 
 interface FAQ {
@@ -11,56 +9,11 @@ interface FAQ {
   answer: string;
 }
 
-interface FAQPageSettings {
-  title?: string;
-  introduction?: string;
-  faqPageImage?: any;
-}
-
-async function getFAQs() {
-  return await client.fetch(`
-    *[_type == "faq"] | order(order asc) {
-      _id,
-      question,
-      answer
-    }
-  `);
-}
-
-async function getFAQPageSettings() {
-  return await client.fetch(`
-    *[_type == "siteSettings"][0] {
-      faqPage {
-        title,
-        introduction,
-        faqPageImage
-      }
-    }
-  `);
-}
-
-export default function FAQPage() {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [settings, setSettings] = useState<FAQPageSettings>({});
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [faqsData, settingsData] = await Promise.all([getFAQs(), getFAQPageSettings()]);
-        setFaqs(faqsData);
-        if (settingsData && settingsData.faqPage) {
-          setSettings(settingsData.faqPage);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
+export default async function FAQPage() {
+  const [faqs, settings] = await Promise.all([
+    getFAQs(),
+    getFAQPageSettings(),
+  ]);
 
   return (
     <Layout>
@@ -99,20 +52,16 @@ export default function FAQPage() {
         <h2 className="text-2xl font-semibold mb-6 text-primary">General Questions</h2>
         {/* FAQ List */}
         <div className="space-y-4 mb-10">
-          {isLoading ? (
-            <p>Loading FAQs...</p>
-          ) : (
-            faqs.map((faq) => (
-              <details key={faq._id} className="group border border-[#d3c7b4] rounded-lg bg-[#f0ead6] shadow-sm overflow-hidden">
-                <summary className="faq-summary cursor-pointer pl-10 pr-4 py-3 font-medium text-lg text-[#755f4f] rounded-lg group-open:rounded-b-none focus:outline-none">
-                  {faq.question}
-                </summary>
-                <div className="px-10 pb-4 text-black bg-[#f0ead6]">
-                  {faq.answer}
-                </div>
-              </details>
-            ))
-          )}
+          {faqs.map((faq: FAQ) => (
+            <details key={faq._id} className="group border border-[#d3c7b4] rounded-lg bg-[#f0ead6] shadow-sm overflow-hidden">
+              <summary className="faq-summary cursor-pointer pl-10 pr-4 py-3 font-medium text-lg text-[#755f4f] rounded-lg group-open:rounded-b-none focus:outline-none">
+                {faq.question}
+              </summary>
+              <div className="px-10 pb-4 text-black bg-[#f0ead6]">
+                {faq.answer}
+              </div>
+            </details>
+          ))}
         </div>
         {/* Contact prompt */}
         <div className="text-center text-lg mt-12 mb-12">

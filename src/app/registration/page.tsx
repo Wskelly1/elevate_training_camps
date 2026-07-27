@@ -1,12 +1,8 @@
-'use client';
-
 import Layout from "../../components/layout";
 import Link from "next/link";
 import { Calendar, Clock, MapPin, Users, CheckCircle, Star, CreditCard, Gift, Zap, Award, Target, Heart } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { useEffect, useState } from "react";
 import { getTrainingPackages, getUpcomingCamps, getPaymentOptions, getWhatsIncluded } from "../../lib/queries";
-import { SanityTrainingPackage, SanityUpcomingCamp, SanityPaymentOption, SanityWhatsIncluded } from "../../lib/types";
 
 /**
  * RegistrationPage - Comprehensive registration and pricing page for Elevate Training Camps
@@ -25,243 +21,216 @@ import { SanityTrainingPackage, SanityUpcomingCamp, SanityPaymentOption, SanityW
  *
  * @returns {JSX.Element} The comprehensive registration and pricing page
  */
-export default function RegistrationPage() {
-  const [trainingPackages, setTrainingPackages] = useState<SanityTrainingPackage[]>([]);
-  const [upcomingCampsData, setUpcomingCampsData] = useState<SanityUpcomingCamp[]>([]);
-  const [paymentOptions, setPaymentOptions] = useState<SanityPaymentOption[]>([]);
-  const [whatsIncluded, setWhatsIncluded] = useState<SanityWhatsIncluded[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [packages, camps, payments, included] = await Promise.all([
-          getTrainingPackages(),
-          getUpcomingCamps(),
-          getPaymentOptions(),
-          getWhatsIncluded()
-        ]);
-
-        setTrainingPackages(packages || []);
-        setUpcomingCampsData(camps || []);
-        setPaymentOptions(payments || []);
-        setWhatsIncluded(included || []);
-      } catch (error) {
-        console.error("Error fetching registration data:", error);
-        // Set fallback data if Sanity fails
-        setTrainingPackages([]);
-        setUpcomingCampsData([]);
-        setPaymentOptions([]);
-        setWhatsIncluded([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Icon mapping function
-  const getIcon = (iconName: string) => {
-    const iconMap: { [key: string]: any } = {
-      award: Award,
-      mappin: MapPin,
-      zap: Zap,
-      users: Users,
-      target: Target,
-      clock: Clock,
-      heart: Heart
-    };
-    return iconMap[iconName] || Award;
+// Icon mapping function
+const getIcon = (iconName: string) => {
+  const iconMap: { [key: string]: any } = {
+    award: Award,
+    mappin: MapPin,
+    zap: Zap,
+    users: Users,
+    target: Target,
+    clock: Clock,
+    heart: Heart
   };
+  return iconMap[iconName] || Award;
+};
 
-  // Fallback data if Sanity is empty
-  const fallbackPackages = [
-    {
-      _id: "fallback-package-1",
-      name: "Basic Camp",
-      description: "Perfect for athletes new to high-altitude training",
-      price: 1200,
-      originalPrice: 1400,
-      duration: "3 days",
-      features: [
-        "High-altitude training sessions",
-        "Basic performance testing",
-        "Group coaching sessions",
-        "Accommodation (shared rooms)",
-        "All meals included",
-        "Training gear rental",
-        "Welcome package"
-      ],
-      popular: false,
-      order: 0,
-      active: true
-    },
-    {
-      _id: "fallback-package-2",
-      name: "Premium Camp",
-      description: "Our most popular option with comprehensive training",
-      price: 1800,
-      originalPrice: 2200,
-      duration: "5 days",
-      features: [
-        "Everything in Basic Camp",
-        "Individual coaching sessions",
-        "Advanced performance testing",
-        "Nutrition consultation",
-        "Recovery and massage therapy",
-        "Private accommodation",
-        "Personalized training plan",
-        "Follow-up coaching (1 month)",
-        "Exclusive training gear"
-      ],
-      popular: true,
-      order: 1,
-      active: true
-    },
-    {
-      _id: "fallback-package-3",
-      name: "Elite Camp",
-      description: "Intensive training for serious athletes",
-      price: 2800,
-      originalPrice: 3200,
-      duration: "7 days",
-      features: [
-        "Everything in Premium Camp",
-        "Daily individual coaching",
-        "Comprehensive performance analysis",
-        "Mental performance coaching",
-        "Sports psychology sessions",
-        "Luxury accommodation",
-        "Personal chef consultation",
-        "Follow-up coaching (3 months)",
-        "Competition preparation",
-        "Priority booking for future camps"
-      ],
-      popular: false,
-      order: 2,
-      active: true
-    }
-  ];
+// Fallback data if Sanity is empty
+const fallbackPackages = [
+  {
+    _id: "fallback-package-1",
+    name: "Basic Camp",
+    description: "Perfect for athletes new to high-altitude training",
+    price: 1200,
+    originalPrice: 1400,
+    duration: "3 days",
+    features: [
+      "High-altitude training sessions",
+      "Basic performance testing",
+      "Group coaching sessions",
+      "Accommodation (shared rooms)",
+      "All meals included",
+      "Training gear rental",
+      "Welcome package"
+    ],
+    popular: false,
+    order: 0,
+    active: true
+  },
+  {
+    _id: "fallback-package-2",
+    name: "Premium Camp",
+    description: "Our most popular option with comprehensive training",
+    price: 1800,
+    originalPrice: 2200,
+    duration: "5 days",
+    features: [
+      "Everything in Basic Camp",
+      "Individual coaching sessions",
+      "Advanced performance testing",
+      "Nutrition consultation",
+      "Recovery and massage therapy",
+      "Private accommodation",
+      "Personalized training plan",
+      "Follow-up coaching (1 month)",
+      "Exclusive training gear"
+    ],
+    popular: true,
+    order: 1,
+    active: true
+  },
+  {
+    _id: "fallback-package-3",
+    name: "Elite Camp",
+    description: "Intensive training for serious athletes",
+    price: 2800,
+    originalPrice: 3200,
+    duration: "7 days",
+    features: [
+      "Everything in Premium Camp",
+      "Daily individual coaching",
+      "Comprehensive performance analysis",
+      "Mental performance coaching",
+      "Sports psychology sessions",
+      "Luxury accommodation",
+      "Personal chef consultation",
+      "Follow-up coaching (3 months)",
+      "Competition preparation",
+      "Priority booking for future camps"
+    ],
+    popular: false,
+    order: 2,
+    active: true
+  }
+];
 
-  const fallbackWhatsIncluded = [
-    {
-      _id: "fallback-included-1",
-      category: "Training & Coaching",
-      items: [
-        "High-altitude training sessions",
-        "Individual and group coaching",
-        "Performance testing and analysis",
-        "Personalized training plans",
-        "Mental performance coaching"
-      ],
-      icon: "award",
-      order: 0,
-      active: true
-    },
-    {
-      _id: "fallback-included-2",
-      category: "Accommodation & Meals",
-      items: [
-        "Comfortable lodging in Flagstaff",
-        "All meals and snacks included",
-        "Nutrition consultation",
-        "Recovery facilities access"
-      ],
-      icon: "mappin",
-      order: 1,
-      active: true
-    },
-    {
-      _id: "fallback-included-3",
-      category: "Equipment & Gear",
-      items: [
-        "Training equipment rental",
-        "Performance tracking devices",
-        "Exclusive Elevate gear",
-        "Welcome package with essentials"
-      ],
-      icon: "zap",
-      order: 2,
-      active: true
-    },
-    {
-      _id: "fallback-included-4",
-      category: "Support & Follow-up",
-      items: [
-        "24/7 support during camp",
-        "Follow-up coaching sessions",
-        "Progress tracking",
-        "Community access"
-      ],
-      icon: "users",
-      order: 3,
-      active: true
-    }
-  ];
+const fallbackWhatsIncluded = [
+  {
+    _id: "fallback-included-1",
+    category: "Training & Coaching",
+    items: [
+      "High-altitude training sessions",
+      "Individual and group coaching",
+      "Performance testing and analysis",
+      "Personalized training plans",
+      "Mental performance coaching"
+    ],
+    icon: "award",
+    order: 0,
+    active: true
+  },
+  {
+    _id: "fallback-included-2",
+    category: "Accommodation & Meals",
+    items: [
+      "Comfortable lodging in Flagstaff",
+      "All meals and snacks included",
+      "Nutrition consultation",
+      "Recovery facilities access"
+    ],
+    icon: "mappin",
+    order: 1,
+    active: true
+  },
+  {
+    _id: "fallback-included-3",
+    category: "Equipment & Gear",
+    items: [
+      "Training equipment rental",
+      "Performance tracking devices",
+      "Exclusive Elevate gear",
+      "Welcome package with essentials"
+    ],
+    icon: "zap",
+    order: 2,
+    active: true
+  },
+  {
+    _id: "fallback-included-4",
+    category: "Support & Follow-up",
+    items: [
+      "24/7 support during camp",
+      "Follow-up coaching sessions",
+      "Progress tracking",
+      "Community access"
+    ],
+    icon: "users",
+    order: 3,
+    active: true
+  }
+];
 
-  const fallbackCamps = [
-    {
-      _id: "fallback-camp-1",
-      date: "March 15-19, 2025",
-      type: "Premium Camp",
-      spots: "8 spots remaining",
-      location: "Flagstaff, AZ",
-      earlyBird: true,
-      earlyBirdEnds: "February 15, 2025",
-      order: 0,
-      active: true
-    },
-    {
-      _id: "fallback-camp-2",
-      date: "April 12-16, 2025",
-      type: "Basic Camp",
-      spots: "12 spots remaining",
-      location: "Flagstaff, AZ",
-      earlyBird: true,
-      earlyBirdEnds: "March 12, 2025",
-      order: 1,
-      active: true
-    },
-    {
-      _id: "fallback-camp-3",
-      date: "May 10-16, 2025",
-      type: "Elite Camp",
-      spots: "4 spots remaining",
-      location: "Flagstaff, AZ",
-      earlyBird: false,
-      earlyBirdEnds: null,
-      order: 2,
-      active: true
-    }
-  ];
+const fallbackCamps = [
+  {
+    _id: "fallback-camp-1",
+    date: "March 15-19, 2025",
+    type: "Premium Camp",
+    spots: "8 spots remaining",
+    location: "Flagstaff, AZ",
+    earlyBird: true,
+    earlyBirdEnds: "February 15, 2025",
+    order: 0,
+    active: true
+  },
+  {
+    _id: "fallback-camp-2",
+    date: "April 12-16, 2025",
+    type: "Basic Camp",
+    spots: "12 spots remaining",
+    location: "Flagstaff, AZ",
+    earlyBird: true,
+    earlyBirdEnds: "March 12, 2025",
+    order: 1,
+    active: true
+  },
+  {
+    _id: "fallback-camp-3",
+    date: "May 10-16, 2025",
+    type: "Elite Camp",
+    spots: "4 spots remaining",
+    location: "Flagstaff, AZ",
+    earlyBird: false,
+    earlyBirdEnds: null,
+    order: 2,
+    active: true
+  }
+];
 
-  const fallbackPaymentOptions = [
-    {
-      _id: "fallback-1",
-      name: "Full Payment",
-      description: "Pay in full and receive an additional 5% discount on your total cost.",
-      discount: "Save 5%",
-      order: 0,
-      active: true
-    },
-    {
-      _id: "fallback-2",
-      name: "2-Payment Plan",
-      description: "Split your payment into two equal installments with no additional fees.",
-      discount: "50% + 50%",
-      order: 1,
-      active: true
-    },
-    {
-      _id: "fallback-3",
-      name: "Monthly Plan",
-      description: "Spread your payments over 3-6 months with a small processing fee.",
-      discount: "3-6 months",
-      order: 2,
-      active: true
-    }
-  ];
+const fallbackPaymentOptions = [
+  {
+    _id: "fallback-1",
+    name: "Full Payment",
+    description: "Pay in full and receive an additional 5% discount on your total cost.",
+    discount: "Save 5%",
+    order: 0,
+    active: true
+  },
+  {
+    _id: "fallback-2",
+    name: "2-Payment Plan",
+    description: "Split your payment into two equal installments with no additional fees.",
+    discount: "50% + 50%",
+    order: 1,
+    active: true
+  },
+  {
+    _id: "fallback-3",
+    name: "Monthly Plan",
+    description: "Spread your payments over 3-6 months with a small processing fee.",
+    discount: "3-6 months",
+    order: 2,
+    active: true
+  }
+];
+
+export default async function RegistrationPage() {
+  const [trainingPackages, upcomingCampsData, paymentOptions, whatsIncluded] = await Promise.all([
+    getTrainingPackages(),
+    getUpcomingCamps(),
+    getPaymentOptions(),
+    getWhatsIncluded(),
+  ]);
 
   // Use Sanity data if available, otherwise use fallback
   const displayPackages = trainingPackages.length > 0 ? trainingPackages : fallbackPackages;

@@ -64,11 +64,13 @@ export async function generateMetadata(): Promise<Metadata> {
  * @param {React.ReactNode} props.children - Page content to render within the layout
  * @returns {JSX.Element} The root HTML structure for the application
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   return (
     <html lang="en">
       <head>
@@ -80,7 +82,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <FaviconProvider />
+        <FaviconProvider favicon={settings.favicon} />
         {children}
       </body>
       {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (

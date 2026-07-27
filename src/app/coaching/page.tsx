@@ -1,12 +1,8 @@
-'use client';
-
 import Layout from "../../components/layout";
 import Link from "next/link";
 import { Target, Users, Clock, MapPin, Star, CheckCircle, Award, TrendingUp, Heart, Zap } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { useEffect, useState } from "react";
 import { getCoachingPrograms, getCoachingBenefits, getCoachingTestimonials } from "../../lib/queries";
-import { SanityCoachingProgram, SanityCoachingBenefit, SanityCoachingTestimonial } from "../../lib/types";
 
 /**
  * Coaching Page - Comprehensive coaching services for Elevate Training Camps
@@ -16,193 +12,169 @@ import { SanityCoachingProgram, SanityCoachingBenefit, SanityCoachingTestimonial
  * Features detailed information about coaching methodologies, pricing,
  * and how to get started with professional coaching services.
  */
-export default function CoachingPage() {
-  const [coachingPrograms, setCoachingPrograms] = useState<SanityCoachingProgram[]>([]);
-  const [coachingBenefits, setCoachingBenefits] = useState<SanityCoachingBenefit[]>([]);
-  const [testimonials, setTestimonials] = useState<SanityCoachingTestimonial[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [programs, benefits, coachingTestimonials] = await Promise.all([
-          getCoachingPrograms(),
-          getCoachingBenefits(),
-          getCoachingTestimonials()
-        ]);
-
-        setCoachingPrograms(programs || []);
-        setCoachingBenefits(benefits || []);
-        setTestimonials(coachingTestimonials || []);
-      } catch (error) {
-        console.error("Error fetching coaching data:", error);
-        // Set fallback data if Sanity fails
-        setCoachingPrograms([]);
-        setCoachingBenefits([]);
-        setTestimonials([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Icon mapping function
-  const getIcon = (iconName: string) => {
-    const iconMap: { [key: string]: any } = {
-      target: Target,
-      users: Users,
-      mappin: MapPin,
-      zap: Zap,
-      award: Award,
-      clock: Clock,
-      trendingup: TrendingUp,
-      heart: Heart
-    };
-    return iconMap[iconName] || Target;
+// Icon mapping function
+const getIcon = (iconName: string) => {
+  const iconMap: { [key: string]: any } = {
+    target: Target,
+    users: Users,
+    mappin: MapPin,
+    zap: Zap,
+    award: Award,
+    clock: Clock,
+    trendingup: TrendingUp,
+    heart: Heart
   };
+  return iconMap[iconName] || Target;
+};
 
-  // Fallback data if Sanity is empty
-  const fallbackPrograms = [
-    {
-      _id: "fallback-program-1",
-      name: "Individual Performance Coaching",
-      description: "One-on-one coaching sessions tailored to your specific athletic goals and needs.",
-      features: [
-        "Personalized training plans",
-        "Performance analysis and feedback",
-        "Goal setting and progress tracking",
-        "Nutrition and recovery guidance",
-        "Mental performance coaching"
-      ],
-      duration: "60-90 minutes per session",
-      price: "Starting at $150/session",
-      icon: "target",
-      popular: true,
-      order: 0,
-      active: true
-    },
-    {
-      _id: "fallback-program-2",
-      name: "Group Training Programs",
-      description: "Small group coaching sessions for athletes looking to train with peers.",
-      features: [
-        "Small group sizes (4-6 athletes)",
-        "Competitive training environment",
-        "Peer motivation and support",
-        "Cost-effective coaching",
-        "Team building exercises"
-      ],
-      duration: "90 minutes per session",
-      price: "Starting at $75/session",
-      icon: "users",
-      popular: false,
-      order: 1,
-      active: true
-    },
-    {
-      _id: "fallback-program-3",
-      name: "High-Altitude Training Camps",
-      description: "Intensive multi-day training camps at our Flagstaff location.",
-      features: [
-        "3-7 day intensive programs",
-        "High-altitude adaptation training",
-        "Comprehensive performance testing",
-        "Lodging and meals included",
-        "Follow-up coaching support"
-      ],
-      duration: "3-7 days",
-      price: "Starting at $1,200/camp",
-      icon: "mappin",
-      popular: true,
-      order: 2,
-      active: true
-    },
-    {
-      _id: "fallback-program-4",
-      name: "Virtual Coaching Programs",
-      description: "Remote coaching services for athletes who can't attend in-person sessions.",
-      features: [
-        "Video analysis and feedback",
-        "Online training plans",
-        "Weekly check-ins via video call",
-        "Progress tracking apps",
-        "24/7 support access"
-      ],
-      duration: "Ongoing monthly programs",
-      price: "Starting at $200/month",
-      icon: "zap",
-      popular: false,
-      order: 3,
-      active: true
-    }
-  ];
+// Fallback data if Sanity is empty
+const fallbackPrograms = [
+  {
+    _id: "fallback-program-1",
+    name: "Individual Performance Coaching",
+    description: "One-on-one coaching sessions tailored to your specific athletic goals and needs.",
+    features: [
+      "Personalized training plans",
+      "Performance analysis and feedback",
+      "Goal setting and progress tracking",
+      "Nutrition and recovery guidance",
+      "Mental performance coaching"
+    ],
+    duration: "60-90 minutes per session",
+    price: "Starting at $150/session",
+    icon: "target",
+    popular: true,
+    order: 0,
+    active: true
+  },
+  {
+    _id: "fallback-program-2",
+    name: "Group Training Programs",
+    description: "Small group coaching sessions for athletes looking to train with peers.",
+    features: [
+      "Small group sizes (4-6 athletes)",
+      "Competitive training environment",
+      "Peer motivation and support",
+      "Cost-effective coaching",
+      "Team building exercises"
+    ],
+    duration: "90 minutes per session",
+    price: "Starting at $75/session",
+    icon: "users",
+    popular: false,
+    order: 1,
+    active: true
+  },
+  {
+    _id: "fallback-program-3",
+    name: "High-Altitude Training Camps",
+    description: "Intensive multi-day training camps at our Flagstaff location.",
+    features: [
+      "3-7 day intensive programs",
+      "High-altitude adaptation training",
+      "Comprehensive performance testing",
+      "Lodging and meals included",
+      "Follow-up coaching support"
+    ],
+    duration: "3-7 days",
+    price: "Starting at $1,200/camp",
+    icon: "mappin",
+    popular: true,
+    order: 2,
+    active: true
+  },
+  {
+    _id: "fallback-program-4",
+    name: "Virtual Coaching Programs",
+    description: "Remote coaching services for athletes who can't attend in-person sessions.",
+    features: [
+      "Video analysis and feedback",
+      "Online training plans",
+      "Weekly check-ins via video call",
+      "Progress tracking apps",
+      "24/7 support access"
+    ],
+    duration: "Ongoing monthly programs",
+    price: "Starting at $200/month",
+    icon: "zap",
+    popular: false,
+    order: 3,
+    active: true
+  }
+];
 
-  const fallbackBenefits = [
-    {
-      _id: "fallback-benefit-1",
-      title: "Expert Guidance",
-      description: "Learn from certified coaches with years of experience in high-performance athletics.",
-      icon: "award",
-      order: 0,
-      active: true
-    },
-    {
-      _id: "fallback-benefit-2",
-      title: "Proven Results",
-      description: "Our athletes consistently achieve personal bests and reach their competitive goals.",
-      icon: "trendingup",
-      order: 1,
-      active: true
-    },
-    {
-      _id: "fallback-benefit-3",
-      title: "Personalized Approach",
-      description: "Every program is tailored to your specific needs, goals, and current fitness level.",
-      icon: "heart",
-      order: 2,
-      active: true
-    },
-    {
-      _id: "fallback-benefit-4",
-      title: "High-Altitude Advantage",
-      description: "Train at 7,000 feet elevation for natural performance enhancement and adaptation.",
-      icon: "mappin",
-      order: 3,
-      active: true
-    }
-  ];
+const fallbackBenefits = [
+  {
+    _id: "fallback-benefit-1",
+    title: "Expert Guidance",
+    description: "Learn from certified coaches with years of experience in high-performance athletics.",
+    icon: "award",
+    order: 0,
+    active: true
+  },
+  {
+    _id: "fallback-benefit-2",
+    title: "Proven Results",
+    description: "Our athletes consistently achieve personal bests and reach their competitive goals.",
+    icon: "trendingup",
+    order: 1,
+    active: true
+  },
+  {
+    _id: "fallback-benefit-3",
+    title: "Personalized Approach",
+    description: "Every program is tailored to your specific needs, goals, and current fitness level.",
+    icon: "heart",
+    order: 2,
+    active: true
+  },
+  {
+    _id: "fallback-benefit-4",
+    title: "High-Altitude Advantage",
+    description: "Train at 7,000 feet elevation for natural performance enhancement and adaptation.",
+    icon: "mappin",
+    order: 3,
+    active: true
+  }
+];
 
-  const fallbackTestimonials = [
-    {
-      _id: "fallback-testimonial-1",
-      name: "Sarah Johnson",
-      sport: "Track & Field",
-      quote: "The individual coaching program transformed my performance. I shaved 15 seconds off my 5K time in just 3 months!",
-      rating: 5,
-      order: 0,
-      active: true
-    },
-    {
-      _id: "fallback-testimonial-2",
-      name: "Mike Chen",
-      sport: "Cycling",
-      quote: "The high-altitude training camp was incredible. I felt stronger and more confident in my races after just one week.",
-      rating: 5,
-      order: 1,
-      active: true
-    },
-    {
-      _id: "fallback-testimonial-3",
-      name: "Emma Rodriguez",
-      sport: "Swimming",
-      quote: "The virtual coaching program kept me on track during the pandemic. My coach's guidance was invaluable.",
-      rating: 5,
-      order: 2,
-      active: true
-    }
-  ];
+const fallbackTestimonials = [
+  {
+    _id: "fallback-testimonial-1",
+    name: "Sarah Johnson",
+    sport: "Track & Field",
+    quote: "The individual coaching program transformed my performance. I shaved 15 seconds off my 5K time in just 3 months!",
+    rating: 5,
+    order: 0,
+    active: true
+  },
+  {
+    _id: "fallback-testimonial-2",
+    name: "Mike Chen",
+    sport: "Cycling",
+    quote: "The high-altitude training camp was incredible. I felt stronger and more confident in my races after just one week.",
+    rating: 5,
+    order: 1,
+    active: true
+  },
+  {
+    _id: "fallback-testimonial-3",
+    name: "Emma Rodriguez",
+    sport: "Swimming",
+    quote: "The virtual coaching program kept me on track during the pandemic. My coach's guidance was invaluable.",
+    rating: 5,
+    order: 2,
+    active: true
+  }
+];
+
+export default async function CoachingPage() {
+  const [coachingPrograms, coachingBenefits, testimonials] = await Promise.all([
+    getCoachingPrograms(),
+    getCoachingBenefits(),
+    getCoachingTestimonials(),
+  ]);
 
   // Use Sanity data if available, otherwise use fallback
   const displayPrograms = coachingPrograms.length > 0 ? coachingPrograms : fallbackPrograms;
