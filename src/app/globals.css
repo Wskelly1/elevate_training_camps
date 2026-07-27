@@ -35,6 +35,19 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Brand tokens (Elevate) — see /style-guide */
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-deep: var(--primary-deep);
+  --color-surface: var(--surface);
+  --color-accent-rock: var(--accent-rock);
+  --color-accent-trail: var(--accent-trail);
+  --color-brown-deep: var(--brown-deep);
+
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-fraunces);
+  --font-mono: var(--font-geist-mono);
+
   --radius: 0.5rem; /* Add this line to define the base radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -42,9 +55,61 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/**
+ * Brand palette — approved at Checkpoint A1 (2026-07-27).
+ *
+ * These are the values the @theme block above has always pointed at but
+ * which were never defined, which is why every component hardcoded hex.
+ * Source of truth is /style-guide; change values here, not in components.
+ */
+:root {
+  /* Core greens */
+  --primary: #427b4d;        /* Elevate Green */
+  --primary-hover: #33603c;  /* 8.3% darker — a visible state change */
+  --primary-deep: #24422a;   /* Footers, dark overlays, logo backgrounds */
+  --primary-foreground: #fbf9f3;
+
+  /* Cream ramp */
+  --background: #fbf9f3;     /* Page */
+  --surface: #f0ead6;        /* Header, footer, cards */
+  --border: #d3c7b4;
+  --input: #d3c7b4;
+
+  /* Ink & browns */
+  --foreground: #333333;
+  --muted-foreground: #755f4f;
+  --brown-deep: #583e2e;     /* Link hover */
+
+  /* Accents (locked at A1) */
+  --accent-rock: #b67d5e;    /* Red Rock */
+  --accent-trail: #67563b;   /* Trail Brown */
+
+  /* shadcn primitive mappings */
+  --card: #ffffff;
+  --card-foreground: #333333;
+  --popover: #f0ead6;
+  --popover-foreground: #333333;
+  --secondary: #f0ead6;
+  --secondary-foreground: #333333;
+  --muted: #f0ead6;
+  --accent: #b67d5e;
+  --accent-foreground: #fbf9f3;
+  --destructive: #b42318;
+  --destructive-foreground: #fbf9f3;
+  --ring: #427b4d;
+}
+
 @layer base {
   * {
     @apply border-border;
+  }
+  /**
+   * Headings use the display serif (Fraunces); body/UI stay on Geist Sans.
+   * Approved at Checkpoint A1 — the Tracksmith-leaning "refined rustic"
+   * direction. Opt out on a case-by-case basis with `font-sans`.
+   */
+  h1, h2, h3, h4 {
+    font-family: var(--font-fraunces), Georgia, serif;
   }
   body {
     @apply bg-background text-foreground;
