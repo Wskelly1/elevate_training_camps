@@ -9,8 +9,9 @@ high-altitude training camp business based in Flagstaff, Arizona.
 - **Tailwind CSS 4** for styling, with Radix UI primitives and Framer Motion for animation
 - **Sanity CMS** (embedded Studio at `/studio`) for all editable content — camps, coaching programs, team members, FAQs, site settings, etc.
 - **Mux** (via `sanity-plugin-mux-input`) for homepage video hosting
-- **SendGrid** for contact form / newsletter email
+- **Gmail/Google Workspace SMTP** (via `nodemailer`) for contact form / newsletter email — see `EMAIL_SETUP.md`
 - **HubSpot** for contact form / newsletter lead capture (CRM)
+- **Google Analytics (GA4)** for traffic analytics
 
 ## Getting started
 
@@ -28,8 +29,9 @@ content editor.
 ## Environment variables
 
 Copy `.env.example` to `.env.local` and fill in real values. See that file for
-the full list (Sanity project id/dataset, SendGrid credentials, HubSpot
-access token, site URL).
+the full list (Sanity project id/dataset, Gmail SMTP credentials, HubSpot
+access token, GA measurement ID, site URL) and `EMAIL_SETUP.md` for how to
+obtain the email/CRM credentials.
 
 ## Scripts
 
