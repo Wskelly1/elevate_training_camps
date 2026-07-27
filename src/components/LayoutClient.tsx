@@ -60,7 +60,7 @@ const customColors = {
   headerFooterBg: '#f0ead6', // Richer cream for header/footer
   mainBg: '#fbf9f3',       // Lighter cream for main content
   foreground: '#333333',
-  navText: '#000000', // Black text
+  navText: 'var(--primary-deep)', // Matches the logo wordmark
   elevateGreen: '#427b4d', // Forest green
   darkerElevateGreen: '#387143', // Darker green for hover
   accent: '#d1c3a1', // Darker cream for dropdown hover
@@ -304,8 +304,9 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                               <NavigationMenuTrigger
                                 style={{
                                   color: customColors.navText,
-                                  fontWeight: 'bold',
-                                  fontSize: '16px',
+                                  fontFamily: 'var(--font-display), Georgia, serif',
+                                  fontWeight: 400,
+                                  fontSize: '18px',
                                   padding: '0.5rem 0.75rem',
                                   display: 'flex',
                                   alignItems: 'center',
@@ -406,8 +407,9 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                               href={item.href}
                               style={{
                                 color: customColors.navText,
-                                fontWeight: 'bold',
-                                fontSize: '16px',
+                                fontFamily: 'var(--font-display), Georgia, serif',
+                                fontWeight: 400,
+                                fontSize: '18px',
                                 padding: '0.5rem 0.75rem',
                                 position: 'relative',
                                 display: 'flex',
@@ -455,7 +457,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                         className="flex items-center justify-between w-full py-2 px-4 rounded-md hover:bg-muted/50"
                         style={{ color: customColors.navText }}
                       >
-                        <span className="font-bold">{item.title}</span>
+                        <span className="font-serif text-lg">{item.title}</span>
                         <ChevronDown className={`h-4 w-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {aboutOpen && (
@@ -488,7 +490,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                       className="block py-2 px-4 rounded-md hover:bg-muted/50"
                       style={{ color: customColors.navText }}
                     >
-                      <span className="font-bold">{item.title}</span>
+                      <span className="font-serif text-lg">{item.title}</span>
                     </Link>
                   )}
                 </div>
@@ -511,7 +513,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           <div className="grid gap-12 md:grid-cols-1 lg:grid-cols-2">
             {/* Contact/newsletter section */}
             <div className="relative" style={{ backgroundColor: 'rgba(168, 152, 133, 0.2)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
-              <h2 className="mb-4 text-3xl font-bold tracking-tight" style={{ color: '#000000' }}>Stay Connected</h2>
+              <h2 className="mb-4 text-3xl tracking-tight" style={{ color: '#000000' }}>Stay Connected</h2>
               <p className="mb-6" style={{ color: customColors.primary }}>
                 Join our newsletter for the latest updates and exclusive offers.
               </p>
@@ -570,7 +572,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
 
             <div className="grid gap-12 md:grid-cols-3">
               <div>
-                <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Quick Links</h3>
+                <h3 className="mb-4 text-lg" style={{ color: '#000000' }}>Quick Links</h3>
                 <nav className="space-y-2 text-sm">
                   <Link href="/" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Home
@@ -596,7 +598,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                 </nav>
               </div>
               <div>
-                <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Contact Us</h3>
+                <h3 className="mb-4 text-lg" style={{ color: '#000000' }}>Contact Us</h3>
                 <address className="space-y-2 text-sm not-italic" style={{ color: customColors.primary }}>
                   <p>830 N Turquoise Dr</p>
                   <p>Flagstaff, AZ 86001</p>
@@ -605,7 +607,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                 </address>
               </div>
               <div className="relative">
-                <h3 className="mb-4 text-lg font-semibold" style={{ color: '#000000' }}>Follow Us</h3>
+                <h3 className="mb-4 text-lg" style={{ color: '#000000' }}>Follow Us</h3>
                 <div className="mb-6 flex space-x-4">
                   <TooltipProvider>
                     <Tooltip>

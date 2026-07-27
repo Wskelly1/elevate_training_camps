@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
-import { Fraunces, Instrument_Serif } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
 
 /**
- * Style Guide (internal) — Checkpoint A1 review artifact, revision 2.
+ * Style Guide (internal) — revision 3. Checkpoint A1 is CLOSED.
  *
- * Revision 2 folds in the owner's A1 feedback: greens separated so hover is
- * actually visible, accents locked to Red Rock + Trail Brown, a Tracksmith-
- * leaning serif display face proposed (two candidates rendered for A/B), the
- * reference-site mapping recorded, and logo concepts added.
+ * Records the decided brand system: consolidated palette, Red Rock + Trail
+ * Brown accents, Instrument Serif as the display face, and the twin-peak
+ * logo with cream-on-deep-green as the primary treatment. All of it is now
+ * live in globals.css and BrandLogo.tsx — this page is the reference and
+ * visual-regression surface, not a proposal.
  *
- * Not linked from any nav and noindexed. Once approved, these values become
- * the real CSS tokens in globals.css (Phase 2) and this page switches to
- * rendering those tokens, becoming a permanent visual-regression reference.
+ * Not linked from any nav; noindexed.
  */
 
-const fraunces = Fraunces({ subsets: ["latin"], display: "swap" });
 const instrument = Instrument_Serif({ subsets: ["latin"], weight: "400", display: "swap" });
 
 export const metadata: Metadata = {
@@ -22,7 +20,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// ——— Palette (revision 2) ————————————————————————————————————————————
+// ——— Palette (decided) ————————————————————————————————————————————
 
 const greens = [
   { token: "--primary", hex: "#427b4d", label: "Elevate Green", note: "Canonical brand green. Absorbs #3c6e45, #2E5631, #4a7f53." },
@@ -106,19 +104,20 @@ export default function StyleGuidePage() {
       <div className="mx-auto max-w-4xl space-y-16">
 
         <header className="border-b border-[#d3c7b4] pb-8">
-          <p className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">Internal · Checkpoint A1 · revision 2</p>
-          <h1 className={`${fraunces.className} mt-3 text-5xl`}>Elevate Training Camps — Style Guide</h1>
+          <p className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">Internal · Checkpoint A1 CLOSED · revision 3</p>
+          <h1 className={`${instrument.className} mt-3 text-5xl`}>Elevate Training Camps — Style Guide</h1>
           <p className="mt-4 max-w-2xl text-lg text-[#755f4f]">
-            Revision 2 applies the A1 feedback: the greens now separate properly, accents
-            are locked to Red Rock and Trail Brown, a serif display face is proposed for
-            the Tracksmith-leaning direction, and logo concepts are drafted. Open items
-            are marked <strong>DECIDE</strong>.
+            Checkpoint A1 is closed and every decision below is live on the site.
+            Instrument Serif carries headings and navigation, the twin-peak mark is in
+            the header, and the palette drives the CSS tokens in{" "}
+            <code className="rounded bg-[#f0ead6] px-1">globals.css</code>. Change values
+            there, not in components.
           </p>
         </header>
 
         {/* 1 — Palette */}
         <section className="space-y-6">
-          <h2 className={`${fraunces.className} text-4xl`}>1 · Palette</h2>
+          <h2 className={`${instrument.className} text-4xl`}>1 · Palette</h2>
 
           <div className="rounded-xl border border-[#b67d5e] bg-[#b67d5e]/10 p-5">
             <p className="text-sm font-semibold">Fixed: green hover was indistinguishable</p>
@@ -145,19 +144,19 @@ export default function StyleGuidePage() {
           </div>
 
           <div className="space-y-4 rounded-xl border border-[#d3c7b4] bg-white p-6">
-            <h3 className={`${fraunces.className} text-2xl`}>Greens</h3>
+            <h3 className={`${instrument.className} text-2xl`}>Greens</h3>
             {greens.map((s) => <Swatch key={s.hex} {...s} />)}
           </div>
           <div className="space-y-4 rounded-xl border border-[#d3c7b4] bg-white p-6">
-            <h3 className={`${fraunces.className} text-2xl`}>Cream ramp</h3>
+            <h3 className={`${instrument.className} text-2xl`}>Cream ramp</h3>
             {creams.map((s) => <Swatch key={s.hex} {...s} />)}
           </div>
           <div className="space-y-4 rounded-xl border border-[#d3c7b4] bg-white p-6">
-            <h3 className={`${fraunces.className} text-2xl`}>Ink &amp; browns</h3>
+            <h3 className={`${instrument.className} text-2xl`}>Ink &amp; browns</h3>
             {inks.map((s) => <Swatch key={s.hex} {...s} />)}
           </div>
           <div className="space-y-4 rounded-xl border-2 border-[#427b4d] bg-white p-6">
-            <h3 className={`${fraunces.className} text-2xl`}>Accents — locked</h3>
+            <h3 className={`${instrument.className} text-2xl`}>Accents — locked</h3>
             <p className="text-sm text-[#755f4f]">Alpine Sky, Haze Blue, Golden Trail and Summit Navy are dropped.</p>
             {accents.map((s) => <Swatch key={s.hex} {...s} />)}
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -170,7 +169,7 @@ export default function StyleGuidePage() {
 
         {/* 2 — Typography */}
         <section className="space-y-6">
-          <h2 className={`${fraunces.className} text-4xl`}>2 · Typography — <span className="text-[#b67d5e]">DECIDE</span></h2>
+          <h2 className={`${instrument.className} text-4xl`}>2 · Typography — <span className="text-[#427b4d]">DECIDED: Instrument Serif</span></h2>
           <p className="text-[#755f4f]">
             The Tracksmith direction means a serif for headlines — retro, editorial, a
             little characterful — with Geist Sans retained for body and UI. Two free
@@ -180,20 +179,20 @@ export default function StyleGuidePage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-xl border-2 border-[#d3c7b4] bg-white p-6">
-              <p className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">Option A</p>
-              <h3 className={`${fraunces.className} mt-1 text-3xl`}>Fraunces</h3>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">Not chosen</p>
+              <h3 className="mt-1 font-sans text-3xl font-semibold">Fraunces</h3>
               <p className="mt-2 text-sm text-[#755f4f]">
                 Old-style serif with deliberate &ldquo;wonk&rdquo; — soft, warm, a little
                 weathered. Leans rustic and characterful.
               </p>
-              <div className={`${fraunces.className} mt-5 space-y-2`}>
+              <div className={`${instrument.className} mt-5 space-y-2`}>
                 <p className="text-4xl">Run higher.</p>
                 <p className="text-2xl">7,000 feet of thin air</p>
                 <p className="text-lg italic">Flagstaff, Arizona</p>
               </div>
             </div>
             <div className="rounded-xl border-2 border-[#d3c7b4] bg-white p-6">
-              <p className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">Option B</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#427b4d]">CHOSEN — now live sitewide</p>
               <h3 className={`${instrument.className} mt-1 text-3xl`}>Instrument Serif</h3>
               <p className="mt-2 text-sm text-[#755f4f]">
                 High-contrast editorial serif with sheared terminals — closest match to
@@ -208,11 +207,11 @@ export default function StyleGuidePage() {
           </div>
 
           <div className="space-y-5 rounded-xl border border-[#d3c7b4] bg-white p-6">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">Scale (shown in Fraunces + Geist Sans)</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">Scale (Instrument Serif headings + Geist Sans body)</p>
             {typeScale.map((t) => (
               <div key={t.name} className="flex flex-col gap-1 border-b border-[#f0ead6] pb-4 last:border-0 last:pb-0">
                 <span className="text-xs uppercase tracking-[0.18em] text-[#755f4f]">{t.name} — {t.spec}</span>
-                <span className={`${t.serif ? fraunces.className : ""} ${t.cls}`}>Run higher. Race faster.</span>
+                <span className={`${t.serif ? instrument.className : ""} ${t.cls}`}>Run higher. Race faster.</span>
               </div>
             ))}
           </div>
@@ -220,7 +219,7 @@ export default function StyleGuidePage() {
 
         {/* 3 — Logo */}
         <section className="space-y-6">
-          <h2 className={`${fraunces.className} text-4xl`}>3 · Logo concepts — <span className="text-[#b67d5e]">DECIDE</span></h2>
+          <h2 className={`${instrument.className} text-4xl`}>3 · Logo — <span className="text-[#427b4d]">DECIDED: twin peak, cream on deep green</span></h2>
           <p className="text-[#755f4f]">
             Built from your inspiration: a peak mark that doubles as an{" "}
             <strong>A</strong>, a lowercase serif wordmark, and a spaced-out sans
@@ -242,17 +241,17 @@ export default function StyleGuidePage() {
             </div>
           </div>
 
-          <h3 className={`${fraunces.className} pt-2 text-2xl`}>Lockups — wordmark in each serif</h3>
+          <h3 className={`${instrument.className} pt-2 text-2xl`}>Lockups — wordmark in each serif</h3>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-xl border border-[#d3c7b4] bg-[#f0ead6] p-8">
-              <p className="mb-5 text-xs uppercase tracking-[0.18em] text-[#755f4f]">Horizontal · Fraunces · site header</p>
+              <p className="mb-5 text-xs uppercase tracking-[0.18em] text-[#755f4f]">Horizontal · site header (live)</p>
               <div className="flex items-center gap-4">
                 <MarkTwinPeak size={64} />
-                <Wordmark fontClass={fraunces.className} color="#427b4d" size="text-4xl" />
+                <Wordmark fontClass={instrument.className} color="#427b4d" size="text-4xl" />
               </div>
             </div>
             <div className="rounded-xl border border-[#d3c7b4] bg-[#f0ead6] p-8">
-              <p className="mb-5 text-xs uppercase tracking-[0.18em] text-[#755f4f]">Horizontal · Instrument Serif · site header</p>
+              <p className="mb-5 text-xs uppercase tracking-[0.18em] text-[#755f4f]">Horizontal · alternate spacing</p>
               <div className="flex items-center gap-4">
                 <MarkTwinPeak size={64} />
                 <Wordmark fontClass={instrument.className} color="#427b4d" size="text-4xl" />
@@ -260,32 +259,32 @@ export default function StyleGuidePage() {
             </div>
           </div>
 
-          <h3 className={`${fraunces.className} pt-2 text-2xl`}>Colour treatments</h3>
+          <h3 className={`${instrument.className} pt-2 text-2xl`}>Colour treatments</h3>
           <div className="grid gap-6 md:grid-cols-3">
             <div className="flex flex-col items-center justify-center rounded-xl border border-[#d3c7b4] bg-[#24422a] p-8">
               <MarkTwinPeak size={72} color="#f0ead6" />
               <div className="mt-4 text-center">
-                <Wordmark fontClass={fraunces.className} color="#f0ead6" sub="#b6c4ae" size="text-3xl" />
+                <Wordmark fontClass={instrument.className} color="#f0ead6" sub="#b6c4ae" size="text-3xl" />
               </div>
               <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#b6c4ae]">Cream on deep green</p>
             </div>
             <div className="flex flex-col items-center justify-center rounded-xl border border-[#d3c7b4] bg-[#fbf9f3] p-8">
               <MarkTwinPeak size={72} color="#427b4d" />
               <div className="mt-4 text-center">
-                <Wordmark fontClass={fraunces.className} color="#24422a" size="text-3xl" />
+                <Wordmark fontClass={instrument.className} color="#24422a" size="text-3xl" />
               </div>
               <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#755f4f]">Green on cream</p>
             </div>
             <div className="flex flex-col items-center justify-center rounded-xl border border-[#d3c7b4] bg-[#67563b] p-8">
               <MarkTwinPeak size={72} color="#f0ead6" />
               <div className="mt-4 text-center">
-                <Wordmark fontClass={fraunces.className} color="#f0ead6" sub="#d3c7b4" size="text-3xl" />
+                <Wordmark fontClass={instrument.className} color="#f0ead6" sub="#d3c7b4" size="text-3xl" />
               </div>
               <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#d3c7b4]">Cream on Trail Brown</p>
             </div>
           </div>
 
-          <h3 className={`${fraunces.className} pt-2 text-2xl`}>Mark alone — favicon &amp; avatar</h3>
+          <h3 className={`${instrument.className} pt-2 text-2xl`}>Mark alone — favicon &amp; avatar</h3>
           <div className="flex flex-wrap items-end gap-6">
             {[64, 40, 32, 16].map((s) => (
               <div key={s} className="text-center">
@@ -304,10 +303,10 @@ export default function StyleGuidePage() {
 
         {/* 4 — References */}
         <section className="space-y-6">
-          <h2 className={`${fraunces.className} text-4xl`}>4 · Reference mapping</h2>
+          <h2 className={`${instrument.className} text-4xl`}>4 · Reference mapping</h2>
           <div className="space-y-4">
             <div className="rounded-xl border border-[#d3c7b4] bg-white p-6">
-              <h3 className={`${fraunces.className} text-2xl`}>The Kenya Experience → content &amp; pricing structure</h3>
+              <h3 className={`${instrument.className} text-2xl`}>The Kenya Experience → content &amp; pricing structure</h3>
               <p className="mt-2 text-sm text-[#755f4f]">
                 Specifically the Young Athlete Camp page. Drives how Registration and camp
                 pages are organised: camp-type segmentation, what-is-included breakdowns,
@@ -315,7 +314,7 @@ export default function StyleGuidePage() {
               </p>
             </div>
             <div className="rounded-xl border border-[#d3c7b4] bg-white p-6">
-              <h3 className={`${fraunces.className} text-2xl`}>Under Canvas → homepage video</h3>
+              <h3 className={`${instrument.className} text-2xl`}>Under Canvas → homepage video</h3>
               <p className="mt-2 text-sm text-[#755f4f]">
                 Full-bleed landscape video as the hero. The good news: this already exists —
                 the Mux-backed scroll-expanding video on the homepage, editable from Sanity.
@@ -324,7 +323,7 @@ export default function StyleGuidePage() {
               </p>
             </div>
             <div className="rounded-xl border border-[#d3c7b4] bg-white p-6">
-              <h3 className={`${fraunces.className} text-2xl`}>Tracksmith → aesthetic, type, layout</h3>
+              <h3 className={`${instrument.className} text-2xl`}>Tracksmith → aesthetic, type, layout</h3>
               <p className="mt-2 text-sm text-[#755f4f]">
                 The retro running-culture register: serif headlines, generous whitespace,
                 photography-led editorial blocks, muted earth tones. This is what the serif
@@ -337,7 +336,7 @@ export default function StyleGuidePage() {
 
         {/* 5 — Motion */}
         <section className="space-y-6">
-          <h2 className={`${fraunces.className} text-4xl`}>5 · Motion vocabulary</h2>
+          <h2 className={`${instrument.className} text-4xl`}>5 · Motion vocabulary</h2>
           <div className="space-y-4 rounded-xl border border-[#d3c7b4] bg-white p-6">
             <p>
               <strong>House style — cinematic scroll.</strong> Large media responds to

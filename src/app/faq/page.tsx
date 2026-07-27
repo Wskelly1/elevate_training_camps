@@ -27,7 +27,7 @@ export default async function FAQPage() {
         {/* Header Section */}
         <div className="container mx-auto px-8 pt-28 pb-8 mb-10 flex items-center">
           <div className="w-1/2 text-black">
-            <h1 className="text-4xl font-bold mb-4">{settings.title || 'Frequently Asked Questions'}</h1>
+            <h1 className="text-4xl mb-4">{settings.title || 'Frequently Asked Questions'}</h1>
             <p className="text-lg opacity-90">
               {settings.introduction || 'At Elevate Training Camps, we believe that high-altitude training should be accessible, fun, and safe for all athletes. Below you\'ll find answers to common questions about our camp, registration, and what to expect in Flagstaff, AZ.'}
             </p>
@@ -49,7 +49,7 @@ export default async function FAQPage() {
       {/* Main content centered and constrained */}
       <div className="max-w-3xl mx-auto">
         {/* Section heading */}
-        <h2 className="text-2xl font-semibold mb-6 text-primary">General Questions</h2>
+        <h2 className="text-2xl mb-6 text-primary">General Questions</h2>
         {/* FAQ List */}
         <div className="space-y-4 mb-10">
           {faqs.map((faq: FAQ) => (

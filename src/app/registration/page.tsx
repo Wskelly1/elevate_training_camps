@@ -247,7 +247,7 @@ export default async function RegistrationPage() {
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="mb-8">
               <Calendar className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
                 Registration & Pricing
               </h1>
               <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -279,7 +279,7 @@ export default async function RegistrationPage() {
         <section id="packages" className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 Choose Your Training Package
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -305,7 +305,7 @@ export default async function RegistrationPage() {
                   )}
 
                   <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier.name}</h3>
+                    <h3 className="text-2xl text-gray-900 mb-2">{tier.name}</h3>
                     <p className="text-gray-600 mb-6">{tier.description}</p>
 
                     <div className="mb-4">
@@ -353,7 +353,7 @@ export default async function RegistrationPage() {
         <section className="py-20 bg-[#fff9eb]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 Upcoming Training Camps
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -373,7 +373,7 @@ export default async function RegistrationPage() {
                     <span className="text-sm text-gray-600">{camp.spots}</span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{camp.type}</h3>
+                  <h3 className="text-xl text-gray-900 mb-2">{camp.type}</h3>
                   <div className="space-y-2 mb-6">
                     <div className="flex items-center text-gray-600">
                       <Calendar className="h-4 w-4 mr-2" />
@@ -404,7 +404,7 @@ export default async function RegistrationPage() {
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 What&apos;s Included
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -421,7 +421,7 @@ export default async function RegistrationPage() {
                     <div className="bg-[#fff9eb] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                       <IconComponent className="h-8 w-8 text-[#427b4d]" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">{category.category}</h3>
+                    <h3 className="text-xl text-gray-900 mb-4">{category.category}</h3>
                     <ul className="space-y-2 text-left">
                       {category.items.map((item, itemIndex) => (
                         <li key={itemIndex} className="flex items-start text-gray-600">
@@ -442,7 +442,7 @@ export default async function RegistrationPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <Users className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 Team & Group Pricing
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -453,10 +453,10 @@ export default async function RegistrationPage() {
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Team/Group Pricing */}
               <div className="bg-[#fff9eb] rounded-2xl p-8">
-                <h3 className="text-3xl font-bold text-gray-900 mb-6">Team / Group Pricing</h3>
+                <h3 className="text-3xl text-gray-900 mb-6">Team / Group Pricing</h3>
                 <div className="space-y-6">
                   <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl font-semibold text-gray-900 mb-2">10 Athletes</h4>
+                    <h4 className="text-xl text-gray-900 mb-2">10 Athletes</h4>
                     <p className="text-lg font-bold text-[#427b4d] mb-2">$1,350 per person</p>
                     <p className="text-gray-600 mb-3">4-week program with Airbnb-style housing</p>
                     <ul className="text-sm text-gray-600 space-y-1">
@@ -468,7 +468,7 @@ export default async function RegistrationPage() {
                   </div>
 
                   <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl font-semibold text-gray-900 mb-2">12-14 Athletes</h4>
+                    <h4 className="text-xl text-gray-900 mb-2">12-14 Athletes</h4>
                     <p className="text-lg font-bold text-[#427b4d] mb-2">$1,200 - $1,250 per person</p>
                     <p className="text-gray-600 mb-3">Best value - shared housing and van rental costs</p>
                     <ul className="text-sm text-gray-600 space-y-1">
@@ -480,7 +480,7 @@ export default async function RegistrationPage() {
                   </div>
 
                   <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl font-semibold text-gray-900 mb-2">6-8 Athletes</h4>
+                    <h4 className="text-xl text-gray-900 mb-2">6-8 Athletes</h4>
                     <p className="text-lg font-bold text-[#427b4d] mb-2">$1,500 - $1,600 per person</p>
                     <p className="text-gray-600 mb-3">Smaller groups - higher per-person costs</p>
                     <ul className="text-sm text-gray-600 space-y-1">
@@ -495,10 +495,10 @@ export default async function RegistrationPage() {
 
               {/* Hostel-Style Option */}
               <div className="bg-[#fff9eb] rounded-2xl p-8">
-                <h3 className="text-3xl font-bold text-gray-900 mb-6">Hostel-Style Option</h3>
+                <h3 className="text-3xl text-gray-900 mb-6">Hostel-Style Option</h3>
                 <div className="space-y-6">
                   <div className="border-l-4 border-[#755f4f] pl-6">
-                    <h4 className="text-xl font-semibold text-gray-900 mb-2">Solo Athletes & Pairs</h4>
+                    <h4 className="text-xl text-gray-900 mb-2">Solo Athletes & Pairs</h4>
                     <p className="text-lg font-bold text-[#755f4f] mb-2">$1,400 - $1,500 per person</p>
                     <p className="text-gray-600 mb-3">4-week program with shared housing</p>
                     <ul className="text-sm text-gray-600 space-y-1">
@@ -533,7 +533,7 @@ export default async function RegistrationPage() {
         <section className="py-20 bg-[#fff9eb]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <CreditCard className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
               Flexible Payment Options
             </h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -543,7 +543,7 @@ export default async function RegistrationPage() {
             <div className="grid md:grid-cols-3 gap-8 mb-12">
               {displayPaymentOptions.map((option, index) => (
                 <div key={option._id || index} className="bg-white p-6 rounded-xl shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">{option.name}</h3>
+                  <h3 className="text-xl text-gray-900 mb-4">{option.name}</h3>
                   <div className="text-3xl font-bold text-[#427b4d] mb-2">{option.discount}</div>
                   <p className="text-gray-600">{option.description}</p>
                 </div>
@@ -551,7 +551,7 @@ export default async function RegistrationPage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Get Started?</h3>
+              <h3 className="text-2xl text-gray-900 mb-4">Ready to Get Started?</h3>
               <p className="text-gray-600 mb-6">
                 Contact us to discuss payment options and secure your spot in our next training camp.
               </p>
