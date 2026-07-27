@@ -190,7 +190,7 @@ export default async function CoachingPage() {
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="mb-8">
               <Target className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
                 Professional Coaching
               </h1>
               <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -222,7 +222,7 @@ export default async function CoachingPage() {
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 Why Choose Our Coaching?
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -235,7 +235,7 @@ export default async function CoachingPage() {
                 return (
                   <div key={benefit._id || index} className="text-center p-6 rounded-lg bg-[#fff9eb] hover:shadow-lg transition-shadow">
                     <IconComponent className="h-12 w-12 mx-auto text-[#427b4d] mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">{benefit.title}</h3>
+                    <h3 className="text-xl text-gray-900 mb-3">{benefit.title}</h3>
                     <p className="text-gray-600">{benefit.description}</p>
                   </div>
                 );
@@ -248,7 +248,7 @@ export default async function CoachingPage() {
         <section id="programs" className="py-20 bg-[#fff9eb]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 Coaching Programs
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -274,7 +274,7 @@ export default async function CoachingPage() {
                     )}
                     <div className="flex items-center mb-6">
                       <IconComponent className="h-8 w-8 text-[#427b4d] mr-3" />
-                      <h3 className="text-2xl font-bold text-gray-900">{program.name || program.title}</h3>
+                      <h3 className="text-2xl text-gray-900">{program.name || program.title}</h3>
                     </div>
                     <p className="text-gray-600 mb-6">{program.description}</p>
                     <ul className="space-y-3 mb-6">
@@ -310,7 +310,7 @@ export default async function CoachingPage() {
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 What Our Athletes Say
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -341,7 +341,7 @@ export default async function CoachingPage() {
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-r from-[#427b4d] to-[#387143]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl text-white mb-6">
               Ready to Elevate Your Performance?
               </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">

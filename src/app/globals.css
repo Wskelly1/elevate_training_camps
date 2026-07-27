@@ -45,7 +45,7 @@
   --color-brown-deep: var(--brown-deep);
 
   --font-sans: var(--font-geist-sans);
-  --font-serif: var(--font-fraunces);
+  --font-serif: var(--font-display);
   --font-mono: var(--font-geist-mono);
 
   --radius: 0.5rem; /* Add this line to define the base radius */
@@ -104,12 +104,15 @@
     @apply border-border;
   }
   /**
-   * Headings use the display serif (Fraunces); body/UI stay on Geist Sans.
-   * Approved at Checkpoint A1 — the Tracksmith-leaning "refined rustic"
-   * direction. Opt out on a case-by-case basis with `font-sans`.
+   * Headings and nav use the display serif (Instrument Serif); body and
+   * form/UI copy stay on Geist Sans. Approved at Checkpoint A1 — the
+   * Tracksmith-leaning editorial direction. Opt out with `font-sans`.
    */
   h1, h2, h3, h4 {
-    font-family: var(--font-fraunces), Georgia, serif;
+    font-family: var(--font-display), Georgia, serif;
+    /* Instrument Serif ships weight 400 only — pin it so nothing
+       triggers a synthesised faux bold. */
+    font-weight: 400;
   }
   body {
     @apply bg-background text-foreground;

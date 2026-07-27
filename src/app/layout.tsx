@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { getSiteSettings } from "../lib/queries";
@@ -17,12 +17,21 @@ const geistMono = Geist_Mono({
 });
 
 /**
- * Display face for headings — approved at Checkpoint A1. Fraunces is an
- * old-style serif with deliberate "wonk", chosen for the refined-rustic
- * direction. Body copy and UI stay on Geist Sans.
+ * Display face for headings and nav — Instrument Serif, chosen at
+ * Checkpoint A1 (option B) for the high-contrast editorial register.
+ * Body copy stays on Geist Sans.
+ *
+ * Note: this family ships weight 400 only. Headings must NOT carry
+ * font-bold/font-semibold or the browser synthesises a faux bold, which
+ * smears the high-contrast strokes. The base layer pins h1-h4 to 400 and
+ * the utility classes were stripped accordingly.
+ *
+ * The CSS variable is deliberately font-agnostic (--font-display) so a
+ * future face swap touches this file only.
  */
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const displaySerif = Instrument_Serif({
+  variable: "--font-display",
+  weight: "400",
   subsets: ["latin"],
   display: "swap",
 });
@@ -91,7 +100,7 @@ export default async function RootLayout({
         <link rel="manifest" href="/api/manifest" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${displaySerif.variable} antialiased`}
       >
         <FaviconProvider favicon={settings.favicon} />
         {children}

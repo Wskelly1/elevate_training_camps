@@ -49,7 +49,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections }: A
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8">
             <User className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
               About Elevate Training Camps
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -73,7 +73,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections }: A
       </section>
 
       <section id="our-team" className="py-12 bg-[#f0ead6] scroll-mt-32">
-        <h2 className="text-5xl font-bold text-center mb-4">Our Team</h2>
+        <h2 className="text-5xl text-center mb-4">Our Team</h2>
         {teamIntroductions.length > 0 ? (
           <AnimatedTeamIntroductions
             introductions={teamIntroductions}
@@ -103,7 +103,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections }: A
                 )}
               </div>
               <div className="md:w-1/2">
-                <h2 className="text-5xl font-bold mb-4">{section.title}</h2>
+                <h2 className="text-5xl mb-4">{section.title}</h2>
                 <div className="prose prose-lg max-w-none">
                   <PortableText value={section.content} />
                 </div>

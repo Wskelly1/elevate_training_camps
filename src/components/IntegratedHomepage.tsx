@@ -451,7 +451,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
               {/* Initial Hero Text - visible before scroll, positioned lower to avoid nav bar */}
               {initialPhase && (
                 <div className="text-center px-4 text-black pointer-events-none mt-32 md:mt-36 lg:mt-40">
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl mb-4">
                     Elevate Training Camps
                   </h1>
                   <p className="text-lg md:text-xl max-w-2xl mx-auto">
@@ -568,7 +568,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                     }}
                   >
                     <h2
-                      className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200"
+                      className="text-4xl md:text-5xl lg:text-6xl text-blue-200"
                       style={{
                         transform: `translateX(-${textTranslateX}px)`,
                         transition: 'transform 0.1s ease-out',
@@ -577,7 +577,7 @@ const IntegratedHomepage: React.FC<IntegratedHomepageProps> = ({ data }) => {
                       {firstWord}
                     </h2>
                     <h2
-                      className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200"
+                      className="text-4xl md:text-5xl lg:text-6xl text-center text-blue-200"
                       style={{
                         transform: `translateX(${textTranslateX}px)`,
                         transition: 'transform 0.1s ease-out',
@@ -682,7 +682,7 @@ const StaticContentSection = ({
 
           {/* Content */}
           <div className="md:w-1/2 text-center md:text-left">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+            <h2 className="text-4xl md:text-5xl mb-4 text-gray-900">
               {section.heading}
             </h2>
             {section.subheading && (
