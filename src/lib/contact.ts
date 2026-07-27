@@ -19,7 +19,7 @@ export interface ContactFormResponse {
   success: boolean;
   message?: string;
   error?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export function validateContactForm(data: ContactFormData): ContactFormErrors {
@@ -81,7 +81,7 @@ export async function submitContactForm(data: ContactFormData): Promise<ContactF
       success: true,
       message: result.message || 'Contact form submitted successfully'
     };
-  } catch (error) {
+  } catch {
     return {
       success: false,
       error: 'Network error. Please try again later.'

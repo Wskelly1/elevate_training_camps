@@ -1,5 +1,7 @@
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
+import type { SanityImageRef } from './types'
 import { apiVersion, dataset, projectId } from '../sanity/env'
 
 /**
@@ -33,9 +35,9 @@ const builder = imageUrlBuilder(client)
  * This function takes a Sanity image source and returns a builder object
  * that can be used to generate optimized image URLs with various transformations.
  *
- * @param {any} source - Sanity image asset object
+ * @param {SanityImageRef | string} source - Sanity image asset object (or asset ref string)
  * @returns {Object} Image URL builder with transformation methods
  */
-export function urlFor(source: any) {
-  return builder.image(source)
+export function urlFor(source: SanityImageRef | string) {
+  return builder.image(source as SanityImageSource)
 }

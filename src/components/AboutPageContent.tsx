@@ -54,7 +54,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections }: A
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Discover the story behind our commitment to excellence in high-altitude training.
-              We're dedicated to helping athletes reach their peak performance through innovative
+              We&apos;re dedicated to helping athletes reach their peak performance through innovative
               training methods and world-class facilities in the heart of Flagstaff, Arizona.
             </p>
           </div>

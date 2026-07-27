@@ -3,6 +3,7 @@ import { urlFor } from "../../lib/sanity";
 import { type TeamIntroduction } from "../../components/AnimatedCarousel";
 import AboutPageContent from "../../components/AboutPageContent";
 import { getTeamMembers, getAboutSections } from "../../lib/queries";
+import type { SanityImageRef } from "../../lib/types";
 
 // Type for team member from Sanity
 type TeamMember = {
@@ -10,7 +11,7 @@ type TeamMember = {
   name: string;
   title: string;
   bio?: string; // Make bio optional
-  image: any;
+  image: SanityImageRef | null;
 };
 
 /**

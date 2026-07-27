@@ -74,7 +74,7 @@ export default function ContactForm() {
         setSubmitStatus('error');
         setSubmitMessage(result.error || 'Something went wrong. Please try again.');
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
       setSubmitMessage('An unexpected error occurred. Please try again.');
     } finally {
@@ -86,7 +86,7 @@ export default function ContactForm() {
     <>
       <div className="max-w-xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-center">Contact Us</h1>
-        <p className="text-center text-gray-600 mb-8">We'd love to hear from you! Please fill out the form below and we'll get back to you as soon as possible.</p>
+        <p className="text-center text-gray-600 mb-8">We&apos;d love to hear from you! Please fill out the form below and we&apos;ll get back to you as soon as possible.</p>
       </div>
       <div className="max-w-xl mx-auto p-8 bg-[#f0ead6] rounded-lg shadow-sm border-2 border-[#d3c7b4] border-t-[#3c6e45] mb-24">
         {/* Success Message */}

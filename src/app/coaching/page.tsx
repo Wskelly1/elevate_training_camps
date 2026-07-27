@@ -1,6 +1,6 @@
 import Layout from "../../components/layout";
 import Link from "next/link";
-import { Target, Users, Clock, MapPin, Star, CheckCircle, Award, TrendingUp, Heart, Zap } from "lucide-react";
+import { Target, Users, Clock, MapPin, Star, CheckCircle, Award, TrendingUp, Heart, Zap, type LucideIcon } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { getCoachingPrograms, getCoachingBenefits, getCoachingTestimonials } from "../../lib/queries";
 
@@ -15,7 +15,7 @@ import { getCoachingPrograms, getCoachingBenefits, getCoachingTestimonials } fro
 
 // Icon mapping function
 const getIcon = (iconName: string) => {
-  const iconMap: { [key: string]: any } = {
+  const iconMap: Record<string, LucideIcon> = {
     target: Target,
     users: Users,
     mappin: MapPin,
@@ -292,7 +292,7 @@ export default async function CoachingPage() {
                           <span className="text-sm">{program.duration}</span>
                         </div>
                         <div className="text-2xl font-bold text-[#427b4d]">
-                          {program.price ? `$${program.price}` : program.price}
+                          {typeof program.price === 'number' ? `$${program.price}` : program.price}
                         </div>
                       </div>
                       <Button asChild className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
@@ -326,7 +326,7 @@ export default async function CoachingPage() {
                     ))}
                   </div>
                   <blockquote className="text-gray-700 mb-6 italic">
-                    "{testimonial.quote}"
+                    &ldquo;{testimonial.quote}&rdquo;
                   </blockquote>
                   <div>
                     <div className="font-semibold text-gray-900">{testimonial.name}</div>

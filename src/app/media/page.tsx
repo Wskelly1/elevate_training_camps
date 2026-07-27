@@ -24,7 +24,7 @@ export default function MediaPage() {
         <p className="text-lg text-center mb-6">Explore photos and videos from past Elevate Training Camps. See the fun, the training, and the beautiful Flagstaff scenery!</p>
         <ul className="list-disc pl-6">
           <li>Photo: Campers at sunrise on Buffalo Park Trail</li>
-          <li>Video: Coach's welcome speech (2023)</li>
+          <li>Video: Coach&apos;s welcome speech (2023)</li>
           <li>Photo: Group run through the pines</li>
         </ul>
       </div>

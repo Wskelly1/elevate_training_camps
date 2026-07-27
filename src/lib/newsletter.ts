@@ -6,7 +6,7 @@ export interface NewsletterResponse {
   success: boolean;
   message?: string;
   error?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export function validateEmail(email: string): boolean {
@@ -38,7 +38,7 @@ export async function subscribeToNewsletter(email: string): Promise<NewsletterRe
       success: true,
       message: result.message || 'Thank you for subscribing to our newsletter!'
     };
-  } catch (error) {
+  } catch {
     return {
       success: false,
       error: 'Network error. Please try again later.'

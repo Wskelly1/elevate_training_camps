@@ -1,4 +1,6 @@
 import { unstable_cache } from 'next/cache'
+import type { PortableTextBlock } from '@portabletext/types'
+import type { SanityImageRef } from './types'
 import { client } from './sanity'
 import { groq } from 'next-sanity';
 
@@ -31,10 +33,10 @@ const REVALIDATE_SECONDS = 300;
 export type SiteSettings = {
   title: string;
   description?: string;
-  logo?: any;
-  footerLogo?: any;
-  aboutUsImage?: any;
-  favicon?: any;
+  logo?: SanityImageRef;
+  footerLogo?: SanityImageRef;
+  aboutUsImage?: SanityImageRef;
+  favicon?: SanityImageRef;
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
@@ -146,8 +148,8 @@ export type AboutSection = {
   slug: {
     current: string;
   };
-  content?: any;
-  image?: any;
+  content?: PortableTextBlock[];
+  image?: SanityImageRef;
 }
 
 const fetchAboutSections = unstable_cache(
@@ -554,7 +556,7 @@ export async function getFAQs() {
 export type FAQPageSettings = {
   title?: string;
   introduction?: string;
-  faqPageImage?: any;
+  faqPageImage?: SanityImageRef;
 };
 
 const fetchFAQPageSettings = unstable_cache(
