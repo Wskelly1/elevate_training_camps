@@ -360,7 +360,7 @@ export default async function CoachingPage() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white hover:text-[#427b4d] px-8 py-4 text-lg"
+                className="border-white bg-transparent text-white hover:bg-white hover:text-[#427b4d] px-8 py-4 text-lg"
               >
                 <a href="tel:+16512074749">Call (651) 207-4749</a>
               </Button>

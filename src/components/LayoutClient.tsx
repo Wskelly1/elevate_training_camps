@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../com
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Logo from "./Logo";
+import BrandLogo from "./BrandLogo";
 import { SiteSettings, AboutSection } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
 import { usePathname } from "next/navigation";
@@ -288,7 +288,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           <div className="flex flex-row h-auto items-center justify-between px-6 py-3">
             {/* Logo container */}
             <div className="flex items-center h-12">
-              <Logo maxWidth={180} siteSettings={siteSettings} />
+              <BrandLogo markSize={38} />
             </div>
 
             {/* Desktop Navigation */}

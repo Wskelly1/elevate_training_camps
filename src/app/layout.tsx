@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { getSiteSettings } from "../lib/queries";
@@ -14,6 +14,17 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/**
+ * Display face for headings — approved at Checkpoint A1. Fraunces is an
+ * old-style serif with deliberate "wonk", chosen for the refined-rustic
+ * direction. Body copy and UI stay on Geist Sans.
+ */
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 /**
@@ -80,7 +91,7 @@ export default async function RootLayout({
         <link rel="manifest" href="/api/manifest" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
       >
         <FaviconProvider favicon={settings.favicon} />
         {children}
