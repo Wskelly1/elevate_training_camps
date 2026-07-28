@@ -74,7 +74,7 @@ export function AnimatedTeamIntroductions({ introductions }: AnimatedTeamIntrodu
 
             {/* Content */}
             <div className="w-full md:w-1/2 md:pl-8 text-center md:text-left">
-              <div className="font-bold text-lg">{intro.name}</div>
+              <div className=" text-lg">{intro.name}</div>
               <div className="text-gray-600 mb-4">{intro.designation}</div>
               <blockquote className="text-lg md:text-xl italic">
                 &ldquo;{intro.quote}&rdquo;

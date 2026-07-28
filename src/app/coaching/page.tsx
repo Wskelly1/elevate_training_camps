@@ -267,7 +267,7 @@ export default async function CoachingPage() {
                   >
                     {program.popular && (
                       <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <span className="bg-[#427b4d] text-white px-4 py-1 rounded-full text-sm font-semibold">
+                        <span className="bg-[#427b4d] text-white px-4 py-1 rounded-full text-sm">
                           Most Popular
                         </span>
                       </div>
@@ -291,7 +291,7 @@ export default async function CoachingPage() {
                           <Clock className="h-4 w-4 mr-2" />
                           <span className="text-sm">{program.duration}</span>
                         </div>
-                        <div className="text-2xl font-bold text-[#427b4d]">
+                        <div className="text-2xl text-[#427b4d]">
                           {typeof program.price === 'number' ? `$${program.price}` : program.price}
                         </div>
                       </div>
@@ -329,7 +329,7 @@ export default async function CoachingPage() {
                     &ldquo;{testimonial.quote}&rdquo;
                   </blockquote>
                   <div>
-                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                    <div className=" text-gray-900">{testimonial.name}</div>
                     <div className="text-[#427b4d] text-sm">{testimonial.sport}</div>
                   </div>
                 </div>
@@ -352,7 +352,7 @@ export default async function CoachingPage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-white text-[#427b4d] hover:bg-gray-100 px-8 py-4 text-lg font-semibold"
+                className="bg-white text-[#427b4d] hover:bg-gray-100 px-8 py-4 text-lg"
               >
                 <Link href="/contact">Book Free Consultation</Link>
               </Button>

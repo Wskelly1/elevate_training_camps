@@ -60,13 +60,13 @@ export default function AboutPageContent({ teamIntroductions, aboutSections }: A
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-              <p className="text-lg font-semibold text-gray-900">Established 2020</p>
+              <p className="text-lg text-gray-900">Established 2020</p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-              <p className="text-lg font-semibold text-gray-900">Flagstaff, Arizona</p>
+              <p className="text-lg text-gray-900">Flagstaff, Arizona</p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-              <p className="text-lg font-semibold text-gray-900">7,000 ft Elevation</p>
+              <p className="text-lg text-gray-900">7,000 ft Elevation</p>
             </div>
           </div>
         </div>

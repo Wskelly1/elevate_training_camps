@@ -696,7 +696,7 @@ const StaticContentSection = ({
             {section.buttonText && section.buttonLink && (
               <a
                 href={section.buttonLink}
-                className="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 {section.buttonText}
               </a>
