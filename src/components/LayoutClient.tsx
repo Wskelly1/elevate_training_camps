@@ -362,7 +362,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                                           </div>
                                         </>
                                       )}
-                                      <div className="mb-2 mt-4 text-lg font-medium relative z-10">
+                                      <div className="mb-2 mt-4 font-serif text-xl relative z-10">
                                         Learn About Us
                                       </div>
                                       <p className="text-sm leading-tight relative z-10" style={{ color: customColors.foreground }}>
@@ -389,7 +389,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                                           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = customColors.accent}
                                           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                                         >
-                                          <div className="text-sm font-medium leading-none">{subItem.title}</div>
+                                          <div className="font-serif text-base leading-none">{subItem.title}</div>
                                           <p className="text-sm leading-snug" style={{ color: customColors.darkAccent }}>
                                             {getDescriptionForSection(subItem.title)}
                                           </p>

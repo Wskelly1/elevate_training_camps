@@ -66,7 +66,7 @@ export default async function FAQPage() {
         {/* Contact prompt */}
         <div className="text-center text-lg mt-12 mb-12">
           Have more questions?{' '}
-          <a href="/contact" className="text-primary underline font-semibold">Contact us</a>
+          <a href="/contact" className="text-primary underline">Contact us</a>
         </div>
       </div>
     </Layout>

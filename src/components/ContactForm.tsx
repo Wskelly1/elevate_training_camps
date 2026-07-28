@@ -108,7 +108,7 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="block font-semibold mb-1 text-black" htmlFor="firstName">
+              <label className="block mb-1 text-black" htmlFor="firstName">
                 First Name *
               </label>
               <Input
@@ -124,7 +124,7 @@ export default function ContactForm() {
               )}
             </div>
             <div className="flex-1">
-              <label className="block font-semibold mb-1 text-black" htmlFor="lastName">
+              <label className="block mb-1 text-black" htmlFor="lastName">
                 Last Name *
               </label>
               <Input
@@ -141,7 +141,7 @@ export default function ContactForm() {
             </div>
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-black" htmlFor="email">
+            <label className="block mb-1 text-black" htmlFor="email">
               Email *
             </label>
             <Input
@@ -158,7 +158,7 @@ export default function ContactForm() {
             )}
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-black" htmlFor="subject">
+            <label className="block mb-1 text-black" htmlFor="subject">
               Subject *
             </label>
             <Input
@@ -174,7 +174,7 @@ export default function ContactForm() {
             )}
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-black" htmlFor="message">
+            <label className="block mb-1 text-black" htmlFor="message">
               Message *
             </label>
             <Textarea
@@ -193,7 +193,7 @@ export default function ContactForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-12 text-base font-semibold bg-[#3c6e45] hover:bg-[#4a7f53] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 text-base bg-[#3c6e45] hover:bg-[#4a7f53] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </Button>

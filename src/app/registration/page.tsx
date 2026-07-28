@@ -298,7 +298,7 @@ export default async function RegistrationPage() {
                 >
                   {tier.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-[#427b4d] text-white px-6 py-2 rounded-full text-sm font-semibold">
+                      <span className="bg-[#427b4d] text-white px-6 py-2 rounded-full text-sm">
                         Most Popular
                       </span>
                     </div>
@@ -310,7 +310,7 @@ export default async function RegistrationPage() {
 
                     <div className="mb-4">
                       <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="text-4xl font-bold text-gray-900">${tier.price}</span>
+                        <span className="text-4xl text-gray-900">${tier.price}</span>
                         {tier.originalPrice && (
                           <span className="text-lg text-gray-500 line-through">${tier.originalPrice}</span>
                         )}
@@ -333,7 +333,7 @@ export default async function RegistrationPage() {
 
                   <Button
                     asChild
-                    className={`w-full py-4 text-lg font-semibold ${
+                    className={`w-full py-4 text-lg ${
                       tier.popular
                         ? 'bg-[#427b4d] hover:bg-[#387143] text-white'
                         : 'bg-gray-900 hover:bg-gray-800 text-white'
@@ -365,7 +365,7 @@ export default async function RegistrationPage() {
               {displayCamps.map((camp, index) => (
                 <div key={camp._id || index} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    <span className={`px-3 py-1 rounded-full text-xs uppercase tracking-[0.14em] ${
                       camp.earlyBird ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                     }`}>
                       {camp.earlyBird ? 'Early Bird Available' : 'Regular Pricing'}
@@ -457,7 +457,7 @@ export default async function RegistrationPage() {
                 <div className="space-y-6">
                   <div className="border-l-4 border-[#427b4d] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">10 Athletes</h4>
-                    <p className="text-lg font-bold text-[#427b4d] mb-2">$1,350 per person</p>
+                    <p className="text-lg text-[#427b4d] mb-2">$1,350 per person</p>
                     <p className="text-gray-600 mb-3">4-week program with Airbnb-style housing</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Housing included</li>
@@ -469,7 +469,7 @@ export default async function RegistrationPage() {
 
                   <div className="border-l-4 border-[#427b4d] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">12-14 Athletes</h4>
-                    <p className="text-lg font-bold text-[#427b4d] mb-2">$1,200 - $1,250 per person</p>
+                    <p className="text-lg text-[#427b4d] mb-2">$1,200 - $1,250 per person</p>
                     <p className="text-gray-600 mb-3">Best value - shared housing and van rental costs</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Shared housing</li>
@@ -481,7 +481,7 @@ export default async function RegistrationPage() {
 
                   <div className="border-l-4 border-[#427b4d] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">6-8 Athletes</h4>
-                    <p className="text-lg font-bold text-[#427b4d] mb-2">$1,500 - $1,600 per person</p>
+                    <p className="text-lg text-[#427b4d] mb-2">$1,500 - $1,600 per person</p>
                     <p className="text-gray-600 mb-3">Smaller groups - higher per-person costs</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Housing included</li>
@@ -499,7 +499,7 @@ export default async function RegistrationPage() {
                 <div className="space-y-6">
                   <div className="border-l-4 border-[#755f4f] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">Solo Athletes & Pairs</h4>
-                    <p className="text-lg font-bold text-[#755f4f] mb-2">$1,400 - $1,500 per person</p>
+                    <p className="text-lg text-[#755f4f] mb-2">$1,400 - $1,500 per person</p>
                     <p className="text-gray-600 mb-3">4-week program with shared housing</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Shared housing with other athletes</li>
@@ -511,14 +511,14 @@ export default async function RegistrationPage() {
                   </div>
 
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h5 className="font-semibold text-yellow-800 mb-2">Important Note:</h5>
+                    <h5 className=" text-yellow-800 mb-2">Important Note:</h5>
                     <p className="text-sm text-yellow-700">
                       Meals out, personal spending, and travel to Flagstaff are <strong>not included</strong> in these prices.
                     </p>
                   </div>
 
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h5 className="font-semibold text-blue-800 mb-2">Final Pricing:</h5>
+                    <h5 className=" text-blue-800 mb-2">Final Pricing:</h5>
                     <p className="text-sm text-blue-700">
                       Final cost depends on total headcount for the session.
                     </p>
@@ -544,7 +544,7 @@ export default async function RegistrationPage() {
               {displayPaymentOptions.map((option, index) => (
                 <div key={option._id || index} className="bg-white p-6 rounded-xl shadow-lg">
                   <h3 className="text-xl text-gray-900 mb-4">{option.name}</h3>
-                  <div className="text-3xl font-bold text-[#427b4d] mb-2">{option.discount}</div>
+                  <div className="text-3xl text-[#427b4d] mb-2">{option.discount}</div>
                   <p className="text-gray-600">{option.description}</p>
                 </div>
               ))}
