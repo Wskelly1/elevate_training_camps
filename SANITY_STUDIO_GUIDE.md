@@ -114,6 +114,27 @@ Testimonials (1).
 
 ---
 
+## Known schema problems (queued, not yet fixed)
+
+Raised by the owner 2026-07-29 after first using the reorganised Studio:
+
+1. **FAQ page content lives in the wrong place.** The FAQ page's title,
+   introduction and image are fields *inside* `siteSettings`, so they appear
+   under Site Settings rather than under FAQ Page where an editor would look
+   for them. They should move into their own document type surfaced under
+   FAQ Page.
+2. **The `logo` field is inert.** The site logo is now a hard-coded brand
+   asset (`BrandLogo.tsx`); changing this field does nothing. It should be
+   removed so it stops presenting as a working control.
+3. **The favicon is still CMS-driven and off-brand** — it does not use the
+   new twin-peak mark. It should become a static asset generated from
+   `public/logo-mark.svg`, and the field removed.
+
+Items 2 and 3 are the trailing edge of moving the logo out of the CMS; item
+1 predates it. All three are structural schema edits (they change where
+existing content lives), so they need a content migration rather than a
+simple field move — hence queued rather than done in passing.
+
 ## Notes for developers
 
 - Structure lives in `src/sanity/structure.ts`; schemas in
