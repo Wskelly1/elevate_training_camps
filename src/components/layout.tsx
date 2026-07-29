@@ -6,6 +6,8 @@ interface LayoutProps {
   children?: React.ReactNode
   showNavigation?: boolean
   footerContent?: React.ReactNode
+  /** Let a full-bleed hero run underneath the header. See LayoutClient. */
+  transparentNav?: boolean
 }
 
 /**
@@ -17,7 +19,8 @@ interface LayoutProps {
 export default async function Layout({
   children,
   showNavigation = true,
-  footerContent
+  footerContent,
+  transparentNav = false
 }: LayoutProps) {
   const [siteSettings, aboutSections] = await Promise.all([
     getSiteSettings(),
@@ -30,6 +33,7 @@ export default async function Layout({
       footerContent={footerContent}
       siteSettings={siteSettings}
       aboutSections={aboutSections}
+      transparentNav={transparentNav}
     >
       {children}
     </LayoutClient>
