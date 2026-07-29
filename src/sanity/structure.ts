@@ -18,7 +18,7 @@ import {
 /**
  * Studio structure — organised by WHERE CONTENT APPEARS ON THE SITE.
  *
- * The organising logic (see SANITY_STUDIO_GUIDE.md for the full rationale):
+ * The organising logic (see docs/03-sanity-studio-guide.md for the full rationale):
  * an editor thinks "I need to update the Registration page", not "I need to
  * edit a trainingPackage document". So the top level mirrors the site's
  * navigation, and document types are nested under the page they feed.

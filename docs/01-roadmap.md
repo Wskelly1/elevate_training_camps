@@ -141,14 +141,14 @@ touches visuals gets promoted to gated.
 - **Phase-boundary sweep** (every phase in §4): GitHub secret scanning;
   `npm audit` + `npm outdated`; **live credential checks** (Gmail SMTP,
   HubSpot, Sanity quota, Stripe once it exists); Vercel env verification
-  against `.env.example`. Logged as a dated entry in `SECURITY_LOG.md`.
+  against `.env.example`. Logged as a dated entry in `07-security-log.md`.
 - **Event-driven:** new secret → immediate scan + confirm it lives in Vercel
   env, not the repo; new dependency → audit; Next.js security advisory →
   same-day patch.
 - **One-time payment security review** at end of Phase 5 before live keys:
   webhook signature verification, idempotency, fulfillment only from the
   webhook, no card data server-side, rate limiting on the checkout route.
-- **Billing/renewal tracking:** `BILLING.md` tracks every service, tier, cost,
+- **Billing/renewal tracking:** `06-billing.md` tracks every service, tier, cost,
   renewal date, and paying account; renewal dates mirrored to Google Calendar
   with reminders once dates are confirmed.
 
@@ -156,11 +156,11 @@ touches visuals gets promoted to gated.
 
 | Phase | Scope | Depends on | Gates/Checkpoints |
 |---|---|---|---|
-| **0 · Hygiene & docs** | Docs rewrite (this file, `EMAIL_SETUP.md`, README, `README_VIDEO.md`), dead-code + unused-dep removal, version pairings, ESLint config + ~50 error fixes, `BILLING.md`/`SECURITY_LOG.md`, calendar renewal events | none | baseline sweep |
+| **0 · Hygiene & docs** | Docs rewrite (this file, `04-email-setup.md`, README, `05-video-playback.md`), dead-code + unused-dep removal, version pairings, ESLint config + ~50 error fixes, `06-billing.md`/`07-security-log.md`, calendar renewal events | none | baseline sweep |
 | **1 · Brand guide** | Photo-derived palette, green/cream canonicalization, type scale, layout references, motion vocabulary; delivered as a committed `/style-guide` route | O-5 mid-phase | **A1** approval |
 | **1.5 · Positioning & IA** | See §5.5. Repositions the site from individual athletes to the coaches who buy; team-block product model; page-by-page IA; claims discipline; alumni-data capture; CMS schema reshape. **Opens with the two live inconsistencies** — `/coaching` selling a cut product, and `trainingPackage` unable to express a 3-week block | `../business-plan/` (source of truth); O-16 decides `/coaching`; O-10/O-11 refine the product model | **A1.5** positioning approval; Gate-5, Gate-6 |
 | **2 · Token migration + providers** | Fill the empty `:root` token layer, delete dead `tailwind.config.js`, migrate hardcoded hexes page-by-page, reconcile Sanity-schema + email-template palette copies, register Magic UI + Aceternity | A1 | **A2** regression approval + sweep |
-| **2.5 · UI & content-organisation overhaul** | Driven by `DESIGN_REVIEW.md`. **Homepage done** (A2.5a approved — scroll-hijack deleted, layout system landed). Remaining: apply the same system to the inner pages; rebuild the testimonial card; fix vertical rhythm and left-edge alignment; retire off-palette dark buttons; resolve CMS-authored `<strong>` marks | Phase 2 tokens; inner-page copy needs Phase 1.5 | ~~**A2.5a**~~ done, **A2.5b** per-page approval |
+| **2.5 · UI & content-organisation overhaul** | Driven by `02-design-review.md`. **Homepage done** (A2.5a approved — scroll-hijack deleted, layout system landed). Remaining: apply the same system to the inner pages; rebuild the testimonial card; fix vertical rhythm and left-edge alignment; retire off-palette dark buttons; resolve CMS-authored `<strong>` marks | Phase 2 tokens; inner-page copy needs Phase 1.5 | ~~**A2.5a**~~ done, **A2.5b** per-page approval |
 | **3 · Media page** | Curate → optimize → gallery with provider scroll components | Phase 2, Gates 1/3/4 | **A3a** direction, **A3b** final + sweep |
 | **4 · Legal pages** | Privacy / ToS / Cookies (footer links are currently dead) **plus the refund/cancellation and wildfire-smoke-AQI policy** — the risk plan requires the latter published at the point of sale, so it is revenue-protecting, not boilerplate | O-7, O-13 | **A4** light + sweep, Gate-5 |
 | **5 · Stripe foundation** | **Re-scoped by Phase 1.5.** The sale is B2B and quote-based: two-part tariff (team base fee + per-athlete), squad minimum, non-refundable deposit at booking with balance before arrival. So: deposit/invoice flow rather than a per-head product checkout; signature-verified idempotent webhook; `/registration/success`; drop `paymentOption` schema | O-1, Phase 1.5, Gate-1 (or fallback); live: Phase 4 | payment security review + **A5** |
@@ -412,8 +412,13 @@ recruiting tiers. Fold in:
 - **`coachingProgram.duration` still offers `1 month / 3 months / 6 months /
   Ongoing`** — the shape of a subscription that no longer exists. Resolve with
   O-16.
-- `paymentOption`, already deprecated and slated for removal with the Stripe
-  work.
+- `paymentOption`, deprecated. **Verified 2026-07-29: 0 documents in the
+  production dataset**, so nothing is lost by deleting the type. The only
+  blocker is that `/registration` still *renders* it — from a hardcoded
+  `fallbackPaymentOptions` array of invented instalment tiers, which
+  contradicts the agreed deposit-plus-balance model. Delete the schema, the
+  query, the type and that section together in Phase 5; removing the schema
+  alone would leave the invented fallback showing.
 - The three known Studio defects: FAQ fields stranded inside `siteSettings`,
   the inert `logo` field, the CMS-driven favicon.
 
@@ -451,6 +456,11 @@ should not wait for the rest of the checkpoint — both are live defects.
 Install via shadcn CLI into `src/components/ui/` as owned source; rewrite
 `motion/react` imports to `framer-motion` (single animation dep); re-theme to
 brand tokens on arrival — nothing merges with provider-default styling.
+
+**`framer-motion` is no longer installed.** Its only consumer was
+`ui/testimonials.tsx`, removed in the repo reorganisation once the homepage
+rebuild orphaned it. Re-add it (`npm i framer-motion`) with the first provider
+component that needs it, rather than carrying an unused runtime dependency.
 Starting shortlist: Magic UI Marquee / Scroll Progress / Scroll-Based Velocity;
 Aceternity parallax gallery / timeline. Adopt only where a phase needs them,
 never speculatively.

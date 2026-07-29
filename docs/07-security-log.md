@@ -1,7 +1,7 @@
 # Security Sweep Log
 
 Dated record of every security sweep (cadence: end of every roadmap phase, plus
-event-driven — see ROADMAP.md §3). Newest first. Each entry records what was
+event-driven — see `01-roadmap.md` §3). Newest first. Each entry records what was
 checked and what was found, so "silently broken for a year" can't recur.
 
 Sweep contents: GitHub secret scanning · `npm audit` + `npm outdated` review ·

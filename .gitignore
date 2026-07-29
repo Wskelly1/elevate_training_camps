@@ -41,3 +41,9 @@ media-source/
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Local verification screenshots. 4.5MB of these were committed by accident;
+# Playwright writes here by default, keep them out of the repo.
+*.png
+!public/**/*.png
+.screenshots/
