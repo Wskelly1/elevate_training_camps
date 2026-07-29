@@ -96,7 +96,7 @@ Testimonials (1).
   reaches the live site until you press **Publish**.
 - **Changes take up to 5 minutes to appear.** Pages are cached for
   performance (this is what keeps the site inside Sanity's free tier —
-  see `ROADMAP.md`). If an edit has not appeared, wait rather than
+  see `01-roadmap.md`). If an edit has not appeared, wait rather than
   re-editing.
 - **Images:** drag and drop. Use the crop tool rather than pre-cropping —
   the site generates its own sizes.

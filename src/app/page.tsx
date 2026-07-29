@@ -7,10 +7,11 @@ import { getHomePage } from "../lib/queries";
 /**
  * Home — Elevate Training Camps.
  *
- * Composition approved at Checkpoint A2.5a (see DESIGN_REVIEW.md and the
- * /mockup route it came from): a full-bleed ambient hero with the nav
- * floating over it, then alternating editorial sections that bleed off
- * opposite viewport edges, a full-bleed break, and a stat band.
+ * Composition approved at Checkpoint A2.5a (see docs/02-design-review.md):
+ * a full-bleed ambient hero with the nav floating over it, then alternating
+ * editorial sections that bleed off opposite viewport edges, a full-bleed
+ * break, and a stat band. It began as a throwaway /mockup route, which was
+ * removed once this page superseded it — see PR #12 for that history.
  *
  * The previous IntegratedHomepage scroll-hijack is deliberately gone. It set
  * `overflow: hidden` on <body> at page load and then jumped scroll position
@@ -31,9 +32,9 @@ import { getHomePage } from "../lib/queries";
  *
  * Wiring these strings to the existing CMS fields would render the old
  * positioning. The schema needs reshaping around the team-block product
- * before that is worth doing — that is Phase 1.5 in ROADMAP.md. Media assets
- * (the Mux clip, photography) DO still come from Sanity, because those are
- * assets rather than positioning.
+ * before that is worth doing — that is Phase 1.5 in docs/01-roadmap.md. Media
+ * assets (the Mux clip, photography) DO still come from Sanity, because those
+ * are assets rather than positioning.
  *
  * Three things this copy must not do, each load-bearing:
  *  1. Never claim lodging is provided. "Facilitate, don't operate" is a
