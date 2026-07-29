@@ -74,6 +74,13 @@ interface LayoutClientProps {
   footerContent?: React.ReactNode
   siteSettings: SiteSettings | null
   aboutSections: AboutSection[]
+  /**
+   * Let the page's first section run underneath the header. The nav drops its
+   * cream pill and switches to cream type while it is over that section, then
+   * returns to the normal treatment once scrolled past it. Used by pages that
+   * open on a full-bleed hero.
+   */
+  transparentNav?: boolean
 }
 
 /**
@@ -85,12 +92,18 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
   children,
   showNavigation = true,
   siteSettings,
-  aboutSections
+  aboutSections,
+  transparentNav = false
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [aboutOpen, setAboutOpen] = React.useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [, setNavOverridden] = useState(false);
+  // Starts true so the first paint over a hero is already cream — flipping
+  // cream-on-dark after hydration would flash dark type over the video.
+  const [overHero, setOverHero] = useState(true);
+  /** Nav is currently sitting on top of a full-bleed hero. */
+  const navOverHero = transparentNav && overHero;
   const lastScrollY = useRef(0);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -139,19 +152,26 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
     setMounted(true);
 
     const handleScroll = () => {
-      // For homepage, let the IntegratedHomepage component control nav visibility
-      if (pathname === '/') {
-        return;
-      }
-
-      // For other pages, use default scroll behavior
       const currentScrollY = window.scrollY;
+
+      // Hide on scroll down, reveal on scroll up. The homepage used to be
+      // exempt because IntegratedHomepage drove nav visibility through a
+      // custom event during its scroll-hijack; that component no longer
+      // renders, so the homepage now uses the same rule as everything else.
       if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
-        setIsNavVisible(false); // scrolling down
+        setIsNavVisible(false);
       } else {
-        setIsNavVisible(true); // scrolling up
+        setIsNavVisible(true);
       }
       lastScrollY.current = currentScrollY;
+
+      // Measured from the live hero rather than a hard-coded height, so the
+      // handoff stays correct at any viewport (the hero is sized in vh).
+      if (transparentNav) {
+        const hero = document.querySelector('main section');
+        const heroBottom = hero ? hero.getBoundingClientRect().height : window.innerHeight;
+        setOverHero(currentScrollY < heroBottom - 96);
+      }
     };
 
     // Listen for custom nav visibility events from IntegratedHomepage
@@ -168,7 +188,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("navVisibility", handleNavVisibilityEvent);
     };
-  }, [pathname]);
+  }, [pathname, transparentNav]);
 
   // Helper function to assign appropriate icons based on section title
   function getIconForSection(title: string) {
@@ -275,6 +295,9 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
         '--nav-bar-color': customColors.elevateGreen,
         '--nav-bar-hover-color': customColors.hoverBrown,
         '--nav-hover-bg': customColors.navHoverBg,
+        // Every header link reads this rather than hardcoding a colour, so
+        // the whole nav flips in one place when it sits over a hero.
+        '--nav-text': navOverHero ? customColors.headerFooterBg : customColors.navText,
       } as React.CSSProperties}
     >
       {/* Header */}
@@ -284,11 +307,16 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           mounted && isNavVisible ? 'opacity-100' : 'opacity-0 invisible'
         }`}
       >
-        <div className="max-w-7xl mx-auto rounded-full shadow-sm" style={{ backgroundColor: customColors.headerFooterBg }}>
+        <div
+          className={`max-w-7xl mx-auto rounded-full transition-[background-color,box-shadow] duration-300 ${
+            navOverHero ? '' : 'shadow-sm'
+          }`}
+          style={{ backgroundColor: navOverHero ? 'transparent' : customColors.headerFooterBg }}
+        >
           <div className="flex flex-row h-auto items-center justify-between px-6 py-3">
             {/* Logo container */}
             <div className="flex items-center h-12">
-              <BrandLogo markSize={38} />
+              <BrandLogo markSize={38} variant={navOverHero ? 'onDark' : 'onLight'} />
             </div>
 
             {/* Desktop Navigation */}
@@ -303,7 +331,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                             <div className="flex items-center relative nav-item-with-bar nav-hover-bg">
                               <NavigationMenuTrigger
                                 style={{
-                                  color: customColors.navText,
+                                  color: 'var(--nav-text)',
                                   fontFamily: 'var(--font-display), Georgia, serif',
                                   fontWeight: 400,
                                   fontSize: '18px',
@@ -406,7 +434,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                             <Link
                               href={item.href}
                               style={{
-                                color: customColors.navText,
+                                color: 'var(--nav-text)',
                                 fontFamily: 'var(--font-display), Georgia, serif',
                                 fontWeight: 400,
                                 fontSize: '18px',
@@ -455,7 +483,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                       <button
                         onClick={() => setAboutOpen(!aboutOpen)}
                         className="flex items-center justify-between w-full py-2 px-4 rounded-md hover:bg-muted/50"
-                        style={{ color: customColors.navText }}
+                        style={{ color: 'var(--nav-text)' }}
                       >
                         <span className="font-serif text-lg">{item.title}</span>
                         <ChevronDown className={`h-4 w-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
@@ -467,7 +495,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                               key={subItem.title}
                               href={subItem.href}
                               className="block py-2 px-4 rounded-md hover:bg-muted/50"
-                              style={{ color: customColors.navText }}
+                              style={{ color: 'var(--nav-text)' }}
                               onClick={(e) => {
                                 if (subItem.href.startsWith('/about#')) {
                                   const sectionId = subItem.href.split('#')[1];
@@ -488,7 +516,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                     <Link
                       href={item.href}
                       className="block py-2 px-4 rounded-md hover:bg-muted/50"
-                      style={{ color: customColors.navText }}
+                      style={{ color: 'var(--nav-text)' }}
                     >
                       <span className="font-serif text-lg">{item.title}</span>
                     </Link>

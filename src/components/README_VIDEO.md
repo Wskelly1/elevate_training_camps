@@ -131,8 +131,21 @@ When a video fails to load or play, the component:
 
 ## Example Integration
 
-See `IntegratedHomepage.tsx` for the component's real-world usage (the homepage
-scroll-expansion hero, fed by a Mux HLS stream via `hlsSrc`).
+`SanityVideo` currently has no callers. Its former consumer,
+`IntegratedHomepage.tsx`, was the homepage scroll-expansion hero and was
+deleted when the homepage was rebuilt — it disabled page scrolling on load.
+The homepage now uses `HeroVideo.tsx`, a much smaller ambient background
+player with no controls and no scroll interception.
+
+Keep `SanityVideo` for a real *player* (a media page, a testimonial clip),
+where controls and an mp4 fallback are wanted — but **audit its HLS branch
+before reusing it.** It tests `video.canPlayType('application/vnd.apple.
+mpegURL')` before `Hls.isSupported()`. Chrome answers `"maybe"` to that MIME
+type and then fails the load with `MEDIA_ERR_SRC_NOT_SUPPORTED`, so passing
+`hlsSrc` breaks playback on every non-Safari browser. The mp4 `<source>`
+children mask it, but they are only rendered when `hlsSrc` is absent. The
+correct order is `Hls.isSupported()` first, native HLS as the fallback — see
+`HeroVideo.tsx`.
 
 ## Troubleshooting
 
