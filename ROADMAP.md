@@ -150,6 +150,48 @@ Stripe live. O-10 (the coach calls) is the highest-value unblock on the board:
 it validates or kills the duration assumption every downstream projection
 rests on.
 
+## §5 — Brand-guide production (Phase 1 detail)
+
+1. Photo palette extraction (node + sharp over `media-source/`, dominant-color
+   clustering per photo set) → candidate accents from the real photography.
+2. Green/cream canonicalization: `#427b4d` (dominant, 50×) proposed as
+   `--primary` with derived hover/dark shades replacing the four ad-hoc greens;
+   ~9 creams collapse to a 2–3 step ramp. Full old-hex → token mapping table.
+3. Typography scale (Geist Sans/Mono kept): display/h1–h4/body/small/caption.
+4. Layout references: researched menu, owner picks, guide annotates which
+   patterns map to which pages.
+5. Motion vocabulary: cinematic scroll (the homepage scroll-hijack hero),
+   spring-based shared-layout transitions (testimonial modal), rules for
+   marquee/velocity/parallax usage, `prefers-reduced-motion` requirements.
+6. Deliverable: a committed **`/style-guide` route** rendering live tokens,
+   type scale, swatches, and motion demos — excluded from nav/sitemap/robots;
+   permanent regression reference.
+
+### A1 decisions (owner, 2026-07-27)
+
+**Locked:**
+- Palette consolidation approved. Green hover revised `#387143` → `#33603c`
+  (the original was only 4% lighter than primary — invisible as a state).
+- Accents: **Red Rock `#b67d5e`** + **Trail Brown `#67563b`**. Alpine Sky,
+  Haze Blue, Golden Trail and Summit Navy dropped.
+- Reference mapping: **Kenya Experience** (Young Athlete Camp page) drives
+  page content, pricing structure and camp information architecture →
+  Phase 6. **Under Canvas** drives the homepage video treatment — note the
+  Mux/Sanity scroll-expanding hero already exists; the work is tuning it
+  toward a calmer, more cinematic feel, not rebuilding. **Tracksmith**
+  drives general aesthetics, typography and layout: retro running-culture,
+  serif headlines, refined rustic — high-end and classy but unmistakably
+  outdoors.
+
+**Open (rendered on `/style-guide` for the owner to pick):**
+- Serif display face: Fraunces (warm, wonky, rustic) vs Instrument Serif
+  (high-contrast, editorial, closest to the inspiration wordmark). Body/UI
+  stays Geist Sans either way.
+- Logo mark: twin peak vs single peak; plus which lockup and colour
+  treatment are primary. Concepts drafted as inline SVG; the approved mark
+  needs redrawing as a standalone optimised SVG asset with the wordmark
+  converted to outlines before it replaces the current Sanity-hosted logo.
+
 ## §5.5 — Positioning & information architecture (Phase 1.5 detail)
 
 Phase 1 settled how the site looks. Phase 1.5 settles **what it says and who
@@ -244,48 +286,6 @@ in the IA; build nothing.
 Owner approves: the coach-as-buyer repositioning, the product model (3–4 week
 block + 1-week on-ramp), whether Coaching is re-scoped or retired, and the
 new-page list. Content build does not start before it.
-
-## §5 — Brand-guide production (Phase 1 detail)
-
-1. Photo palette extraction (node + sharp over `media-source/`, dominant-color
-   clustering per photo set) → candidate accents from the real photography.
-2. Green/cream canonicalization: `#427b4d` (dominant, 50×) proposed as
-   `--primary` with derived hover/dark shades replacing the four ad-hoc greens;
-   ~9 creams collapse to a 2–3 step ramp. Full old-hex → token mapping table.
-3. Typography scale (Geist Sans/Mono kept): display/h1–h4/body/small/caption.
-4. Layout references: researched menu, owner picks, guide annotates which
-   patterns map to which pages.
-5. Motion vocabulary: cinematic scroll (the homepage scroll-hijack hero),
-   spring-based shared-layout transitions (testimonial modal), rules for
-   marquee/velocity/parallax usage, `prefers-reduced-motion` requirements.
-6. Deliverable: a committed **`/style-guide` route** rendering live tokens,
-   type scale, swatches, and motion demos — excluded from nav/sitemap/robots;
-   permanent regression reference.
-
-### A1 decisions (owner, 2026-07-27)
-
-**Locked:**
-- Palette consolidation approved. Green hover revised `#387143` → `#33603c`
-  (the original was only 4% lighter than primary — invisible as a state).
-- Accents: **Red Rock `#b67d5e`** + **Trail Brown `#67563b`**. Alpine Sky,
-  Haze Blue, Golden Trail and Summit Navy dropped.
-- Reference mapping: **Kenya Experience** (Young Athlete Camp page) drives
-  page content, pricing structure and camp information architecture →
-  Phase 6. **Under Canvas** drives the homepage video treatment — note the
-  Mux/Sanity scroll-expanding hero already exists; the work is tuning it
-  toward a calmer, more cinematic feel, not rebuilding. **Tracksmith**
-  drives general aesthetics, typography and layout: retro running-culture,
-  serif headlines, refined rustic — high-end and classy but unmistakably
-  outdoors.
-
-**Open (rendered on `/style-guide` for the owner to pick):**
-- Serif display face: Fraunces (warm, wonky, rustic) vs Instrument Serif
-  (high-contrast, editorial, closest to the inspiration wordmark). Body/UI
-  stays Geist Sans either way.
-- Logo mark: twin peak vs single peak; plus which lockup and colour
-  treatment are primary. Concepts drafted as inline SVG; the approved mark
-  needs redrawing as a standalone optimised SVG asset with the wordmark
-  converted to outlines before it replaces the current Sanity-hosted logo.
 
 ## §6 — Component providers (Magic UI + Aceternity)
 
