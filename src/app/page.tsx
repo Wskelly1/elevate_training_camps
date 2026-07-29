@@ -20,12 +20,14 @@ import { getHomePage } from "../lib/queries";
  * ─────────────────────────────────────────────────────────────────────────
  * COPY IS INTENTIONALLY IN CODE, NOT IN THE CMS, AND ONLY FOR NOW.
  *
- * The positioning below comes from three planning documents at the project
- * root (team-altitude-block-pricing-analysis, feasibility-study-2027-2031,
- * risk-management-loss-control-plan). It contradicts what currently sits in
- * Sanity (`heroHeading` = "Elevate Training Camps", `heroSubheading` = "An
- * elevated training experience for all athletes"), which addresses individual
- * athletes rather than the coaches who actually buy.
+ * The positioning below comes from the business plan, which lives outside this
+ * repo at `../business-plan/` (docs 01–05, plus WEBSITE-SYNC.md mapping each
+ * business decision to a site surface). That folder is the source of truth for
+ * what is sold, at what price, to whom, and with what promises; this page is a
+ * rendering of it. It contradicts what currently sits in Sanity (`heroHeading`
+ * = "Elevate Training Camps", `heroSubheading` = "An elevated training
+ * experience for all athletes"), which addresses individual athletes rather
+ * than the coaches who actually buy.
  *
  * Wiring these strings to the existing CMS fields would render the old
  * positioning. The schema needs reshaping around the team-block product

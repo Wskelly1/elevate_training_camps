@@ -16,12 +16,19 @@ layout system, repositioned copy). Known-broken: Sanity billing-blocked (quota
 overage — billing team contacted), HubSpot token 401s (leads not reaching CRM),
 Stripe not yet created.
 
-**The site's positioning changed on 2026-07-29.** Three planning documents at
-the project root established that the buyer is a high school cross country
-*coach*, not an individual athlete, and that the product is a team altitude
-block sold on a two-part tariff with lodging deliberately excluded. This
-invalidates content across Registration, Coaching and FAQ. See **§5.5
-(Phase 1.5)** — read it before writing any copy.
+**The site's positioning changed on 2026-07-29.** The business plan (now at
+`../business-plan/`, restructured and expanded the same day) establishes that
+the buyer is a high school cross country *coach*, not an individual athlete;
+that the product is a team altitude block sold on a two-part tariff with
+lodging deliberately excluded; and that the **college recruiting advisory is
+now the principal service line**, with the camp reframed as the funnel rather
+than the business. A remote coaching subscription and a paid alumni membership
+were both cut, and the 501(c)(3) route was declined.
+
+This invalidates content across Registration, Coaching and FAQ. **`/coaching`
+is actively selling the cut subscription and undercutting the buyer — see the
+red-flagged items in §5.5.** Read §5.5 before writing any copy, and
+`../business-plan/WEBSITE-SYNC.md` before acting on any business change.
 
 ---
 
@@ -58,6 +65,7 @@ website copy depends on them; see §5.5.
 | O-13 | **Refund / cancellation / AQI-and-smoke policy text**, legally reviewed. The risk plan requires it published at the point of sale, not negotiated during a smoke event | Gate-5, Phase 4, Phase 5 checkout |
 | O-14 | Verify **state-association summer contact rules** (AIA, CIF, NIAA, NMAA…) — they decide whether a team's own coaches may attend, which changes supervision, staffing and liability | FAQ content; supervision claims |
 | O-15 | Written **worker classification opinion** (1099 vs W-2) from an AZ attorney/CPA | Any site content describing staff; blocks counsellor hiring |
+| O-16 | **Decide `/coaching`'s fate** — re-scope to in-person/unattached only, repurpose for the recruiting advisory, or pull from nav. It currently sells a product cut on 2026-07-29 and undercuts the coaches who are the buyer. See §5.5 | The single most urgent live content fix |
 
 **Tier 3 — approvals on demand:** brand-guide sign-off (A1), per-PR screenshot
 approvals, component picks from shortlist menus. Each takes minutes.
@@ -84,6 +92,21 @@ approvals, component picks from shortlist menus. Each takes minutes.
   asked, the 3–4 week block is an unvalidated assumption. Registration must
   therefore present the one-week on-ramp as a first-class product, not a
   footnote, and no phase should invest heavily in 3-week-specific content.
+- **Gate-7 · Recruiting attach rate.** No priced recruiting tiers publish
+  until the Year-1 pilot measures one. The launch sequence gives the Tier-1
+  evaluation away free to every camper and counts who asks follow-up questions
+  unprompted; below roughly 15% the line does not work. Phase 8 ships the free
+  evaluation as camp copy first, and the rate card only after the number
+  exists — publishing pricing earlier inverts the sequence and risks building
+  a surface for demand that was never measured.
+
+**Keeping this in sync.** `../business-plan/` is the source of truth for
+product, price, audience and promises; this file is the source of truth for how
+the site gets built. When a business document changes, work through
+`../business-plan/WEBSITE-SYNC.md` — it maps each decision to a site surface
+and says whether it is a Sanity edit or a code change — then update §5.5 here.
+Check `CHANGELOG.md`'s *superseded assumptions* and *decisions taken* tables
+before proposing anything; they exist to stop settled questions being reopened.
 
 ## §2 — How Claude Operates
 
@@ -135,7 +158,7 @@ touches visuals gets promoted to gated.
 |---|---|---|---|
 | **0 · Hygiene & docs** | Docs rewrite (this file, `EMAIL_SETUP.md`, README, `README_VIDEO.md`), dead-code + unused-dep removal, version pairings, ESLint config + ~50 error fixes, `BILLING.md`/`SECURITY_LOG.md`, calendar renewal events | none | baseline sweep |
 | **1 · Brand guide** | Photo-derived palette, green/cream canonicalization, type scale, layout references, motion vocabulary; delivered as a committed `/style-guide` route | O-5 mid-phase | **A1** approval |
-| **1.5 · Positioning & IA** | See §5.5. Repositions the site from individual athletes to the coaches who buy; team-block product model; page-by-page IA; claims discipline; alumni-data capture; CMS schema reshape | The three planning docs (done); O-10/O-11 refine it | **A1.5** positioning approval; Gate-5, Gate-6 |
+| **1.5 · Positioning & IA** | See §5.5. Repositions the site from individual athletes to the coaches who buy; team-block product model; page-by-page IA; claims discipline; alumni-data capture; CMS schema reshape. **Opens with the two live inconsistencies** — `/coaching` selling a cut product, and `trainingPackage` unable to express a 3-week block | `../business-plan/` (source of truth); O-16 decides `/coaching`; O-10/O-11 refine the product model | **A1.5** positioning approval; Gate-5, Gate-6 |
 | **2 · Token migration + providers** | Fill the empty `:root` token layer, delete dead `tailwind.config.js`, migrate hardcoded hexes page-by-page, reconcile Sanity-schema + email-template palette copies, register Magic UI + Aceternity | A1 | **A2** regression approval + sweep |
 | **2.5 · UI & content-organisation overhaul** | Driven by `DESIGN_REVIEW.md`. **Homepage done** (A2.5a approved — scroll-hijack deleted, layout system landed). Remaining: apply the same system to the inner pages; rebuild the testimonial card; fix vertical rhythm and left-edge alignment; retire off-palette dark buttons; resolve CMS-authored `<strong>` marks | Phase 2 tokens; inner-page copy needs Phase 1.5 | ~~**A2.5a**~~ done, **A2.5b** per-page approval |
 | **3 · Media page** | Curate → optimize → gallery with provider scroll components | Phase 2, Gates 1/3/4 | **A3a** direction, **A3b** final + sweep |
@@ -143,12 +166,16 @@ touches visuals gets promoted to gated.
 | **5 · Stripe foundation** | **Re-scoped by Phase 1.5.** The sale is B2B and quote-based: two-part tariff (team base fee + per-athlete), squad minimum, non-refundable deposit at booking with balance before arrival. So: deposit/invoice flow rather than a per-head product checkout; signature-verified idempotent webhook; `/registration/success`; drop `paymentOption` schema | O-1, Phase 1.5, Gate-1 (or fallback); live: Phase 4 | payment security review + **A5** |
 | **6 · Real content** | Replace fabricated Registration/Coaching fallbacks (the invented $1,200/$1,800/$2,800 tiers are structurally wrong, not merely stale), honest empty-states, wire CTAs to the quote/deposit flow | O-8, Phase 1.5, Gate-1, Gate-6 | **A6** direction + approval + sweep |
 | **7 · Blog** | `blogPost` schema, listing, post page, nav | Phase 2, Gate-1 | **A7** + sweep |
+| **8 · Recruiting advisory surface** | The principal service line (doc 04) gets a page + schema: four tiers, two different buyers, NCAA-compliant copy. **Phased** — Y1 ships only the free Tier-1 evaluation as camp copy; the priced rate card waits on a measured attach rate | Phase 1.5, Gate-7; O-16 if the page is a `/coaching` repurpose | **A8** direction + approval, Gate-5 rule 4 |
 
-**Critical path:** A1 → Phase 2 → all visual work; **Phase 1.5 → Phases 5/6**
-(the product model determines both the checkout and the content); O-1/O-7 →
-Stripe live. O-10 (the coach calls) is the highest-value unblock on the board:
-it validates or kills the duration assumption every downstream projection
-rests on.
+**Critical path:** A1 → Phase 2 → all visual work; **Phase 1.5 → Phases 5/6/8**
+(the product model determines the checkout, the content and the service-line
+surface); O-1/O-7 → Stripe live.
+
+**Two unblocks dominate the board.** **O-16** is the most urgent — `/coaching`
+is live right now selling a cut product to the wrong audience. **O-10** (the
+coach calls) is the highest-value — it validates or kills the duration
+assumption every downstream projection rests on.
 
 ## §5 — Brand-guide production (Phase 1 detail)
 
@@ -195,12 +222,41 @@ rests on.
 ## §5.5 — Positioning & information architecture (Phase 1.5 detail)
 
 Phase 1 settled how the site looks. Phase 1.5 settles **what it says and who
-it says it to.** Added 2026-07-29, derived from three planning documents at
-the project root — read them before working in this phase:
+it says it to.**
 
-- `team-altitude-block-pricing-analysis.pdf` — product, price, structure
-- `feasibility-study-2027-2031.pdf` (Rev 2) — sequencing, revenue lines, gates
-- `risk-management-loss-control-plan.pdf` — the constraints on what may be said
+### Source of truth — `../business-plan/`
+
+The business plan is **not in this repo**. It lives one level up, and it is the
+source of truth for what the business sells, at what price, to whom, and with
+what promises. **The website is a rendering of those decisions.** Restructured
+and expanded 2026-07-29; the paths below supersede the loose project-root
+files this section originally cited.
+
+| Doc | File | Drives |
+|---|---|---|
+| **01** | `01-feasibility-study-2027-2031` | Sequencing, revenue lines, go/no-go gates |
+| **02** | `02-team-block-pricing-analysis` | The flagship product, price and structure |
+| **03** | `03-revenue-expansion-and-structure-decision` | The seven service lines; LLC-vs-501(c)(3) (declined) |
+| **04** | `04-recruiting-advisory-launch-plan` | **The principal service line.** Four tiers, launch sequence, compliance |
+| **05** | `05-risk-management-loss-control-plan` | The constraints on what may be said |
+
+Two companion files matter as much as the documents:
+
+- **`WEBSITE-SYNC.md`** — the propagation map from business decision to site
+  surface, and whether each is a Sanity edit or a code change. **Work through
+  its checklist whenever a document changes.** Rule of thumb it sets: changing
+  a *value* is Sanity; changing the *shape* of what can be expressed is code.
+- **`CHANGELOG.md`** — what changed and *why*, including a **"superseded
+  assumptions — do not reintroduce"** table and a **"decisions taken"** table.
+  Read it before proposing anything; several obvious ideas (a coaching
+  subscription, a paid alumni membership, a nonprofit structure, individual
+  housing referrals) are already tested and rejected there.
+
+**The reusable test**, from `CHANGELOG.md`: for any revenue line or page, ask
+*does it compete with the high school coach, or complement them?* Training
+plans compete — the coach already writes those, and selling around them damages
+the relationship the camp depends on. Recruiting help complements. This test is
+why `/coaching` is now the site's most urgent problem (below).
 
 ### The repositioning, in one line
 
@@ -222,32 +278,112 @@ running the trip himself for free.** Flagstaff's answer: resident professional
 community, university facilities, trail volume, a real town, cheaper lodging,
 and proximity for AZ/NV/NM/W-TX. Say that; don't lead with bagel-shop runs.
 
-### Claims discipline (Gate-5) — three rules, each load-bearing
+### Claims discipline (Gate-5) — five rules, each load-bearing
 
-1. **Never claim lodging is provided.** "Facilitate, don't operate" is a
-   liability posture (R12), not a wording preference. Refer to partners;
-   never take booking custody or overnight supervision. It is what keeps
-   Elevate a programme provider rather than a camp operator, which materially
-   reduces insurance and regulatory exposure.
-2. **Never promise the sea-level race effect.** A June/July block cannot
-   deliver it before November championships. Overselling is the fastest way
-   to lose the sophisticated coaches this business targets.
+Mirrors the guardrails in `../business-plan/WEBSITE-SYNC.md`. Each is a
+liability or credibility exposure, not a style preference.
+
+1. **Never claim lodging or supervision is provided.** "Facilitate, don't
+   operate" is a liability posture (R12), not a wording preference. Refer to
+   partners; never take booking custody or overnight supervisory
+   responsibility. It is what keeps Elevate a programme provider rather than a
+   camp operator, which materially reduces insurance and regulatory exposure.
+2. **Never promise the sea-level race effect.** A June/July block builds
+   aerobic base; it does not make anyone faster at a November championship.
+   Overselling is the fastest way to lose the sophisticated coaches this
+   business targets.
 3. **Never state a track record that does not exist.** No season has run.
    Write safety and quality as *the standard sessions run to* — commitments,
-   not history — until G1 clears.
+   not history — until G1 clears. **Currently violated in production:**
+   `/coaching` claims *"Proven Results — our athletes consistently achieve
+   personal bests"* and *"certified coaches with decades of experience."*
+4. **Never promise placement or scholarships, and never charge a fee
+   contingent on either** (04 §04). Contingency pricing tied to scholarship
+   value is the pattern that resembles athlete agency, is restricted in
+   several states, and would put the reputation the camp depends on at risk.
+   Flat fees; outcomes stated only as work performed. Applies to every word of
+   recruiting copy.
+5. **Never imply a guaranteed session.** Wildfire and smoke can cancel or
+   truncate one. Refund terms must be published at the point of sale, not
+   negotiated afterwards (05 §05).
+
+### 🔴 Two live inconsistencies — fix before anything else
+
+Both raised by `../business-plan/WEBSITE-SYNC.md` and confirmed against the
+running site on 2026-07-29.
+
+**1. `/coaching` sells the product that was cut — and undercuts the buyer.**
+
+On 2026-07-29 the remote coaching subscription was **cut** (`CHANGELOG.md`,
+"Decisions taken"), previously modelled at ~$130,000 by Year 5. The reason is
+the reusable test above: campers arrive **as teams with established coaches**
+who already write their off-season plans. Selling those athletes a competing
+plan undercuts the person who books the camp.
+
+Production right now advertises exactly that: *"Personalized Training Plans —
+built around your goals and schedule"*, *"Weekly Phone Calls"*, and an
+**"Ongoing $100"** programme. `coachingProgram.duration` still offers
+`1 month / 3 months / 6 months / Ongoing`. The same page also breaks Gate-5
+rule 3 with *"Proven Results — our athletes consistently achieve personal
+bests."*
+
+A coach who lands here may reasonably conclude the camp intends to poach their
+athletes. **Do not leave it as-is.** Three options, in the sync guide's order
+of preference — this is O-16, an owner decision:
+
+1. **Re-scope** to what survives: in-person strength, mobility and recovery
+   delivered *at camp*, plus unattached/graduating/masters athletes. Drop the
+   ongoing and monthly durations.
+2. **Repurpose** the page for the recruiting advisory (04), which is the
+   intended service line and needs a home anyway.
+3. **Remove** it from navigation until there is something to put there.
+
+**2. The flagship product cannot be expressed in the schema.**
+`trainingPackage.duration` offers `3 days, 5 days, 7 days, 4 weeks, 1 month,
+3 months, 6 months`. The flagship is a **3-week team block** and the on-ramp is
+**1 week**. There is no `2 weeks` or `3 weeks` value, so the product literally
+cannot be entered in the Studio. Add both to
+`src/sanity/schemaTypes/trainingPackage.ts` — schema change, so code + deploy.
 
 ### Page-by-page IA
 
 | Page | Change |
 |---|---|
 | **Home** | ✅ Done — rebuilt on the A2.5a composition with corrected positioning |
-| **Registration** | The biggest rebuild. Becomes *team blocks + quote request*, modelling the two-part tariff and squad minimum. Present the 1-week on-ramp alongside the 3-week block (Gate-6). Current invented tiers and 2025 dates are structurally wrong, not just stale |
-| **Coaching** | Currently sells individual coaching, which is not a Year-1 revenue line. Re-scope toward the coach-facing offer or retire it for now — an owner decision |
-| **About** | Carry the community flywheel: HS camper → collegiate counsellor → professional advocate. The feasibility study calls this "the primary product, not the marketing wrapper" |
+| **Coaching** | 🔴 **Highest priority.** Sells a cut product and undercuts the buyer; also carries a false results claim. Owner decision O-16 (above) |
+| **Registration** | The biggest rebuild. Becomes *team blocks + quote request*, modelling the two-part tariff and squad minimum. Present the 1-week on-ramp alongside the 3-week block (Gate-6). Needs the schema durations fixed first. Current invented tiers and 2025 dates are structurally wrong, not just stale |
+| **Recruiting advisory** | **New page + new schema.** The principal service line (04) — four tiers, buyer changes between them (Tier 4 sold to coaches, Tiers 2–3 to families). **Phased: publish nothing priced in Y1.** The Y1 move is the free Tier-1 evaluation for every camper, which doubles as the attach-rate measurement; pricing publishes in Y2, where transparency is itself the differentiator against NCSA's no-published-pricing sales call |
+| **About** | Carry the community flywheel: HS camper → collegiate counsellor → professional advocate. Note the alumni network is retained as **free** infrastructure — the paid "Elevate Family" membership was cut, so never present it as a paid tier |
 | **FAQ** | Rewrite for the questions a coach actually asks: who supervises, state-association summer contact rules (O-14), what is and isn't included, ferritin screening, AQI and cancellation, minimum squad size, payment terms |
 | **Safety & safeguarding** | **New page.** Two-deep leadership, background screening, WFR on session, EAP, altitude protocols, AQI thresholds. Risk plan §06 is explicit that these are sales differentiators as much as controls — coaches and parents will look for them |
 | **For coaches** | **New page.** A single shareable page that supports the O-10 calls and any cold outreach — product, price structure, what's included, what isn't, next step |
 | **Legal** (Phase 4) | Refund/cancellation + wildfire/smoke/AQI policy, published at the point of sale |
+
+### The recruiting advisory is now the strategic centre
+
+Doc 03's framing: **"the camp is not the business — it is the funnel."** Camps
+alone reach Year 5 at ~$477K revenue / ~$39K net. The year-round service lines
+lift that to ~$703K / ~$184K, and they work because they consume time rather
+than beds — which is also what fixes the seasonality problem the flywheel does
+*not* fix.
+
+Consequences for the site, in priority order:
+
+- **The camp pages must feed the funnel, not just sell a camp.** Every camper
+  captured is a recruiting-advisory prospect and a future counsellor. This
+  raises the alumni-data requirement below from "important" to load-bearing.
+- **The Tier-1 evaluation belongs in camp copy from Y1** — every camper gets a
+  written assessment. It costs almost nothing, it is a genuine differentiator
+  (no competitor has watched the athlete train for three weeks), and it is the
+  natural upsell conversation.
+- **All seven service lines are sized off the alumni base**, so they fail
+  together if retention fails. That concentration is deliberate: it makes
+  "build the community" a measurable variable rather than a soft aspiration.
+- **Compliance is a copy constraint, not just an ops one.** Counsellors may not
+  advise on or advocate for their own programme. If Elevate ever sold athlete
+  information *to colleges* rather than advice *to families*, that is a
+  recruiting/scouting service under NCAA rules and a different regime applies —
+  nothing on the site should drift toward implying it.
 
 ### Alumni data — a website requirement, not a nicety
 
@@ -268,24 +404,47 @@ Sanity currently models an individual-athlete camp business, which is why the
 homepage copy now lives in code (see the header comment in `src/app/page.tsx`)
 rather than being wired to fields that would render the old positioning.
 Reshape around: `teamBlock` (duration, base fee, per-athlete rate, minimum
-squad), coach-facing FAQ, safety standards, partner lodging. Fold in the three
-known Studio defects already queued — FAQ fields stranded inside
-`siteSettings`, the inert `logo` field, the CMS-driven favicon. Gated behind
-Sanity billing (O-2) like all schema work.
+squad), coach-facing FAQ, safety standards, partner lodging, and — later — the
+recruiting tiers. Fold in:
+
+- **`trainingPackage.duration` is missing `2 weeks` and `3 weeks`** — the
+  flagship product cannot currently be entered. Smallest, most urgent fix here.
+- **`coachingProgram.duration` still offers `1 month / 3 months / 6 months /
+  Ongoing`** — the shape of a subscription that no longer exists. Resolve with
+  O-16.
+- `paymentOption`, already deprecated and slated for removal with the Stripe
+  work.
+- The three known Studio defects: FAQ fields stranded inside `siteSettings`,
+  the inert `logo` field, the CMS-driven favicon.
+
+Gated behind Sanity billing (O-2) like all schema work.
 
 ### What NOT to build yet
 
-Year 1 is deliberately asset-light and programming-only. Do not build lodging
-booking, federation/delegation portals, or an athlete-housing marketplace —
-those are Year 2+ revenue lines, and the feasibility study's central finding
-is that the layers **must be sequenced, not pursued in parallel**. Leave room
-in the IA; build nothing.
+Year 1 is deliberately asset-light and programming-only, and doc 01's central
+finding is that the layers **must be sequenced, not pursued in parallel**.
+Leave room in the IA; build nothing for:
+
+- Lodging booking, federation/delegation portals, athlete-housing marketplace
+  (Year 2+).
+- **Priced recruiting tiers** — Y1 gives the Tier-1 evaluation away free and
+  *measures* the attach rate; publishing a rate card before that number exists
+  inverts the launch sequence. Under ~15% attach and the line doesn't work.
+- **A paid alumni membership.** Cut 2026-07-29 — no recurring benefit survived
+  scrutiny. The network stays free infrastructure. Listed explicitly because it
+  is the kind of thing a future session would otherwise propose.
+- Anything premised on a 501(c)(3). The hybrid structure was analysed in
+  detail and **declined** by owner decision; Elevate remains a for-profit LLC.
+  Do not reintroduce donation, tax-credit or grant-funded framing.
 
 ### Checkpoint A1.5
 
-Owner approves: the coach-as-buyer repositioning, the product model (3–4 week
-block + 1-week on-ramp), whether Coaching is re-scoped or retired, and the
-new-page list. Content build does not start before it.
+Owner approves: the coach-as-buyer repositioning; the product model (3–4 week
+block + 1-week on-ramp); **`/coaching`'s disposition (O-16)**; the phased
+recruiting-advisory surface — free Tier-1 evaluation in camp copy now, priced
+tiers only after Gate-7; and the new-page list. Content build does not start
+before it, but the `/coaching` fix and the `trainingPackage` duration fix
+should not wait for the rest of the checkpoint — both are live defects.
 
 ## §6 — Component providers (Magic UI + Aceternity)
 
@@ -302,3 +461,13 @@ Customer/parent portal + auth (prereq for an in-site billing dashboard);
 coaching booking/calendar; dark mode; multi-location; custom-CRM integration
 (awaiting O-9); custom weekly-analytics report via Vercel Cron (native GA
 scheduled emails already active).
+
+Later service lines from doc 03, each needing a surface eventually but **not
+yet** — winter & spring break camps, coach education & clinics, brand
+partnerships & sponsorship, event & race hosting. They start Y3 in the model.
+Leave room in the IA; build nothing.
+
+**Do not park these — they are decided, not deferred:** a remote coaching
+subscription, a paid alumni membership, individual housing referrals, and any
+501(c)(3) or hybrid structure. All were analysed and rejected; see
+`../business-plan/CHANGELOG.md`.
