@@ -20,6 +20,7 @@ document that owns it rather than scattered across the tree.
 | **06** | [`06-billing.md`](06-billing.md) | Every paid service, tier, renewal date and paying account. |
 | **07** | [`07-security-log.md`](07-security-log.md) | Dated sweep entries. Append-only. |
 | **08** | [`08-contributing.md`](08-contributing.md) | Code and commit conventions actually used in this repo. |
+| **09** | [`09-architecture.md`](09-architecture.md) | How the app works end to end — rendering model, the caching rules that keep Sanity inside its free tier, integrations, and the known debt. |
 
 ## Where content lives
 
