@@ -316,7 +316,15 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           <div className="flex flex-row h-auto items-center justify-between px-6 py-3">
             {/* Logo container */}
             <div className="flex items-center h-12">
-              <BrandLogo markSize={38} variant={navOverHero ? 'onDark' : 'onLight'} />
+              {/* An uploaded logo (Site Settings → Site Logo) replaces the
+                  built-in mark; without one, BrandLogo draws its own, so the
+                  header survives a Sanity outage. */}
+              <BrandLogo
+                markSize={38}
+                variant={navOverHero ? 'onDark' : 'onLight'}
+                src={siteSettings?.logo ? urlFor(siteSettings.logo).height(96).url() : undefined}
+                alt={siteSettings?.title}
+              />
             </div>
 
             {/* Desktop Navigation */}

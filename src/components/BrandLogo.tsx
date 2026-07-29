@@ -47,6 +47,20 @@ interface BrandLogoProps {
   className?: string;
   /** Render as a link to the homepage. Set false when already inside a link. */
   asLink?: boolean;
+  /**
+   * Optional uploaded logo from Sanity (Site Settings → Site Logo, or Footer
+   * Logo). When present it replaces the built-in mark and wordmark entirely.
+   *
+   * The built-in version stays as the fallback rather than being removed. An
+   * earlier iteration fetched the logo from the CMS with no fallback, and the
+   * site degraded to plain text whenever Sanity was unreachable — which has
+   * happened, via a billing block. This way the logo is fully editable without
+   * the brand disappearing during an outage.
+   */
+  src?: string;
+  /** Alt text for an uploaded logo. Ignored by the built-in mark, which is
+   *  decorative next to the wordmark it already spells out. */
+  alt?: string;
 }
 
 export default function BrandLogo({
@@ -54,13 +68,30 @@ export default function BrandLogo({
   markSize = 38,
   className = "",
   asLink = true,
+  src,
+  alt,
 }: BrandLogoProps) {
   const isDark = variant === "onDark";
   const markColor = isDark ? "var(--surface)" : "var(--primary)";
   const wordColor = isDark ? "var(--surface)" : "var(--primary-deep)";
   const subColor = isDark ? "var(--border)" : "var(--muted-foreground)";
 
-  const content = (
+  const content = src ? (
+    <span className={`inline-flex items-center ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element --
+          next/image needs known intrinsic dimensions or a `fill` container. An
+          uploaded logo can be any aspect ratio, and the design constrains
+          height while letting width follow. Sanity's CDN is already serving a
+          height-capped, format-optimised asset, so next/image would add a
+          second optimisation pass for no benefit. */}
+      <img
+        src={src}
+        alt={alt ?? "Elevate Training Camps"}
+        style={{ height: markSize * 1.25, width: "auto" }}
+        className="object-contain"
+      />
+    </span>
+  ) : (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <ElevateMark size={markSize} color={markColor} />
       <span className="leading-none">
