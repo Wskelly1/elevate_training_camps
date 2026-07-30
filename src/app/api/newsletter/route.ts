@@ -70,12 +70,12 @@ export async function POST(request: NextRequest) {
           subject: `Welcome to Elevate Training Camps Newsletter!`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #3c6e45; margin-bottom: 20px;">Welcome to Our Newsletter!</h2>
+              <h2 style="color: #427b4d; margin-bottom: 20px;">Welcome to Our Newsletter!</h2>
 
               <p>Thank you for subscribing to the Elevate Training Camps newsletter!</p>
 
               <p>You're now part of our community and will receive:</p>
-              <ul style="color: #3c6e45;">
+              <ul style="color: #427b4d;">
                 <li>Latest training camp updates and schedules</li>
                 <li>Exclusive offers and early bird discounts</li>
                 <li>Training tips and techniques from our expert coaches</li>
@@ -84,10 +84,10 @@ export async function POST(request: NextRequest) {
               </ul>
 
               <div style="background-color: #f0ead6; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-                <h3 style="color: #3c6e45; margin-top: 0;">Ready to Elevate Your Game?</h3>
+                <h3 style="color: #427b4d; margin-top: 0;">Ready to Elevate Your Game?</h3>
                 <p>Check out our upcoming training camps and take your skills to the next level!</p>
                 <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/registration"
-                   style="display: inline-block; background-color: #3c6e45; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                   style="display: inline-block; background-color: #427b4d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
                   View Training Camps
                 </a>
               </div>
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
               <p>Best regards,<br>
               The Elevate Training Camps Team</p>
 
-              <hr style="margin: 30px 0; border: none; border-top: 1px solid #e6dfd3;">
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid #d3c7b4;">
               <p style="font-size: 12px; color: #666;">
                 You received this email because you subscribed to our newsletter. If you no longer wish to receive these emails, please contact us to unsubscribe.
               </p>

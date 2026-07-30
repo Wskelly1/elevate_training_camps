@@ -88,7 +88,7 @@ export default function ContactForm() {
         <h1 className="text-3xl mb-2 text-center">Contact Us</h1>
         <p className="text-center text-gray-600 mb-8">We&apos;d love to hear from you! Please fill out the form below and we&apos;ll get back to you as soon as possible.</p>
       </div>
-      <div className="max-w-xl mx-auto p-8 bg-[#f0ead6] rounded-lg shadow-sm border-2 border-[#d3c7b4] border-t-[#3c6e45] mb-24">
+      <div className="max-w-xl mx-auto p-8 bg-[var(--surface)] rounded-lg shadow-sm border-2 border-[var(--border)] border-t-[var(--primary)] mb-24">
         {/* Success Message */}
         {submitStatus === 'success' && (
           <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
@@ -193,7 +193,7 @@ export default function ContactForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-12 text-base bg-[#3c6e45] hover:bg-[#4a7f53] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 text-base bg-[var(--primary)] hover:bg-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </Button>

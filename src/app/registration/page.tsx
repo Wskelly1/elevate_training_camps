@@ -240,13 +240,13 @@ export default async function RegistrationPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-[#fbf9f3] to-[#fff9eb]">
+      <div className="min-h-screen bg-gradient-to-b from-[var(--background)] to-[var(--surface)]">
         {/* Hero Section */}
         <section className="relative py-20 md:py-32 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#427b4d]/10 to-[#755f4f]/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--muted-foreground)]/10"></div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="mb-8">
-              <Calendar className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
+              <Calendar className="h-16 w-16 mx-auto text-[var(--primary)] mb-6" />
               <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
                 Registration & Pricing
               </h1>
@@ -259,7 +259,7 @@ export default async function RegistrationPage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
+                className="bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-8 py-4 text-lg"
               >
                 <a href="#packages">Register Now</a>
               </Button>
@@ -267,7 +267,7 @@ export default async function RegistrationPage() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
+                className="border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white px-8 py-4 text-lg"
               >
                 <Link href="/contact">Download Brochure</Link>
               </Button>
@@ -293,12 +293,12 @@ export default async function RegistrationPage() {
                 <div
                   key={tier._id || index}
                   className={`relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                    tier.popular ? 'ring-2 ring-[#427b4d] scale-105' : 'border border-gray-200'
+                    tier.popular ? 'ring-2 ring-[var(--primary)] scale-105' : 'border border-gray-200'
                   }`}
                 >
                   {tier.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-[#427b4d] text-white px-6 py-2 rounded-full text-sm">
+                      <span className="bg-[var(--primary)] text-white px-6 py-2 rounded-full text-sm">
                         Most Popular
                       </span>
                     </div>
@@ -325,7 +325,7 @@ export default async function RegistrationPage() {
                   <ul className="space-y-4 mb-8">
                     {tier.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
-                        <CheckCircle className="h-5 w-5 text-[#427b4d] mr-3 flex-shrink-0 mt-0.5" />
+                        <CheckCircle className="h-5 w-5 text-[var(--primary)] mr-3 flex-shrink-0 mt-0.5" />
                         <span className="text-gray-700">{feature}</span>
                       </li>
                     ))}
@@ -335,7 +335,7 @@ export default async function RegistrationPage() {
                     asChild
                     className={`w-full py-4 text-lg ${
                       tier.popular
-                        ? 'bg-[#427b4d] hover:bg-[#387143] text-white'
+                        ? 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
                         : 'bg-gray-900 hover:bg-gray-800 text-white'
                     }`}
                   >
@@ -350,7 +350,7 @@ export default async function RegistrationPage() {
         </section>
 
         {/* Upcoming Camps */}
-        <section className="py-20 bg-[#fff9eb]">
+        <section className="py-20 bg-[var(--surface)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
@@ -391,7 +391,7 @@ export default async function RegistrationPage() {
                     )}
                   </div>
 
-                  <Button asChild className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
+                  <Button asChild className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white">
                     <Link href="/contact">Register for This Camp</Link>
                   </Button>
                 </div>
@@ -418,14 +418,14 @@ export default async function RegistrationPage() {
                 const IconComponent = getIcon(category.icon);
                 return (
                   <div key={category._id || index} className="text-center">
-                    <div className="bg-[#fff9eb] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <IconComponent className="h-8 w-8 text-[#427b4d]" />
+                    <div className="bg-[var(--surface)] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <IconComponent className="h-8 w-8 text-[var(--primary)]" />
                     </div>
                     <h3 className="text-xl text-gray-900 mb-4">{category.category}</h3>
                     <ul className="space-y-2 text-left">
                       {category.items.map((item, itemIndex) => (
                         <li key={itemIndex} className="flex items-start text-gray-600">
-                          <CheckCircle className="h-4 w-4 text-[#427b4d] mr-2 flex-shrink-0 mt-0.5" />
+                          <CheckCircle className="h-4 w-4 text-[var(--primary)] mr-2 flex-shrink-0 mt-0.5" />
                           <span className="text-sm">{item}</span>
                         </li>
                       ))}
@@ -441,7 +441,7 @@ export default async function RegistrationPage() {
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <Users className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
+              <Users className="h-16 w-16 mx-auto text-[var(--primary)] mb-6" />
               <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
                 Team & Group Pricing
               </h2>
@@ -452,12 +452,12 @@ export default async function RegistrationPage() {
 
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Team/Group Pricing */}
-              <div className="bg-[#fff9eb] rounded-2xl p-8">
+              <div className="bg-[var(--surface)] rounded-2xl p-8">
                 <h3 className="text-3xl text-gray-900 mb-6">Team / Group Pricing</h3>
                 <div className="space-y-6">
-                  <div className="border-l-4 border-[#427b4d] pl-6">
+                  <div className="border-l-4 border-[var(--primary)] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">10 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,350 per person</p>
+                    <p className="text-lg text-[var(--primary)] mb-2">$1,350 per person</p>
                     <p className="text-gray-600 mb-3">4-week program with Airbnb-style housing</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Housing included</li>
@@ -467,9 +467,9 @@ export default async function RegistrationPage() {
                     </ul>
                   </div>
 
-                  <div className="border-l-4 border-[#427b4d] pl-6">
+                  <div className="border-l-4 border-[var(--primary)] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">12-14 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,200 - $1,250 per person</p>
+                    <p className="text-lg text-[var(--primary)] mb-2">$1,200 - $1,250 per person</p>
                     <p className="text-gray-600 mb-3">Best value - shared housing and van rental costs</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Shared housing</li>
@@ -479,9 +479,9 @@ export default async function RegistrationPage() {
                     </ul>
                   </div>
 
-                  <div className="border-l-4 border-[#427b4d] pl-6">
+                  <div className="border-l-4 border-[var(--primary)] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">6-8 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,500 - $1,600 per person</p>
+                    <p className="text-lg text-[var(--primary)] mb-2">$1,500 - $1,600 per person</p>
                     <p className="text-gray-600 mb-3">Smaller groups - higher per-person costs</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Housing included</li>
@@ -494,12 +494,12 @@ export default async function RegistrationPage() {
               </div>
 
               {/* Hostel-Style Option */}
-              <div className="bg-[#fff9eb] rounded-2xl p-8">
+              <div className="bg-[var(--surface)] rounded-2xl p-8">
                 <h3 className="text-3xl text-gray-900 mb-6">Hostel-Style Option</h3>
                 <div className="space-y-6">
-                  <div className="border-l-4 border-[#755f4f] pl-6">
+                  <div className="border-l-4 border-[var(--muted-foreground)] pl-6">
                     <h4 className="text-xl text-gray-900 mb-2">Solo Athletes & Pairs</h4>
-                    <p className="text-lg text-[#755f4f] mb-2">$1,400 - $1,500 per person</p>
+                    <p className="text-lg text-[var(--muted-foreground)] mb-2">$1,400 - $1,500 per person</p>
                     <p className="text-gray-600 mb-3">4-week program with shared housing</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Shared housing with other athletes</li>
@@ -530,9 +530,9 @@ export default async function RegistrationPage() {
         </section>
 
         {/* Payment Options */}
-        <section className="py-20 bg-[#fff9eb]">
+        <section className="py-20 bg-[var(--surface)]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <CreditCard className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
+            <CreditCard className="h-16 w-16 mx-auto text-[var(--primary)] mb-6" />
             <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
               Flexible Payment Options
             </h2>
@@ -544,7 +544,7 @@ export default async function RegistrationPage() {
               {displayPaymentOptions.map((option, index) => (
                 <div key={option._id || index} className="bg-white p-6 rounded-xl shadow-lg">
                   <h3 className="text-xl text-gray-900 mb-4">{option.name}</h3>
-                  <div className="text-3xl text-[#427b4d] mb-2">{option.discount}</div>
+                  <div className="text-3xl text-[var(--primary)] mb-2">{option.discount}</div>
                   <p className="text-gray-600">{option.description}</p>
                 </div>
               ))}
@@ -559,7 +559,7 @@ export default async function RegistrationPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
+                  className="bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-8 py-4 text-lg"
                 >
                   <Link href="/contact">Register Now</Link>
                 </Button>
@@ -567,7 +567,7 @@ export default async function RegistrationPage() {
                   asChild
                   variant="outline"
                   size="lg"
-                  className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
+                  className="border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white px-8 py-4 text-lg"
                 >
                   <a href="tel:+16512074749">Call (651) 207-4749</a>
                 </Button>
