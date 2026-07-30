@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react"
-import { Menu, X, User, BookOpen, Users, Target, ClipboardList, Image as ImageIcon, HelpCircle, Mail, MapPin, Facebook, Instagram, Send, Twitter, ChevronDown } from "lucide-react"
+import { Menu, X, User, BookOpen, Users, Target, GraduationCap, ClipboardList, Image as ImageIcon, HelpCircle, Mail, MapPin, Facebook, Instagram, Send, Twitter, ChevronDown } from "lucide-react"
 import { Button } from "../components/ui/button"
 import {
   NavigationMenu,
@@ -275,7 +275,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
       ],
       href: "/about"
     },
-    { title: "Coaching", href: "/coaching", icon: Target },
+    { title: "Recruiting", href: "/recruiting", icon: GraduationCap },
     { title: "Registration", href: "/registration", icon: ClipboardList },
     { title: "Media", href: "/media", icon: ImageIcon },
     { title: "FAQ", href: "/faq", icon: HelpCircle },
@@ -608,8 +608,8 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                   <Link href="/about" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     About Us
                   </Link>
-                  <Link href="/coaching" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
-                    Coaching
+                  <Link href="/recruiting" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                    Recruiting
                   </Link>
                   <Link href="/registration" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
                     Registration

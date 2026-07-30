@@ -40,6 +40,8 @@ export default defineType({
           { title: '3 days', value: '3 days' },
           { title: '5 days', value: '5 days' },
           { title: '7 days', value: '7 days' },
+          { title: '2 weeks', value: '2 weeks' },
+          { title: '3 weeks', value: '3 weeks' },
           { title: '4 weeks', value: '4 weeks' },
           { title: '1 month', value: '1 month' },
           { title: '3 months', value: '3 months' },

@@ -25,9 +25,12 @@ now the principal service line**, with the camp reframed as the funnel rather
 than the business. A remote coaching subscription and a paid alumni membership
 were both cut, and the 501(c)(3) route was declined.
 
-This invalidates content across Registration, Coaching and FAQ. **`/coaching`
-is actively selling the cut subscription and undercutting the buyer — see the
-red-flagged items in §5.5.** Read §5.5 before writing any copy, and
+This invalidates content across Registration, Coaching and FAQ. `/coaching`
+was actively selling the cut subscription until O-16 resolved it (repurposed
+as `/recruiting` — see §5.5). **Also 2026-07-29: the buyer definition was
+widened** — team blocks sell to the coach *or a parent organiser* where the
+coach can't travel; parent-led trips are first-class (see
+`../business-plan/CHANGELOG.md`). Read §5.5 before writing any copy, and
 `../business-plan/WEBSITE-SYNC.md` before acting on any business change.
 
 ---
@@ -65,7 +68,7 @@ website copy depends on them; see §5.5.
 | O-13 | **Refund / cancellation / AQI-and-smoke policy text**, legally reviewed. The risk plan requires it published at the point of sale, not negotiated during a smoke event | Gate-5, Phase 4, Phase 5 checkout |
 | O-14 | Verify **state-association summer contact rules** (AIA, CIF, NIAA, NMAA…) — they decide whether a team's own coaches may attend, which changes supervision, staffing and liability | FAQ content; supervision claims |
 | O-15 | Written **worker classification opinion** (1099 vs W-2) from an AZ attorney/CPA | Any site content describing staff; blocks counsellor hiring |
-| O-16 | **Decide `/coaching`'s fate** — re-scope to in-person/unattached only, repurpose for the recruiting advisory, or pull from nav. It currently sells a product cut on 2026-07-29 and undercuts the coaches who are the buyer. See §5.5 | The single most urgent live content fix |
+| O-16 | ✅ **Decided 2026-07-29: repurpose for the recruiting advisory.** Implemented as `/recruiting` (with `/coaching` 308-redirected) in the `feat/recruiting-advisory` PR — awaiting screenshot approval + merge | ~~The single most urgent live content fix~~ |
 
 **Tier 3 — approvals on demand:** brand-guide sign-off (A1), per-PR screenshot
 approvals, component picks from shortlist menus. Each takes minutes.
@@ -172,10 +175,11 @@ touches visuals gets promoted to gated.
 (the product model determines the checkout, the content and the service-line
 surface); O-1/O-7 → Stripe live.
 
-**Two unblocks dominate the board.** **O-16** is the most urgent — `/coaching`
-is live right now selling a cut product to the wrong audience. **O-10** (the
-coach calls) is the highest-value — it validates or kills the duration
-assumption every downstream projection rests on.
+**The dominant unblock is O-10** (the coach calls) — it validates or kills the
+duration assumption every downstream projection rests on, and now doubles as
+the test of the parent-led configuration ("if you couldn't attend, would a
+parent group run the trip?"). O-16, previously the most urgent item, was
+resolved 2026-07-29 (repurpose → `/recruiting`).
 
 ## §5 — Brand-guide production (Phase 1 detail)
 
@@ -266,7 +270,7 @@ problem downstream is a consequence of that mismatch.
 
 | | Site said (pre-2026-07-29) | Business actually does |
 |---|---|---|
-| Buyer | Individual athlete / parent | **A coach**, buying for a squad. B2B. |
+| Buyer | Individual athlete / parent | **The team's trip leader** — the coach, or a **parent organiser** where the coach can't travel (buyer widened 2026-07-29; parent-led trips are first-class, and the accompanying adults own supervision either way). B2B. |
 | Product | Generic "training camps" | **Team Altitude Block** — 3–4 weeks flagship, **1-week on-ramp** as a first-class product (ST-1 hedge) |
 | Price | Flat per-head tiers | **Two-part tariff**: team base fee + per-athlete, ~8–10 athlete minimum (≈$7,500 revenue floor) |
 | Included | "Housing, transport and logistics handled" | **Programming only.** Lodging and food excluded — brokered via partners |
@@ -310,7 +314,9 @@ liability or credibility exposure, not a style preference.
 ### 🔴 Two live inconsistencies — fix before anything else
 
 Both raised by `../business-plan/WEBSITE-SYNC.md` and confirmed against the
-running site on 2026-07-29.
+running site on 2026-07-29. **Both fixed in the `feat/recruiting-advisory`
+PR** (O-16 resolved as a repurpose → `/recruiting`; `2 weeks`/`3 weeks` added
+to `trainingPackage.duration`) — the history below is kept for context.
 
 **1. `/coaching` sells the product that was cut — and undercuts the buyer.**
 
@@ -350,7 +356,7 @@ cannot be entered in the Studio. Add both to
 | Page | Change |
 |---|---|
 | **Home** | ✅ Done — rebuilt on the A2.5a composition with corrected positioning |
-| **Coaching** | 🔴 **Highest priority.** Sells a cut product and undercuts the buyer; also carries a false results claim. Owner decision O-16 (above) |
+| **Coaching → Recruiting** | ✅ O-16 resolved: repurposed as `/recruiting` (recruiting advisory, Y1-phased — free evaluation only, no pricing per Gate-7). `/coaching` 308-redirects. The `coachingProgram`/`coachingBenefit`/`coachingTestimonial` schema types remain for the Phase 1.5 CMS reshape (3 documents still in the dataset) |
 | **Registration** | The biggest rebuild. Becomes *team blocks + quote request*, modelling the two-part tariff and squad minimum. Present the 1-week on-ramp alongside the 3-week block (Gate-6). Needs the schema durations fixed first. Current invented tiers and 2025 dates are structurally wrong, not just stale |
 | **Recruiting advisory** | **New page + new schema.** The principal service line (04) — four tiers, buyer changes between them (Tier 4 sold to coaches, Tiers 2–3 to families). **Phased: publish nothing priced in Y1.** The Y1 move is the free Tier-1 evaluation for every camper, which doubles as the attach-rate measurement; pricing publishes in Y2, where transparency is itself the differentiator against NCSA's no-published-pricing sales call |
 | **About** | Carry the community flywheel: HS camper → collegiate counsellor → professional advocate. Note the alumni network is retained as **free** infrastructure — the paid "Elevate Family" membership was cut, so never present it as a paid tier |
