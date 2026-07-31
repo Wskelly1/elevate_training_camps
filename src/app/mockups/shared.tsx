@@ -38,3 +38,16 @@ export const COPY = {
   ],
   navItems: ["About", "Recruiting", "Registration", "Media", "FAQ", "Contact Us"],
 };
+
+/** Small CSS block shared by the round-2 mockups: entrance reveals and
+ *  image hover life. Injected per-page via a <style> tag so globals.css
+ *  stays clean of mockup-only rules. */
+export const MOTION_CSS = `
+  @keyframes riseIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  .rise { animation: riseIn 700ms cubic-bezier(.2,.6,.2,1) both; }
+  .rise-1 { animation-delay: 80ms; } .rise-2 { animation-delay: 180ms; } .rise-3 { animation-delay: 300ms; }
+  .img-live { overflow: hidden; }
+  .img-live img { transition: transform 1200ms cubic-bezier(.2,.6,.2,1); }
+  .img-live:hover img { transform: scale(1.04); }
+  @media (prefers-reduced-motion: reduce) { .rise { animation: none; } .img-live img { transition: none; } }
+`;

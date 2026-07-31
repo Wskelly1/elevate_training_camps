@@ -1,55 +1,66 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-/** Index for the three refined-rustic direction mockups (2026-07-31). */
+/** Index for the round-2 refined-rustic direction mockups (2026-07-31).
+ *  Round 1 (flat print-editorial) was rejected: too much empty cream, too
+ *  flat, too static. Round 2 brief: photography and atmosphere first,
+ *  confident color, layered and alive. */
 export const metadata: Metadata = {
-  title: "Layout Mockups",
+  title: "Layout Mockups · Round 2",
   robots: { index: false, follow: false },
 };
 
 const OPTIONS = [
   {
-    href: "/mockups/field-journal",
-    name: "A · Field Journal",
-    refs: "Tracksmith · Kinfolk",
+    href: "/mockups/lodge",
+    name: "1 · Cinematic Lodge",
+    refs: "Post Ranch Inn · Rock Creek · Under Canvas",
     blurb:
-      "One continuous paper ground, centered ruled masthead, hairline dividers, italic captions. Quietest and most literary.",
+      "Photography IS the page: full-bleed image mastheads with the title over them, portraits with names on the photo, edge-to-edge triptychs. Warm-dark and expensive.",
   },
   {
-    href: "/mockups/trailhead",
-    name: "B · Trailhead Lodge",
-    refs: "Under Canvas · Filson · vintage NPS",
+    href: "/mockups/estate",
+    name: "2 · Botanical Estate",
+    refs: "Flamingo Estate · Scribe",
     blurb:
-      "Deep-green masthead running from the very top with the nav inside it — no seam possible. Double rules, trail-marker stat tags, bravest color.",
+      "Confident colored grounds — garden green, terracotta, sun — carry whole sections; cream is only an accent. Arched crops, big italic serif moments. Sun-soaked and alive.",
   },
   {
-    href: "/mockups/gallery",
-    name: "C · Quiet Gallery",
-    refs: "Aesop · Cereal",
+    href: "/mockups/modern",
+    name: "3 · Modern Refined Outdoor",
+    refs: "Snow Peak · Klättermusen",
     blurb:
-      "One warm-stone ground, modest type, asymmetric offset grid, images hung like objects. Most restrained and most 'artistic'.",
+      "Contemporary sans type in a tight modular grid where photography fills the modules — calm through order, not emptiness. Heritage craft, zero costume.",
+  },
+  {
+    href: "/mockups/film",
+    name: "4 · Documentary Journal",
+    refs: "YETI Presents · Patagonia Stories",
+    blurb:
+      "Dark theatre ground with film grain, chapters with markers, letterboxed stills, amber titles. The deepest atmosphere of the four.",
   },
 ];
 
 export default function MockupsIndex() {
   return (
-    <div className="min-h-screen bg-[#f6f1e2] text-[#232a20]">
+    <div className="min-h-screen bg-[#161a14] text-[#ece5d3]">
       <div className="mx-auto max-w-3xl px-6 py-24">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[var(--accent-rock)]">Aesthetic explorations</p>
-        <h1 className="mt-4 text-4xl">Refined-rustic layout directions</h1>
-        <p className="mt-4 text-[16px] leading-[1.8] text-[#4a4a42]">
-          Three treatments of the same About-page content. Each fixes the nav
-          seam and the masthead spacing in its own way — pick the one that
-          feels right and it becomes the system for every inner page.
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#d9a566]">Aesthetic explorations · round 2</p>
+        <h1 className="mt-4 text-4xl">Photography-first directions</h1>
+        <p className="mt-4 text-[16px] leading-[1.8] text-[#ece5d3]/75">
+          Four treatments of the same About-page content, built to the revised
+          brief: imagery and atmosphere first, confident color, layered and
+          alive — no empty cream fields, nothing print-flat, subtle motion
+          throughout.
         </p>
         <div className="mt-12 space-y-8">
           {OPTIONS.map((o) => (
-            <Link key={o.href} href={o.href} className="block border-t border-[#d8cfb8] pt-6 transition hover:opacity-70">
-              <div className="flex items-baseline justify-between">
+            <Link key={o.href} href={o.href} className="block border-t border-[#ece5d3]/15 pt-6 transition hover:opacity-70">
+              <div className="flex items-baseline justify-between gap-4">
                 <h2 className="text-2xl">{o.name}</h2>
-                <span className="text-[11px] uppercase tracking-[0.2em] text-[#8a8272]">{o.refs}</span>
+                <span className="text-right text-[11px] uppercase tracking-[0.18em] text-[#ece5d3]/50">{o.refs}</span>
               </div>
-              <p className="mt-2 max-w-[60ch] text-[15px] leading-[1.7] text-[#4a4a42]">{o.blurb}</p>
+              <p className="mt-2 max-w-[64ch] text-[15px] leading-[1.7] text-[#ece5d3]/75">{o.blurb}</p>
             </Link>
           ))}
         </div>
