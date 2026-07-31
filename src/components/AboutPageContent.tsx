@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { urlFor } from "../lib/sanity";
 import { type TeamIntroduction } from "./AnimatedCarousel";
+import TeamRotator from "./TeamRotator";
+import PageMasthead from "./PageMasthead";
 import { AboutSection } from "../lib/queries";
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
@@ -20,12 +22,14 @@ interface AboutPageContentProps {
 }
 
 /**
- * AboutPageContent — full editorial rebuild (owner decision 2026-07-31),
- * applying the A2.5a system that the homepage and /recruiting already use:
- * left-aligned serif masthead, edge-bleeding alternating sections, an
- * editorial team grid replacing the old AnimatedCarousel, and token colors
- * throughout. This retires the "centered PowerPoint" composition the
- * design review (docs/02) diagnosed.
+ * AboutPageContent — editorial About page (A2.5a system).
+ *
+ * Section order deliberately mirrors the About dropdown in the nav (owner
+ * decision 2026-07-31): Our Team first, then the CMS sections in the same
+ * query order the dropdown itself is built from — the two can't drift
+ * because they share `getAboutSections()`. The team section uses the
+ * rotational TeamRotator (replacing first the old carousel, then the
+ * static grid).
  *
  * Owns only the hash-based scroll-to-section behavior (needs the browser);
  * all data arrives as props from the server component.
@@ -53,38 +57,46 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
 
   return (
     <>
-      {/* ——— Masthead ————————————————————————————————————— */}
-      <section className="pt-20 pb-16 md:pt-28 md:pb-20">
+      <PageMasthead
+        eyebrow="About Elevate"
+        heading={hero?.heroHeading || "About Elevate Training Camps"}
+        intro={hero?.heroIntro}
+      >
+        {hero?.statChips && hero.statChips.length > 0 && (
+          <div className="mt-9 flex flex-wrap gap-x-10 gap-y-4 border-t border-[var(--border)] pt-5">
+            {hero.statChips.map((chip) => (
+              <p key={chip} className="text-xs uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                {chip}
+              </p>
+            ))}
+          </div>
+        )}
+      </PageMasthead>
+
+      {/* ——— Our Team — first, matching the dropdown ————————————— */}
+      <section id="our-team" className="scroll-mt-32 py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">About Elevate</p>
-          <h1 className="mt-5 max-w-3xl text-5xl leading-[1.05] md:text-7xl">
-            {hero?.heroHeading || "About Elevate Training Camps"}
-          </h1>
-          {hero?.heroIntro && (
-            <p className="mt-7 max-w-2xl text-lg leading-[1.75] text-[#4a4a4a]">{hero.heroIntro}</p>
-          )}
-          {hero?.statChips && hero.statChips.length > 0 && (
-            <div className="mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t border-[var(--border)] pt-5">
-              {hero.statChips.map((chip) => (
-                <p key={chip} className="text-xs uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-                  {chip}
-                </p>
-              ))}
-            </div>
+          <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">The people</p>
+          <h2 className="mt-5 text-[2.75rem] leading-[1.06] md:text-[3.25rem]">Our Team</h2>
+          {teamIntroductions.length > 0 ? (
+            <TeamRotator introductions={teamIntroductions} />
+          ) : (
+            <p className="mt-8 text-lg text-[var(--muted-foreground)]">Team members will be added soon.</p>
           )}
         </div>
       </section>
 
-      {/* ——— CMS sections — alternating, edge-bleeding ————————
-          The image column runs off one viewport edge, alternating sides, so
-          consecutive sections don't share a silhouette (A2.5a system). */}
+      {/* ——— CMS sections — same order as the dropdown ————————
+          Alternating edge-bleed layout (A2.5a); zebra backgrounds continue
+          from the team section above. */}
       {aboutSections.map((section, index) => {
+        const surface = index % 2 === 0;
         const left = index % 2 !== 0;
         return (
           <section
             key={section._id}
             id={section.slug.current}
-            className={`scroll-mt-32 ${left ? "py-20 md:py-28" : "border-t border-[var(--border)] bg-[var(--surface)] py-16 md:py-24"}`}
+            className={`scroll-mt-32 ${surface ? "border-t border-[var(--border)] bg-[var(--surface)] py-16 md:py-24" : "py-20 md:py-28"}`}
           >
             <div
               className={`grid items-center gap-12 px-6 md:grid-cols-12 md:gap-14 ${
@@ -114,42 +126,6 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
           </section>
         );
       })}
-
-      {/* ——— Team — editorial grid (replaces the carousel) ———————— */}
-      <section id="our-team" className="scroll-mt-32 border-t border-[var(--border)] py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">The people</p>
-          <h2 className="mt-5 text-[2.75rem] leading-[1.06] md:text-[3.25rem]">Our Team</h2>
-          {teamIntroductions.length > 0 ? (
-            <div className="mt-12 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-              {teamIntroductions.map((member) => (
-                <div key={member.name}>
-                  {member.src && (
-                    <div className="relative aspect-[4/5] w-full overflow-hidden">
-                      <Image
-                        src={member.src}
-                        alt={member.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
-                      />
-                    </div>
-                  )}
-                  <h3 className="mt-5 text-[1.5rem] leading-snug">{member.name}</h3>
-                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[var(--accent-rock)]">
-                    {member.designation}
-                  </p>
-                  {member.quote && (
-                    <p className="mt-3 text-[15px] leading-[1.7] text-[#4a4a4a]">{member.quote}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-8 text-lg text-[var(--muted-foreground)]">Team members will be added soon.</p>
-          )}
-        </div>
-      </section>
     </>
   );
 }

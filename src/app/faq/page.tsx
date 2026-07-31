@@ -1,4 +1,5 @@
 import Layout from "../../components/layout";
+import PageMasthead from "../../components/PageMasthead";
 import Link from "next/link";
 import { urlFor } from "../../lib/sanity";
 import { getFAQs, getFAQPageSettings } from "../../lib/queries";
@@ -47,39 +48,27 @@ export default async function FAQPage() {
   return (
     <Layout>
       {/* ——— Masthead ————————————————————————————————————— */}
-      <section className="pt-20 pb-14 md:pt-28 md:pb-16">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 md:grid-cols-12">
-          <div className="md:col-span-7">
-            <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">
-              Questions & answers
-            </p>
-            <h1 className="mt-5 text-5xl leading-[1.05] md:text-6xl">
-              {settings.title || "Frequently Asked Questions"}
-            </h1>
-            {settings.introduction && (
-              <p className="mt-6 max-w-xl text-lg leading-[1.75] text-[#4a4a4a]">
-                {settings.introduction}
-              </p>
-            )}
-          </div>
-          {settings.faqPageImage && (
-            <div className="md:col-span-5">
-              <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-lg md:ml-auto">
-                <Image
-                  src={urlFor(settings.faqPageImage).url()}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width:768px) 100vw, 40vw"
-                />
-              </div>
+      <PageMasthead
+        eyebrow="Questions & answers"
+        heading={settings.title || "Frequently Asked Questions"}
+        intro={settings.introduction}
+        aside={
+          settings.faqPageImage ? (
+            <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-lg md:ml-auto">
+              <Image
+                src={urlFor(settings.faqPageImage).url()}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="(max-width:768px) 100vw, 40vw"
+              />
             </div>
-          )}
-        </div>
-      </section>
+          ) : undefined
+        }
+      />
 
       {/* ——— Grouped questions ———————————————————————————— */}
-      <section className="border-t border-[var(--border)] bg-[var(--surface)] py-16">
+      <section className="py-16">
         <div className="mx-auto max-w-3xl px-6">
           {grouped.map((cat) => (
             <div key={cat.id} className="mb-14 last:mb-0">
@@ -90,7 +79,7 @@ export default async function FAQPage() {
                 {cat.items.map((faq) => (
                   <details
                     key={faq._id}
-                    className="group rounded-lg border border-[var(--border)] bg-[var(--background)] shadow-sm overflow-hidden"
+                    className="group rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-sm overflow-hidden"
                   >
                     <summary className="faq-summary cursor-pointer pl-10 pr-4 py-3.5 text-lg leading-snug rounded-lg group-open:rounded-b-none focus:outline-none">
                       {faq.question}

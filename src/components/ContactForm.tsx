@@ -24,9 +24,8 @@ import {
  * rides the email subject and the HubSpot lead for triage.
  *
  * Split out from app/contact/page.tsx so that page can be a plain Server
- * Component; the heading/intro copy arrives as props from the contactPage
- * singleton (CMS-ification Wave 3). Form labels stay in code — UI, not
- * content.
+ * Component; the page renders the CMS heading/intro in its PageMasthead.
+ * Form labels stay in code — UI, not content.
  */
 
 const EMPTY_FORM = (segment: ContactSegment): ContactFormData => ({
@@ -70,7 +69,7 @@ function Field({
   );
 }
 
-export default function ContactForm({ heading, intro }: { heading?: string; intro?: string }) {
+export default function ContactForm() {
   const [formData, setFormData] = useState<ContactFormData>(EMPTY_FORM('coach'));
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -140,10 +139,6 @@ export default function ContactForm({ heading, intro }: { heading?: string; intr
 
   return (
     <>
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl mb-2 text-center">{heading || "Contact Us"}</h1>
-        {intro && <p className="text-center text-gray-600 mb-8">{intro}</p>}
-      </div>
       <div className="max-w-2xl mx-auto p-8 bg-[var(--surface)] rounded-lg shadow-sm border-2 border-[var(--border)] border-t-[var(--primary)] mb-24">
         {/* ——— Segment picker ————————————————————————————— */}
         <fieldset className="mb-8">
