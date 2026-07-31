@@ -443,15 +443,16 @@ export type FAQPageSettings = {
   faqPageImage?: SanityImageRef;
 };
 
+// Reads the faqPage singleton (Wave 3 — content migrated out of
+// siteSettings.faqPage on 2026-07-30). The image field is aliased to the
+// old faqPageImage name so the page component is unchanged.
 const fetchFAQPageSettings = unstable_cache(
-  async (): Promise<{ faqPage?: FAQPageSettings } | null> => {
+  async (): Promise<FAQPageSettings | null> => {
     return await client.fetch(`
-      *[_type == "siteSettings"][0] {
-        faqPage {
-          title,
-          introduction,
-          faqPageImage
-        }
+      *[_type == "faqPage" && _id == "faqPage"][0] {
+        title,
+        introduction,
+        "faqPageImage": image
       }
     `);
   },
@@ -467,7 +468,7 @@ const fetchFAQPageSettings = unstable_cache(
 export async function getFAQPageSettings(): Promise<FAQPageSettings> {
   try {
     const settings = await fetchFAQPageSettings();
-    return settings?.faqPage || {};
+    return settings || {};
   } catch (error) {
     console.error('Error fetching FAQ page settings:', error);
     return {};
@@ -653,6 +654,59 @@ export async function getRecruitingPage(): Promise<RecruitingPageContent | null>
     return await fetchRecruitingPage();
   } catch (error) {
     console.error('Error fetching recruiting page:', error);
+    return null;
+  }
+}
+
+/** AboutPageHero — the /about hero copy (Wave 3). */
+export type AboutPageHero = {
+  heroHeading?: string;
+  heroIntro?: string;
+  statChips?: string[];
+};
+
+const fetchAboutPage = unstable_cache(
+  async (): Promise<AboutPageHero | null> => {
+    return await client.fetch(`
+      *[_type == "aboutPage" && _id == "aboutPage"][0]{ heroHeading, heroIntro, statChips }
+    `);
+  },
+  ['about-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/** Null on failure → the hero renders a minimal neutral state (docs/10 §5 rule 2). */
+export async function getAboutPage(): Promise<AboutPageHero | null> {
+  try {
+    return await fetchAboutPage();
+  } catch (error) {
+    console.error('Error fetching about page:', error);
+    return null;
+  }
+}
+
+/** ContactPageContent — the /contact heading + intro (Wave 3). */
+export type ContactPageContent = {
+  heading?: string;
+  intro?: string;
+};
+
+const fetchContactPage = unstable_cache(
+  async (): Promise<ContactPageContent | null> => {
+    return await client.fetch(`
+      *[_type == "contactPage" && _id == "contactPage"][0]{ heading, intro }
+    `);
+  },
+  ['contact-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/** Null on failure → the form renders with a bare neutral heading. */
+export async function getContactPage(): Promise<ContactPageContent | null> {
+  try {
+    return await fetchContactPage();
+  } catch (error) {
+    console.error('Error fetching contact page:', error);
     return null;
   }
 }

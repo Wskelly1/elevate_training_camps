@@ -14,8 +14,11 @@ import whatsIncluded from './whatsIncluded'
 import teamBlock from './teamBlock'
 import registrationPage from './registrationPage'
 import recruitingPage from './recruitingPage'
+import aboutPage from './aboutPage'
+import contactPage from './contactPage'
+import faqPage from './faqPage'
 
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [siteSettings, homePage, teamMember, faq, aboutSection, coachingProgram, coachingBenefit, coachingTestimonial, trainingPackage, upcomingCamp, paymentOption, whatsIncluded, teamBlock, registrationPage, recruitingPage],
+  types: [siteSettings, homePage, teamMember, faq, aboutSection, coachingProgram, coachingBenefit, coachingTestimonial, trainingPackage, upcomingCamp, paymentOption, whatsIncluded, teamBlock, registrationPage, recruitingPage, aboutPage, contactPage, faqPage],
 }

@@ -112,31 +112,10 @@ export default defineType({
         }
       ]
     }),
-    defineField({
-      name: 'faqPage',
-      title: 'FAQ Page Settings',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'title',
-          title: 'FAQ Page Title',
-          type: 'string',
-        }),
-        defineField({
-          name: 'introduction',
-          title: 'FAQ Page Introduction',
-          type: 'text',
-        }),
-        defineField({
-          name: 'faqPageImage',
-          title: 'FAQ Page Image',
-          type: 'image',
-          options: {
-            hotspot: true,
-          },
-        }),
-      ],
-    }),
+    // The FAQ page settings that used to be stranded here moved to the
+    // faqPage singleton (CMS-ification Wave 3, 2026-07-30). The old data
+    // remains harmlessly on existing documents; the field is gone so
+    // editors can't author into the dead location.
   ],
   preview: {
     select: {

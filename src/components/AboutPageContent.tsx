@@ -11,6 +11,13 @@ import { User } from "lucide-react";
 interface AboutPageContentProps {
   teamIntroductions: TeamIntroduction[];
   aboutSections: AboutSection[];
+  /** Hero copy from the aboutPage singleton (CMS-ification Wave 3).
+   *  Absent fields render nothing — no hard-coded copy fallback. */
+  hero?: {
+    heroHeading?: string;
+    heroIntro?: string;
+    statChips?: string[];
+  } | null;
 }
 
 /**
@@ -20,7 +27,7 @@ interface AboutPageContentProps {
  * app/about/page.tsx) and owns only the hash-based scroll-to-section
  * behavior, which needs the browser.
  */
-export default function AboutPageContent({ teamIntroductions, aboutSections }: AboutPageContentProps) {
+export default function AboutPageContent({ teamIntroductions, aboutSections, hero }: AboutPageContentProps) {
   // Handle URL hash navigation on load (e.g. /about#our-team)
   useEffect(() => {
     if (window.location.hash) {
@@ -50,25 +57,23 @@ export default function AboutPageContent({ teamIntroductions, aboutSections }: A
           <div className="mb-8">
             <User className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
             <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
-              About Elevate Training Camps
+              {hero?.heroHeading || "About Elevate Training Camps"}
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Discover the story behind our commitment to excellence in high-altitude training.
-              We&apos;re dedicated to helping teams get the most from a summer at altitude, on
-              Flagstaff&apos;s trail network in the heart of northern Arizona.
-            </p>
+            {hero?.heroIntro && (
+              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                {hero.heroIntro}
+              </p>
+            )}
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-              <p className="text-lg text-gray-900">First season: Summer 2027</p>
+          {hero?.statChips && hero.statChips.length > 0 && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {hero.statChips.map((chip) => (
+                <div key={chip} className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
+                  <p className="text-lg text-gray-900">{chip}</p>
+                </div>
+              ))}
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-              <p className="text-lg text-gray-900">Flagstaff, Arizona</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-              <p className="text-lg text-gray-900">7,000 ft Elevation</p>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 

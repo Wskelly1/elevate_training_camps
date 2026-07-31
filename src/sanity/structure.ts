@@ -181,6 +181,15 @@ export const structure: StructureResolver = (S) =>
             .title('About Page')
             .items([
               S.listItem()
+                .title('Hero Copy')
+                .icon(UserIcon)
+                .child(
+                  S.document()
+                    .schemaType('aboutPage')
+                    .documentId('aboutPage')
+                    .title('About Hero Copy')
+                ),
+              S.listItem()
                 .title('Page Sections')
                 .icon(DocumentTextIcon)
                 .child(
@@ -197,14 +206,43 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
 
+      // ——— Contact page ————————————————————————————————————————
+      S.listItem()
+        .title('Contact Page')
+        .icon(DocumentTextIcon)
+        .child(
+          S.document()
+            .schemaType('contactPage')
+            .documentId('contactPage')
+            .title('Contact Page Copy')
+        ),
+
       // ——— FAQ page ————————————————————————————————————————————
       S.listItem()
         .title('FAQ Page')
         .icon(HelpCircleIcon)
         .child(
-          S.documentTypeList('faq')
-            .title('FAQ Questions')
-            .defaultOrdering(byOrder)
+          S.list()
+            .title('FAQ Page')
+            .items([
+              S.listItem()
+                .title('Page Header')
+                .icon(HelpCircleIcon)
+                .child(
+                  S.document()
+                    .schemaType('faqPage')
+                    .documentId('faqPage')
+                    .title('FAQ Page Header')
+                ),
+              S.listItem()
+                .title('FAQ Questions')
+                .icon(HelpCircleIcon)
+                .child(
+                  S.documentTypeList('faq')
+                    .title('FAQ Questions')
+                    .defaultOrdering(byOrder)
+                ),
+            ])
         ),
 
       S.divider(),
