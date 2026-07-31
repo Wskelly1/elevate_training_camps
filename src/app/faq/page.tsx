@@ -53,11 +53,11 @@ export default async function FAQPage() {
         {/* FAQ List */}
         <div className="space-y-4 mb-10">
           {faqs.map((faq: FAQ) => (
-            <details key={faq._id} className="group border border-[#d3c7b4] rounded-lg bg-[#f0ead6] shadow-sm overflow-hidden">
-              <summary className="faq-summary cursor-pointer pl-10 pr-4 py-3 font-medium text-lg text-[#755f4f] rounded-lg group-open:rounded-b-none focus:outline-none">
+            <details key={faq._id} className="group border border-[var(--border)] rounded-lg bg-[var(--surface)] shadow-sm overflow-hidden">
+              <summary className="faq-summary cursor-pointer pl-10 pr-4 py-3 font-medium text-lg text-[var(--muted-foreground)] rounded-lg group-open:rounded-b-none focus:outline-none">
                 {faq.question}
               </summary>
-              <div className="px-10 pb-4 text-black bg-[#f0ead6]">
+              <div className="px-10 pb-4 text-black bg-[var(--surface)]">
                 {faq.answer}
               </div>
             </details>
