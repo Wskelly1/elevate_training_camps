@@ -14,8 +14,9 @@ import { getContactPage } from "../../lib/queries";
 export default async function ContactPage() {
   const content = await getContactPage();
   return (
-    <Layout>
+    <Layout transparentNav>
       <PageMasthead
+        imageUrl={content?.mastheadImageUrl}
         eyebrow="Get in touch"
         heading={content?.heading || "Contact Us"}
         intro={content?.intro}

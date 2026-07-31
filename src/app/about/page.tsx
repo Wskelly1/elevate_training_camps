@@ -62,7 +62,7 @@ export default async function AboutPage() {
     : [];
 
   return (
-    <Layout>
+    <Layout transparentNav>
       <AboutPageContent teamIntroductions={teamIntroductions} aboutSections={aboutSections} hero={hero} />
     </Layout>
   );

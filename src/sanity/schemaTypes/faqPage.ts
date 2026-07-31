@@ -11,6 +11,14 @@ export default defineType({
   title: 'FAQ Page',
   type: 'document',
   fields: [
+    defineField({
+      name: 'mastheadImage',
+      title: 'Masthead Image',
+      type: 'image',
+      description:
+        'The full-bleed photograph behind the page title (Cinematic Lodge masthead). Landscape orientation works best; the title sits over the lower third.',
+      options: { hotspot: true },
+    }),
     defineField({ name: 'title', title: 'Page Title', type: 'string' }),
     defineField({ name: 'introduction', title: 'Introduction', type: 'text', rows: 4 }),
     defineField({ name: 'image', title: 'Header Image', type: 'image' }),

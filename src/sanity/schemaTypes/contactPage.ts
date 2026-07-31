@@ -10,6 +10,14 @@ export default defineType({
   title: 'Contact Page',
   type: 'document',
   fields: [
+    defineField({
+      name: 'mastheadImage',
+      title: 'Masthead Image',
+      type: 'image',
+      description:
+        'The full-bleed photograph behind the page title (Cinematic Lodge masthead). Landscape orientation works best; the title sits over the lower third.',
+      options: { hotspot: true },
+    }),
     defineField({ name: 'heading', title: 'Heading', type: 'string' }),
     defineField({ name: 'intro', title: 'Intro', type: 'text', rows: 3 }),
   ],

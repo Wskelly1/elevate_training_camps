@@ -68,9 +68,14 @@ export default async function RegistrationPage() {
   const blocks = content.blocks ?? [];
 
   return (
-    <Layout>
+    <Layout transparentNav>
       {/* ——— Masthead ————————————————————————————————————— */}
-      <PageMasthead eyebrow={content.eyebrow} heading={content.heading} intro={content.intro}>
+      <PageMasthead
+        imageUrl={content.mastheadImageUrl}
+        eyebrow={content.eyebrow}
+        heading={content.heading}
+        intro={content.intro}
+      >
         <div className="mt-9 flex flex-wrap gap-4">
           <Link
             href="/contact"
@@ -80,7 +85,7 @@ export default async function RegistrationPage() {
           </Link>
           <Link
             href="/recruiting"
-            className="rounded-md border border-[var(--accent-trail)]/40 px-7 py-3.5 text-base text-[var(--foreground)] transition hover:bg-[var(--background)]"
+            className="rounded-md border border-[#f0ead6]/60 px-7 py-3.5 text-base text-[#f0ead6] transition hover:bg-[#f0ead6]/10"
           >
             The recruiting advisory
           </Link>

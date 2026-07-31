@@ -1,9 +1,7 @@
 import Layout from "../../components/layout";
 import PageMasthead from "../../components/PageMasthead";
 import Link from "next/link";
-import { urlFor } from "../../lib/sanity";
 import { getFAQs, getFAQPageSettings } from "../../lib/queries";
-import Image from "next/image";
 
 /**
  * FAQ — grouped by audience (owner decision 2026-07-31) and restyled onto
@@ -46,25 +44,14 @@ export default async function FAQPage() {
   })).filter((cat) => cat.items.length > 0);
 
   return (
-    <Layout>
-      {/* ——— Masthead ————————————————————————————————————— */}
+    <Layout transparentNav>
+      {/* ——— Masthead — full-bleed photo; the old clip-art tree aside is
+          retired in the Cinematic Lodge direction ——————————————— */}
       <PageMasthead
+        imageUrl={settings.mastheadImageUrl}
         eyebrow="Questions & answers"
         heading={settings.title || "Frequently Asked Questions"}
         intro={settings.introduction}
-        aside={
-          settings.faqPageImage ? (
-            <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-lg md:ml-auto">
-              <Image
-                src={urlFor(settings.faqPageImage).url()}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width:768px) 100vw, 40vw"
-              />
-            </div>
-          ) : undefined
-        }
       />
 
       {/* ——— Grouped questions ———————————————————————————— */}

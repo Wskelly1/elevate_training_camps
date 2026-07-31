@@ -321,6 +321,7 @@ export async function getFAQs() {
 }
 
 export type FAQPageSettings = {
+  mastheadImageUrl?: string;
   title?: string;
   introduction?: string;
   faqPageImage?: SanityImageRef;
@@ -333,6 +334,7 @@ const fetchFAQPageSettings = unstable_cache(
   async (): Promise<FAQPageSettings | null> => {
     return await client.fetch(`
       *[_type == "faqPage" && _id == "faqPage"][0] {
+        "mastheadImageUrl": mastheadImage.asset->url,
         title,
         introduction,
         "faqPageImage": image
@@ -375,6 +377,7 @@ export type TeamBlock = {
 };
 
 export type RegistrationPageContent = {
+  mastheadImageUrl?: string;
   eyebrow?: string;
   heading?: string;
   intro?: string;
@@ -402,6 +405,7 @@ const fetchRegistrationPage = unstable_cache(
   async (): Promise<RegistrationPageContent | null> => {
     return await client.fetch(`
       *[_type == "registrationPage" && _id == "registrationPage"][0]{
+        "mastheadImageUrl": mastheadImage.asset->url,
         eyebrow,
         heading,
         intro,
@@ -464,6 +468,7 @@ export async function getRegistrationPage(): Promise<RegistrationPageContent | n
  * no price fields (Gate-7 — no rate card until the attach rate is measured).
  */
 export type RecruitingPageContent = {
+  mastheadImageUrl?: string;
   eyebrow?: string;
   heading?: string;
   intro?: string;
@@ -508,6 +513,7 @@ const fetchRecruitingPage = unstable_cache(
   async (): Promise<RecruitingPageContent | null> => {
     return await client.fetch(`
       *[_type == "recruitingPage" && _id == "recruitingPage"][0]{
+        "mastheadImageUrl": mastheadImage.asset->url,
         eyebrow, heading, intro, ctaPrimary, ctaSecondary,
         stats[]{ number, label, sub },
         whyEyebrow, whyHeading, whyParagraphs, whyImage, whyImageAlt,
@@ -543,6 +549,7 @@ export async function getRecruitingPage(): Promise<RecruitingPageContent | null>
 
 /** AboutPageHero — the /about hero copy (Wave 3). */
 export type AboutPageHero = {
+  mastheadImageUrl?: string;
   heroHeading?: string;
   heroIntro?: string;
   statChips?: string[];
@@ -551,7 +558,7 @@ export type AboutPageHero = {
 const fetchAboutPage = unstable_cache(
   async (): Promise<AboutPageHero | null> => {
     return await client.fetch(`
-      *[_type == "aboutPage" && _id == "aboutPage"][0]{ heroHeading, heroIntro, statChips }
+      *[_type == "aboutPage" && _id == "aboutPage"][0]{ "mastheadImageUrl": mastheadImage.asset->url, heroHeading, heroIntro, statChips }
     `);
   },
   ['about-page'],
@@ -570,6 +577,7 @@ export async function getAboutPage(): Promise<AboutPageHero | null> {
 
 /** ContactPageContent — the /contact heading + intro (Wave 3). */
 export type ContactPageContent = {
+  mastheadImageUrl?: string;
   heading?: string;
   intro?: string;
 };
@@ -577,7 +585,7 @@ export type ContactPageContent = {
 const fetchContactPage = unstable_cache(
   async (): Promise<ContactPageContent | null> => {
     return await client.fetch(`
-      *[_type == "contactPage" && _id == "contactPage"][0]{ heading, intro }
+      *[_type == "contactPage" && _id == "contactPage"][0]{ "mastheadImageUrl": mastheadImage.asset->url, heading, intro }
     `);
   },
   ['contact-page'],
@@ -596,6 +604,7 @@ export async function getContactPage(): Promise<ContactPageContent | null> {
 
 /** MediaPageContent + gallery items (CMS-ification Wave 4). */
 export type MediaPageContent = {
+  mastheadImageUrl?: string;
   heading?: string;
   intro?: string;
   note?: string;
@@ -612,7 +621,7 @@ export type MediaItem = {
 const fetchMediaPage = unstable_cache(
   async (): Promise<{ page: MediaPageContent | null; items: MediaItem[] }> => {
     return await client.fetch(`{
-      "page": *[_type == "mediaPage" && _id == "mediaPage"][0]{ heading, intro, note },
+      "page": *[_type == "mediaPage" && _id == "mediaPage"][0]{ "mastheadImageUrl": mastheadImage.asset->url, heading, intro, note },
       "items": *[_type == "mediaItem"] | order(order asc) { _id, image, caption, alt, category }
     }`);
   },

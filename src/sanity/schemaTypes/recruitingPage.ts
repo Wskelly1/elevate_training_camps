@@ -37,6 +37,14 @@ export default defineType({
     { name: 'closing', title: 'Closing' },
   ],
   fields: [
+    defineField({
+      name: 'mastheadImage',
+      title: 'Masthead Image',
+      type: 'image',
+      description:
+        'The full-bleed photograph behind the page title (Cinematic Lodge masthead). Landscape orientation works best; the title sits over the lower third.',
+      options: { hotspot: true },
+    }),
     defineField({ name: 'eyebrow', title: 'Masthead Eyebrow', type: 'string', group: 'masthead' }),
     defineField({ name: 'heading', title: 'Masthead Heading', type: 'string', group: 'masthead', validation: (Rule) => Rule.required() }),
     defineField({ name: 'intro', title: 'Masthead Intro', type: 'text', rows: 4, group: 'masthead' }),
