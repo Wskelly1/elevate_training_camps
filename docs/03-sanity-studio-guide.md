@@ -46,6 +46,19 @@ Three rules the structure follows:
    under the last divider clearly labelled, so content never disappears
    silently — you can always see it still exists.
 
+> **What the Registration group feeds (since 2026-07-30, CMS-ification
+> Wave 1):** the **Page Copy** singleton and **Team Blocks (pricing)** are
+> live — editing them changes `/registration` (after the ~5-minute cache).
+> Prices live ONLY on Team Blocks and must match
+> `business-plan/PRICING.md`; a price edit is a business decision — change
+> PRICING.md and its CHANGELOG first, then the Team Block, then run
+> `npm run check:pricing`. The three items marked **legacy — not
+> rendered** under the same group (`trainingPackage`, `upcomingCamp`,
+> `whatsIncluded`) feed nothing, as does the entire **Coaching Page**
+> group (`/coaching` became `/recruiting`, O-16; its documents were
+> deleted 2026-07-30). Legacy types are removed in CMS-ification Wave 5 —
+> don't author content into them.
+
 ### Ordering
 
 Lists that the site renders in sequence are sorted in the Studio by their
@@ -67,26 +80,21 @@ true singleton is wanted later it needs a small content migration first.
 
 ## What still needs filling in
 
-As of 2026-07-28 these types are **empty**, so the site falls back to
-placeholder content that was written as scaffolding — including invented
-prices and testimonial names. Filling these replaces the placeholders
-automatically:
+**Updated 2026-07-30.** The table that used to sit here directed editors to
+fill Training Packages, Upcoming Camps, What's Included and Why Choose Us.
+That advice is retired: the fabricated fallbacks it was trying to displace
+were removed when `/registration` was rebuilt copy-in-code, and none of those
+four types is read by any page anymore (see the callout in the structure
+section above). Authoring into them changes nothing on the site.
 
-| Needs content | Feeds | Currently showing |
-|---|---|---|
-| **Training Packages** | Registration pricing tiers | Invented tiers at $1,200 / $1,800 / $2,800 |
-| **Upcoming Camps** | Registration camp dates | Invented 2025 dates |
-| **What's Included** | Registration "what you get" | Generic placeholder list |
-| **Why Choose Us** | Coaching benefit tiles | Generic placeholder benefits |
+What *does* still take content today: **Site Settings**, **Home Page** media,
+**About sections**, **Team Members**, **FAQs**, and **Media** assets. The
+next real content task is the Phase 1.5 schema reshape (a `teamBlock` type
+the Registration page can actually read), tracked in `01-roadmap.md` §5.5.
 
-> **Worth doing soon.** The placeholder pricing and the invented
-> testimonial names (Sarah Johnson, Mike Chen, Emma Rodriguez) are visible
-> to real visitors right now. Publishing real content is the fix; there is
-> no code change needed.
-
-Types that already have real content: Site Settings, Home Page, About
-sections (3), Team Members (2), FAQs (3), Coaching Programs (2), Coaching
-Testimonials (1).
+Types with real content: Site Settings, Home Page, About sections (3), Team
+Members (2), FAQs (3) — plus 2 Coaching Programs and 1 Coaching Testimonial
+that belong to the cut product and are queued for removal in the reshape.
 
 ---
 

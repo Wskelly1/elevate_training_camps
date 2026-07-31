@@ -192,9 +192,10 @@ config was present but dead (v4 uses the CSS pipeline and there was no
 - **`:root`** defines those variables — the actual palette.
 
 For most of this project's life the `@theme` block existed and `:root` did
-**not**, so every token resolved to nothing. That is the root cause of the ~276
-hardcoded hex values still being migrated in Phase 2. `:root` is now the source
-of truth; don't add new literals.
+**not**, so every token resolved to nothing. That is the root cause of the
+roughly three hundred hardcoded hex values still being migrated in Phase 2
+(293 at the 2026-07-30 count — re-count rather than trust this number).
+`:root` is now the source of truth; don't add new literals.
 
 A regression pattern worth remembering: filling in `--background` *broke* an
 outline button that had only looked correct because the token was undefined
@@ -214,11 +215,11 @@ heading produces a synthesised faux bold that smears the strokes.
 src/app/
   page.tsx              /              homepage — ambient hero + editorial sections
   about/                /about         team carousel + CMS sections
-  coaching/             /coaching      ⚠ sells a cut product — see 01-roadmap.md O-16
-  registration/         /registration  packages, camps, what's included
+  recruiting/           /recruiting    recruiting advisory, copy-in-code (replaced /coaching, O-16)
+  registration/         /registration  team-block pricing — CMS-driven (registrationPage + teamBlock, Wave 1)
   faq/                  /faq
   contact/              /contact       ContactForm island
-  media/                /media         ⚠ placeholder text, publicly visible
+  media/                /media         honest coming-soon placeholder (real gallery = Phase 3)
   style-guide/          /style-guide   live token/type reference, noindexed
   studio/[[...tool]]/   /studio        Sanity Studio SPA
   icon.tsx              /icon          generated favicon (edge runtime)
@@ -227,6 +228,9 @@ src/app/
   api/favicon/          GET            Sanity-derived favicon
   api/manifest/         GET            PWA manifest from siteSettings
 ```
+
+`/coaching` no longer exists as a route — `next.config.ts` 308-redirects it to
+`/recruiting` (O-16 repurpose, PRs #15/#17).
 
 ## Forms and integrations
 

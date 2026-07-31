@@ -634,10 +634,9 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
               <div>
                 <h3 className="mb-4 text-lg" style={{ color: '#000000' }}>Contact Us</h3>
                 <address className="space-y-2 text-sm not-italic" style={{ color: customColors.primary }}>
-                  <p>830 N Turquoise Dr</p>
-                  <p>Flagstaff, AZ 86001</p>
+                  <p>Flagstaff, AZ</p>
                   <p>Phone: 651-207-4749</p>
-                  <p>Email: elevatetrainingcamps@gmail.com</p>
+                  <p>Email: support@elevatetrainingcamps.com</p>
                 </address>
               </div>
               <div className="relative">
@@ -686,21 +685,13 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
               </div>
             </div>
           </div>
+          {/* Legal links (Privacy / Terms / Refunds) return here once the
+              Phase 4 legal pages exist — dead "#" links misrepresent
+              policies we haven't published yet. */}
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#e6dfd3] pt-8 text-center md:flex-row">
             <p className="text-sm" style={{ color: customColors.primary }}>
-              © 2025 Elevate Training Camps. All rights reserved.
+              © 2026 Elevate Training Camps. All rights reserved.
             </p>
-            <nav className="flex gap-4 text-sm">
-              <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
-                Privacy Policy
-              </a>
-              <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
-                Terms of Service
-              </a>
-              <a href="#" className="transition-colors hover:text-[#583e2e] hover:underline" style={{ color: customColors.primary }}>
-                Cookie Settings
-              </a>
-            </nav>
           </div>
         </div>
       </footer>

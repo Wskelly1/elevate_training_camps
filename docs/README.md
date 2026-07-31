@@ -21,6 +21,7 @@ document that owns it rather than scattered across the tree.
 | **07** | [`07-security-log.md`](07-security-log.md) | Dated sweep entries. Append-only. |
 | **08** | [`08-contributing.md`](08-contributing.md) | Code and commit conventions actually used in this repo. |
 | **09** | [`09-architecture.md`](09-architecture.md) | How the app works end to end — rendering model, the caching rules that keep Sanity inside its free tier, integrations, and the known debt. |
+| **10** | [`10-sanity-content-plan.md`](10-sanity-content-plan.md) | The coordination contract for Sanity: surface ownership, pending content fixes, branch sequencing, single-writer rules, the Phase 1.5 reshape, and CMS write-safety. |
 
 ## Where content lives
 

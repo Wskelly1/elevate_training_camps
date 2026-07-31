@@ -6,8 +6,8 @@ high-altitude training camp business based in Flagstaff, Arizona.
 ## Stack
 
 - **Next.js 15** (App Router) + **React 19** + **TypeScript**
-- **Tailwind CSS 4** for styling, with Radix UI primitives and Framer Motion for animation
-- **Sanity CMS** (embedded Studio at `/studio`) for all editable content — camps, coaching programs, team members, FAQs, site settings, etc.
+- **Tailwind CSS 4** for styling, with Radix UI primitives (`framer-motion` is no longer installed — see `docs/01-roadmap.md` §6)
+- **Sanity CMS** (embedded Studio at `/studio`) for editable content — team members, FAQs, about sections, site settings, media. Several marketing pages (`/`, `/recruiting`, `/registration`) are deliberately copy-in-code until the Phase 1.5 schema reshape; legacy coaching-program types remain in the schema but render nothing
 - **Mux** (via `sanity-plugin-mux-input`) for homepage video hosting
 - **Gmail/Google Workspace SMTP** (via `nodemailer`) for contact form / newsletter email — see [`docs/04-email-setup.md`](docs/04-email-setup.md)
 - **HubSpot** for contact form / newsletter lead capture (CRM)

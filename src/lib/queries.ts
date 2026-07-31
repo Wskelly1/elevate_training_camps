@@ -473,3 +473,103 @@ export async function getFAQPageSettings(): Promise<FAQPageSettings> {
     return {};
   }
 }
+
+/**
+ * TeamBlock - the team-sold product: a base fee plus a per-athlete rate.
+ * Prices live ONLY on these documents (docs/10-sanity-content-plan.md §5)
+ * and must match business-plan/PRICING.md — `npm run check:pricing` verifies.
+ */
+export type TeamBlock = {
+  _id: string;
+  name: string;
+  tagline?: string;
+  baseFee: number;
+  perAthleteRate: number;
+  exampleLine?: string;
+  detail?: string;
+  seasonLabel?: string;
+};
+
+export type RegistrationPageContent = {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  pricingEyebrow?: string;
+  pricingHeading?: string;
+  blocks?: TeamBlock[];
+  pricingFootnote?: string;
+  includedEyebrow?: string;
+  includedHeading?: string;
+  includedIntro?: string;
+  includedItems?: Array<{ title?: string; body?: string }>;
+  notIncludedTitle?: string;
+  notIncludedItems?: string[];
+  bookingEyebrow?: string;
+  bookingHeading?: string;
+  bookingSteps?: Array<{ title?: string; body?: string }>;
+  finePrintEyebrow?: string;
+  finePrintCards?: Array<{ title?: string; body?: string }>;
+  closingHeading?: string;
+  closingBody?: string;
+  closingCtaLabel?: string;
+};
+
+const fetchRegistrationPage = unstable_cache(
+  async (): Promise<RegistrationPageContent | null> => {
+    return await client.fetch(`
+      *[_type == "registrationPage" && _id == "registrationPage"][0]{
+        eyebrow,
+        heading,
+        intro,
+        pricingEyebrow,
+        pricingHeading,
+        "blocks": blocks[]->{
+          _id,
+          name,
+          tagline,
+          baseFee,
+          perAthleteRate,
+          exampleLine,
+          detail,
+          seasonLabel
+        },
+        pricingFootnote,
+        includedEyebrow,
+        includedHeading,
+        includedIntro,
+        includedItems[]{ title, body },
+        notIncludedTitle,
+        notIncludedItems,
+        bookingEyebrow,
+        bookingHeading,
+        bookingSteps[]{ title, body },
+        finePrintEyebrow,
+        finePrintCards[]{ title, body },
+        closingHeading,
+        closingBody,
+        closingCtaLabel
+      }
+    `);
+  },
+  ['registration-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/**
+ * Fetches the Registration page copy + referenced team blocks.
+ *
+ * Returns null on failure or when the singleton doesn't exist. The page
+ * renders a neutral empty state in that case — deliberately NOT a
+ * copy-carrying fallback (docs/10-sanity-content-plan.md §5 rule 2: a
+ * divergent hard-coded fallback is how fabricated pricing went live once).
+ *
+ * @returns {Promise<RegistrationPageContent | null>} Page content or null
+ */
+export async function getRegistrationPage(): Promise<RegistrationPageContent | null> {
+  try {
+    return await fetchRegistrationPage();
+  } catch (error) {
+    console.error('Error fetching registration page:', error);
+    return null;
+  }
+}

@@ -79,7 +79,8 @@ keyboard-accessible controls, and no autoplay with sound.
 
 ## Known content limitation
 
-The current hero clip is **~4 seconds, shot 1080×1920 portrait**. It crops hard
+The current hero clip is **~3–4 seconds (the design review's player readout
+showed 0:03), shot 1080×1920 portrait**. It crops hard
 to fill a landscape hero and loops too fast to read as cinematic. A hero wants
 15–30 seconds of landscape footage — the Under Canvas reference uses 35. This
 is a footage problem, not a code problem.

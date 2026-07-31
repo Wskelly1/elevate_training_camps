@@ -1,581 +1,240 @@
-import Layout from "../../components/layout";
 import Link from "next/link";
-import { Calendar, Clock, MapPin, Users, CheckCircle, CreditCard, Zap, Award, Target, Heart, type LucideIcon } from "lucide-react";
-import { Button } from "../../components/ui/button";
-import { getTrainingPackages, getUpcomingCamps, getPaymentOptions, getWhatsIncluded } from "../../lib/queries";
+import type { Metadata } from "next";
+import Layout from "../../components/layout";
+import { getRegistrationPage } from "../../lib/queries";
 
 /**
- * RegistrationPage - Comprehensive registration and pricing page for Elevate Training Camps
+ * Registration & Pricing — CMS-driven (Wave 1 of the full CMS-ification,
+ * docs/10-sanity-content-plan.md §5).
  *
- * This component displays detailed registration information, pricing tiers, and upcoming
- * camp details. It provides users with complete information about costs, discounts,
- * payment options, and what to expect during the registration process.
+ * Copy lives in the `registrationPage` singleton; prices live ONLY on the
+ * referenced `teamBlock` documents, which must match
+ * ../business-plan/PRICING.md (verified by `npm run check:pricing`).
+ * The documents were seeded 2026-07-30 with the guardrail-compliant copy
+ * that previously lived in this file.
  *
- * Features:
- * - Detailed pricing tiers with feature comparisons
- * - Early bird discounts and special offers
- * - Registration timeline and important dates
- * - Payment options and policies
- * - What's included in each package
- * - Call-to-action for registration
+ * If the CMS returns nothing, this page renders a NEUTRAL empty state —
+ * deliberately not a copy-carrying fallback. A divergent hard-coded
+ * fallback is exactly how fabricated pricing went live once (the
+ * $1,200/$1,800/$2,800 incident); do not reintroduce one.
  *
- * @returns {JSX.Element} The comprehensive registration and pricing page
+ * Guardrails carried by the content (business-plan/WEBSITE-SYNC.md):
+ * programming only, no lodging/supervision promises, sold to teams via
+ * their trip leader, no ranges, no invented dates/scarcity/discounts, the
+ * cancellation posture stated at the point of sale.
  */
 
-// Icon mapping function
-const getIcon = (iconName: string) => {
-  const iconMap: Record<string, LucideIcon> = {
-    award: Award,
-    mappin: MapPin,
-    zap: Zap,
-    users: Users,
-    target: Target,
-    clock: Clock,
-    heart: Heart
-  };
-  return iconMap[iconName] || Award;
+export const metadata: Metadata = {
+  title: "Registration & Pricing | Elevate Training Camps",
+  description:
+    "Team altitude training blocks in Flagstaff, Arizona — a 3-week flagship block and a 1-week camp, priced as a team. Programming only; transparent pricing for coaches and parent organisers.",
 };
 
-// Fallback data if Sanity is empty
-const fallbackPackages = [
-  {
-    _id: "fallback-package-1",
-    name: "Basic Camp",
-    description: "Perfect for athletes new to high-altitude training",
-    price: 1200,
-    originalPrice: 1400,
-    duration: "3 days",
-    features: [
-      "High-altitude training sessions",
-      "Basic performance testing",
-      "Group coaching sessions",
-      "Accommodation (shared rooms)",
-      "All meals included",
-      "Training gear rental",
-      "Welcome package"
-    ],
-    popular: false,
-    order: 0,
-    active: true
-  },
-  {
-    _id: "fallback-package-2",
-    name: "Premium Camp",
-    description: "Our most popular option with comprehensive training",
-    price: 1800,
-    originalPrice: 2200,
-    duration: "5 days",
-    features: [
-      "Everything in Basic Camp",
-      "Individual coaching sessions",
-      "Advanced performance testing",
-      "Nutrition consultation",
-      "Recovery and massage therapy",
-      "Private accommodation",
-      "Personalized training plan",
-      "Follow-up coaching (1 month)",
-      "Exclusive training gear"
-    ],
-    popular: true,
-    order: 1,
-    active: true
-  },
-  {
-    _id: "fallback-package-3",
-    name: "Elite Camp",
-    description: "Intensive training for serious athletes",
-    price: 2800,
-    originalPrice: 3200,
-    duration: "7 days",
-    features: [
-      "Everything in Premium Camp",
-      "Daily individual coaching",
-      "Comprehensive performance analysis",
-      "Mental performance coaching",
-      "Sports psychology sessions",
-      "Luxury accommodation",
-      "Personal chef consultation",
-      "Follow-up coaching (3 months)",
-      "Competition preparation",
-      "Priority booking for future camps"
-    ],
-    popular: false,
-    order: 2,
-    active: true
-  }
-];
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  if (!children) return null;
+  return <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">{children}</p>;
+}
 
-const fallbackWhatsIncluded = [
-  {
-    _id: "fallback-included-1",
-    category: "Training & Coaching",
-    items: [
-      "High-altitude training sessions",
-      "Individual and group coaching",
-      "Performance testing and analysis",
-      "Personalized training plans",
-      "Mental performance coaching"
-    ],
-    icon: "award",
-    order: 0,
-    active: true
-  },
-  {
-    _id: "fallback-included-2",
-    category: "Accommodation & Meals",
-    items: [
-      "Comfortable lodging in Flagstaff",
-      "All meals and snacks included",
-      "Nutrition consultation",
-      "Recovery facilities access"
-    ],
-    icon: "mappin",
-    order: 1,
-    active: true
-  },
-  {
-    _id: "fallback-included-3",
-    category: "Equipment & Gear",
-    items: [
-      "Training equipment rental",
-      "Performance tracking devices",
-      "Exclusive Elevate gear",
-      "Welcome package with essentials"
-    ],
-    icon: "zap",
-    order: 2,
-    active: true
-  },
-  {
-    _id: "fallback-included-4",
-    category: "Support & Follow-up",
-    items: [
-      "24/7 support during camp",
-      "Follow-up coaching sessions",
-      "Progress tracking",
-      "Community access"
-    ],
-    icon: "users",
-    order: 3,
-    active: true
-  }
-];
-
-const fallbackCamps = [
-  {
-    _id: "fallback-camp-1",
-    date: "March 15-19, 2025",
-    type: "Premium Camp",
-    spots: "8 spots remaining",
-    location: "Flagstaff, AZ",
-    earlyBird: true,
-    earlyBirdEnds: "February 15, 2025",
-    order: 0,
-    active: true
-  },
-  {
-    _id: "fallback-camp-2",
-    date: "April 12-16, 2025",
-    type: "Basic Camp",
-    spots: "12 spots remaining",
-    location: "Flagstaff, AZ",
-    earlyBird: true,
-    earlyBirdEnds: "March 12, 2025",
-    order: 1,
-    active: true
-  },
-  {
-    _id: "fallback-camp-3",
-    date: "May 10-16, 2025",
-    type: "Elite Camp",
-    spots: "4 spots remaining",
-    location: "Flagstaff, AZ",
-    earlyBird: false,
-    earlyBirdEnds: null,
-    order: 2,
-    active: true
-  }
-];
-
-const fallbackPaymentOptions = [
-  {
-    _id: "fallback-1",
-    name: "Full Payment",
-    description: "Pay in full and receive an additional 5% discount on your total cost.",
-    discount: "Save 5%",
-    order: 0,
-    active: true
-  },
-  {
-    _id: "fallback-2",
-    name: "2-Payment Plan",
-    description: "Split your payment into two equal installments with no additional fees.",
-    discount: "50% + 50%",
-    order: 1,
-    active: true
-  },
-  {
-    _id: "fallback-3",
-    name: "Monthly Plan",
-    description: "Spread your payments over 3-6 months with a small processing fee.",
-    discount: "3-6 months",
-    order: 2,
-    active: true
-  }
-];
+function formatUsd(n: number | undefined): string {
+  return typeof n === "number" ? `$${n.toLocaleString("en-US")}` : "—";
+}
 
 export default async function RegistrationPage() {
-  const [trainingPackages, upcomingCampsData, paymentOptions, whatsIncluded] = await Promise.all([
-    getTrainingPackages(),
-    getUpcomingCamps(),
-    getPaymentOptions(),
-    getWhatsIncluded(),
-  ]);
+  const content = await getRegistrationPage();
 
-  // Use Sanity data if available, otherwise use fallback
-  const displayPackages = trainingPackages.length > 0 ? trainingPackages : fallbackPackages;
-  const displayCamps = upcomingCampsData.length > 0 ? upcomingCampsData : fallbackCamps;
-  const displayPaymentOptions = paymentOptions.length > 0 ? paymentOptions : fallbackPaymentOptions;
-  const displayWhatsIncluded = whatsIncluded.length > 0 ? whatsIncluded : fallbackWhatsIncluded;
+  if (!content) {
+    return (
+      <Layout>
+        <section className="py-32">
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <h1 className="text-4xl md:text-5xl">Registration</h1>
+            <p className="mx-auto mt-6 max-w-xl text-[17px] leading-[1.75] text-[#4a4a4a]">
+              Pricing and registration details are being updated. Get in touch
+              and we&apos;ll walk you through bringing your team to Flagstaff.
+            </p>
+            <Link
+              href="/contact"
+              className="mt-9 inline-block rounded-md bg-[var(--primary)] px-8 py-4 text-base text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
+            >
+              Contact us
+            </Link>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
+
+  const blocks = content.blocks ?? [];
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-[#fbf9f3] to-[#fff9eb]">
-        {/* Hero Section */}
-        <section className="relative py-20 md:py-32 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#427b4d]/10 to-[#755f4f]/10"></div>
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="mb-8">
-              <Calendar className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-              <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
-                Registration & Pricing
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Secure your spot for an unforgettable high-altitude training experience.
-                Choose from our comprehensive camp packages designed for every athlete.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                asChild
-                size="lg"
-                className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
-              >
-                <a href="#packages">Register Now</a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
-              >
-                <Link href="/contact">Download Brochure</Link>
-              </Button>
-            </div>
+      {/* ——— Masthead ————————————————————————————————————— */}
+      <section className="pt-20 pb-16 md:pt-28 md:pb-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <Eyebrow>{content.eyebrow}</Eyebrow>
+          <h1 className="mt-5 max-w-3xl text-5xl leading-[1.05] md:text-7xl">
+            {content.heading}
+          </h1>
+          {content.intro && (
+            <p className="mt-7 max-w-2xl text-lg leading-[1.75] text-[#4a4a4a]">{content.intro}</p>
+          )}
+          <div className="mt-9 flex flex-wrap gap-4">
+            <Link
+              href="/contact"
+              className="rounded-md bg-[var(--primary)] px-7 py-3.5 text-base text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
+            >
+              {content.closingCtaLabel || "Contact us"}
+            </Link>
+            <Link
+              href="/recruiting"
+              className="rounded-md border border-[var(--border)] px-7 py-3.5 text-base text-[var(--foreground)] transition hover:bg-[var(--surface)]"
+            >
+              The recruiting advisory
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Pricing Section */}
-        <section id="packages" className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                Choose Your Training Package
+      {/* ——— 01 · The team blocks ————————————————————————— */}
+      {blocks.length > 0 && (
+        <section className="border-t border-[var(--border)] bg-[var(--surface)] py-20">
+          <div className="mx-auto max-w-6xl px-6">
+            <Eyebrow>{content.pricingEyebrow}</Eyebrow>
+            {content.pricingHeading && (
+              <h2 className="mt-5 max-w-2xl text-[2.25rem] leading-[1.1] md:text-[2.75rem]">
+                {content.pricingHeading}
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                All packages include accommodation, meals, and comprehensive training.
-                Early bird discounts available for limited time!
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-8">
-              {displayPackages.map((tier, index) => (
-                <div
-                  key={tier._id || index}
-                  className={`relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                    tier.popular ? 'ring-2 ring-[#427b4d] scale-105' : 'border border-gray-200'
-                  }`}
-                >
-                  {tier.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-[#427b4d] text-white px-6 py-2 rounded-full text-sm">
-                        Most Popular
-                      </span>
+            )}
+            <div className="mt-12 grid gap-10 md:grid-cols-2">
+              {blocks.map((b) => (
+                <div key={b._id} className="border-t-2 border-[var(--primary)] bg-[var(--background)] p-8">
+                  <h3 className="text-[1.75rem] leading-snug">{b.name}</h3>
+                  {b.tagline && <p className="mt-2 text-[15px] text-[var(--accent-trail)]">{b.tagline}</p>}
+                  <div className="mt-7 flex items-baseline gap-6">
+                    <div>
+                      <div className="text-4xl leading-none">{formatUsd(b.baseFee)}</div>
+                      <div className="mt-2 text-sm text-[var(--muted-foreground)]">team base fee</div>
                     </div>
+                    <div className="text-2xl text-[var(--muted-foreground)]">+</div>
+                    <div>
+                      <div className="text-4xl leading-none">{formatUsd(b.perAthleteRate)}</div>
+                      <div className="mt-2 text-sm text-[var(--muted-foreground)]">per athlete</div>
+                    </div>
+                  </div>
+                  {b.exampleLine && (
+                    <p className="mt-5 text-[15px] leading-[1.7] text-[var(--accent-trail)]">{b.exampleLine}</p>
                   )}
-
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl text-gray-900 mb-2">{tier.name}</h3>
-                    <p className="text-gray-600 mb-6">{tier.description}</p>
-
-                    <div className="mb-4">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="text-4xl text-gray-900">${tier.price}</span>
-                        {tier.originalPrice && (
-                          <span className="text-lg text-gray-500 line-through">${tier.originalPrice}</span>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{tier.duration}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <ul className="space-y-4 mb-8">
-                    {tier.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-start">
-                        <CheckCircle className="h-5 w-5 text-[#427b4d] mr-3 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Button
-                    asChild
-                    className={`w-full py-4 text-lg ${
-                      tier.popular
-                        ? 'bg-[#427b4d] hover:bg-[#387143] text-white'
-                        : 'bg-gray-900 hover:bg-gray-800 text-white'
-                    }`}
-                  >
-                    <Link href="/contact">Choose {tier.name}</Link>
-                  </Button>
+                  {b.detail && <p className="mt-5 text-[16px] leading-[1.7] text-[#4a4a4a]">{b.detail}</p>}
                 </div>
               ))}
             </div>
-
-
+            {content.pricingFootnote && (
+              <p className="mt-10 max-w-2xl text-[15px] leading-[1.7] text-[var(--muted-foreground)]">
+                {content.pricingFootnote}
+              </p>
+            )}
           </div>
         </section>
+      )}
 
-        {/* Upcoming Camps */}
-        <section className="py-20 bg-[#fff9eb]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                Upcoming Training Camps
+      {/* ——— 02 · What's included / what isn't ———————————————— */}
+      {(content.includedItems?.length || content.includedHeading) && (
+        <section className="py-20 md:py-28">
+          <div className="mx-auto max-w-6xl px-6">
+            <Eyebrow>{content.includedEyebrow}</Eyebrow>
+            {content.includedHeading && (
+              <h2 className="mt-5 max-w-2xl text-[2.25rem] leading-[1.1] md:text-[2.75rem]">
+                {content.includedHeading}
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Book your spot for our upcoming high-altitude training camps in Flagstaff, Arizona.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {displayCamps.map((camp, index) => (
-                <div key={camp._id || index} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs uppercase tracking-[0.14em] ${
-                      camp.earlyBird ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {camp.earlyBird ? 'Early Bird Available' : 'Regular Pricing'}
-                    </span>
-                    <span className="text-sm text-gray-600">{camp.spots}</span>
+            )}
+            {content.includedIntro && (
+              <p className="mt-6 max-w-2xl text-[17px] leading-[1.75] text-[#4a4a4a]">{content.includedIntro}</p>
+            )}
+            {content.includedItems && content.includedItems.length > 0 && (
+              <div className="mt-12 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+                {content.includedItems.map((i) => (
+                  <div key={i.title} className="border-t border-[var(--border)] pt-5">
+                    <h3 className="text-[1.3rem] leading-snug">{i.title}</h3>
+                    {i.body && <p className="mt-3 text-[15px] leading-[1.7] text-[#4a4a4a]">{i.body}</p>}
                   </div>
+                ))}
+              </div>
+            )}
+            {content.notIncludedItems && content.notIncludedItems.length > 0 && (
+              <div className="mt-14 max-w-2xl border-l-2 border-[var(--accent-rock)] pl-6">
+                {content.notIncludedTitle && <h3 className="text-[1.3rem]">{content.notIncludedTitle}</h3>}
+                <ul className="mt-4 space-y-2">
+                  {content.notIncludedItems.map((n) => (
+                    <li key={n} className="text-[15px] leading-[1.7] text-[#4a4a4a]">
+                      {n}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
-                  <h3 className="text-xl text-gray-900 mb-2">{camp.type}</h3>
-                  <div className="space-y-2 mb-6">
-                    <div className="flex items-center text-gray-600">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span>{camp.date}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{camp.location}</span>
-                    </div>
-                    {camp.earlyBird && camp.earlyBirdEnds && (
-                      <div className="flex items-center text-green-600">
-                        <Clock className="h-4 w-4 mr-2" />
-                        <span className="text-sm">Early bird ends {camp.earlyBirdEnds}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <Button asChild className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
-                    <Link href="/contact">Register for This Camp</Link>
-                  </Button>
+      {/* ——— 03 · How booking works ————————————————————————— */}
+      {content.bookingSteps && content.bookingSteps.length > 0 && (
+        <section className="bg-[var(--primary-deep)] py-20 text-[#f0ead6]">
+          <div className="mx-auto max-w-6xl px-6">
+            {content.bookingEyebrow && (
+              <p className="text-xs uppercase tracking-[0.22em] text-[#f0ead6]/70">{content.bookingEyebrow}</p>
+            )}
+            {content.bookingHeading && (
+              <h2 className="mt-5 max-w-2xl text-[2.25rem] leading-[1.1] md:text-[2.75rem]">
+                {content.bookingHeading}
+              </h2>
+            )}
+            <div className="mt-12 grid gap-12 sm:grid-cols-3">
+              {content.bookingSteps.map((s, idx) => (
+                <div key={s.title} className="border-t border-[#f0ead6]/25 pt-6">
+                  <div className="text-sm tracking-[0.2em] text-[#f0ead6]/60">{String(idx + 1).padStart(2, "0")}</div>
+                  <h3 className="mt-3 text-[1.4rem] leading-snug">{s.title}</h3>
+                  {s.body && <p className="mt-3 text-[15px] leading-[1.7] text-[#f0ead6]/80">{s.body}</p>}
                 </div>
               ))}
             </div>
           </div>
         </section>
+      )}
 
-        {/* What's Included */}
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                What&apos;s Included
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Every training camp package includes comprehensive services and amenities
-                to ensure you get the most out of your high-altitude training experience.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {displayWhatsIncluded.map((category, index) => {
-                const IconComponent = getIcon(category.icon);
-                return (
-                  <div key={category._id || index} className="text-center">
-                    <div className="bg-[#fff9eb] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <IconComponent className="h-8 w-8 text-[#427b4d]" />
-                    </div>
-                    <h3 className="text-xl text-gray-900 mb-4">{category.category}</h3>
-                    <ul className="space-y-2 text-left">
-                      {category.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-start text-gray-600">
-                          <CheckCircle className="h-4 w-4 text-[#427b4d] mr-2 flex-shrink-0 mt-0.5" />
-                          <span className="text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Team & Group Pricing */}
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <Users className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                Team & Group Pricing
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Special pricing for teams and groups. The more athletes you bring, the more you save!
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-12">
-              {/* Team/Group Pricing */}
-              <div className="bg-[#fff9eb] rounded-2xl p-8">
-                <h3 className="text-3xl text-gray-900 mb-6">Team / Group Pricing</h3>
-                <div className="space-y-6">
-                  <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">10 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,350 per person</p>
-                    <p className="text-gray-600 mb-3">4-week program with Airbnb-style housing</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Housing included</li>
-                      <li>• Van rental</li>
-                      <li>• Groceries</li>
-                      <li>• Training support</li>
-                    </ul>
-                  </div>
-
-                  <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">12-14 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,200 - $1,250 per person</p>
-                    <p className="text-gray-600 mb-3">Best value - shared housing and van rental costs</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Shared housing</li>
-                      <li>• Van rental split among group</li>
-                      <li>• Groceries</li>
-                      <li>• Training support</li>
-                    </ul>
-                  </div>
-
-                  <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">6-8 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,500 - $1,600 per person</p>
-                    <p className="text-gray-600 mb-3">Smaller groups - higher per-person costs</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Housing included</li>
-                      <li>• Van rental</li>
-                      <li>• Groceries</li>
-                      <li>• Training support</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hostel-Style Option */}
-              <div className="bg-[#fff9eb] rounded-2xl p-8">
-                <h3 className="text-3xl text-gray-900 mb-6">Hostel-Style Option</h3>
-                <div className="space-y-6">
-                  <div className="border-l-4 border-[#755f4f] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">Solo Athletes & Pairs</h4>
-                    <p className="text-lg text-[#755f4f] mb-2">$1,400 - $1,500 per person</p>
-                    <p className="text-gray-600 mb-3">4-week program with shared housing</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Shared housing with other athletes</li>
-                      <li>• Paired with athletes from other schools/teams</li>
-                      <li>• Transport included</li>
-                      <li>• Groceries included</li>
-                      <li>• Training support</li>
-        </ul>
-                  </div>
-
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h5 className=" text-yellow-800 mb-2">Important Note:</h5>
-                    <p className="text-sm text-yellow-700">
-                      Meals out, personal spending, and travel to Flagstaff are <strong>not included</strong> in these prices.
-                    </p>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h5 className=" text-blue-800 mb-2">Final Pricing:</h5>
-                    <p className="text-sm text-blue-700">
-                      Final cost depends on total headcount for the session.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Payment Options */}
-        <section className="py-20 bg-[#fff9eb]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <CreditCard className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-            <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-              Flexible Payment Options
-            </h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              We offer flexible payment plans to make high-altitude training accessible to every athlete.
-            </p>
-
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              {displayPaymentOptions.map((option, index) => (
-                <div key={option._id || index} className="bg-white p-6 rounded-xl shadow-lg">
-                  <h3 className="text-xl text-gray-900 mb-4">{option.name}</h3>
-                  <div className="text-3xl text-[#427b4d] mb-2">{option.discount}</div>
-                  <p className="text-gray-600">{option.description}</p>
+      {/* ——— 04 · The honest fine print ————————————————————— */}
+      {content.finePrintCards && content.finePrintCards.length > 0 && (
+        <section className="py-20">
+          <div className="mx-auto max-w-6xl px-6">
+            <Eyebrow>{content.finePrintEyebrow}</Eyebrow>
+            <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
+              {content.finePrintCards.map((c) => (
+                <div key={c.title} className="border-t border-[var(--border)] pt-5">
+                  <h3 className="text-[1.4rem] leading-snug">{c.title}</h3>
+                  {c.body && <p className="mt-3 text-[16px] leading-[1.7] text-[#4a4a4a]">{c.body}</p>}
                 </div>
               ))}
             </div>
-
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl text-gray-900 mb-4">Ready to Get Started?</h3>
-              <p className="text-gray-600 mb-6">
-                Contact us to discuss payment options and secure your spot in our next training camp.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
-                >
-                  <Link href="/contact">Register Now</Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
-                >
-                  <a href="tel:+16512074749">Call (651) 207-4749</a>
-                </Button>
-              </div>
-            </div>
           </div>
         </section>
-      </div>
+      )}
+
+      {/* ——— Closing CTA ————————————————————————————————— */}
+      <section className="border-t border-[var(--border)] bg-[var(--surface)] py-24">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          {content.closingHeading && (
+            <h2 className="text-[2.5rem] leading-[1.08] md:text-[3.25rem]">{content.closingHeading}</h2>
+          )}
+          {content.closingBody && (
+            <p className="mx-auto mt-6 max-w-xl text-[17px] leading-[1.75] text-[#4a4a4a]">{content.closingBody}</p>
+          )}
+          <Link
+            href="/contact"
+            className="mt-9 inline-block rounded-md bg-[var(--primary)] px-8 py-4 text-base text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
+          >
+            {content.closingCtaLabel || "Contact us"}
+          </Link>
+        </div>
+      </section>
     </Layout>
   );
 }

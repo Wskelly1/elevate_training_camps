@@ -54,13 +54,13 @@ export default function AboutPageContent({ teamIntroductions, aboutSections }: A
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Discover the story behind our commitment to excellence in high-altitude training.
-              We&apos;re dedicated to helping athletes reach their peak performance through innovative
-              training methods and world-class facilities in the heart of Flagstaff, Arizona.
+              We&apos;re dedicated to helping teams get the most from a summer at altitude, on
+              Flagstaff&apos;s trail network in the heart of northern Arizona.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-              <p className="text-lg text-gray-900">Established 2020</p>
+              <p className="text-lg text-gray-900">First season: Summer 2027</p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
               <p className="text-lg text-gray-900">Flagstaff, Arizona</p>

@@ -161,7 +161,7 @@ export default function StyleGuidePage() {
             {accents.map((s) => <Swatch key={s.hex} {...s} />)}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button type="button" className="rounded-md bg-[#b67d5e] px-4 py-2 text-sm font-semibold text-white">Red Rock CTA</button>
-              <span className="rounded-full border border-[#b67d5e] bg-[#f0ead6] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#b67d5e]">Early bird</span>
+              <span className="rounded-full border border-[#b67d5e] bg-[#f0ead6] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#b67d5e]">Summer 2027</span>
               <span className="text-base" style={{ color: "#67563b" }}>Trail Brown body copy sits comfortably on cream.</span>
             </div>
           </div>

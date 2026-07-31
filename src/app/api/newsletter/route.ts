@@ -76,11 +76,9 @@ export async function POST(request: NextRequest) {
 
               <p>You're now part of our community and will receive:</p>
               <ul style="color: #3c6e45;">
-                <li>Latest training camp updates and schedules</li>
-                <li>Exclusive offers and early bird discounts</li>
-                <li>Training tips and techniques from our expert coaches</li>
-                <li>Success stories from our camp participants</li>
-                <li>Special events and community highlights</li>
+                <li>Training camp updates and 2027 season dates as they're set</li>
+                <li>Training tips and techniques from our coaches</li>
+                <li>News from Flagstaff and the altitude-training world</li>
               </ul>
 
               <div style="background-color: #f0ead6; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
@@ -109,11 +107,9 @@ export async function POST(request: NextRequest) {
             Thank you for subscribing to the Elevate Training Camps newsletter!
 
             You're now part of our community and will receive:
-            - Latest training camp updates and schedules
-            - Exclusive offers and early bird discounts
-            - Training tips and techniques from our expert coaches
-            - Success stories from our camp participants
-            - Special events and community highlights
+            - Training camp updates and 2027 season dates as they're set
+            - Training tips and techniques from our coaches
+            - News from Flagstaff and the altitude-training world
 
             Ready to Elevate Your Game?
             Check out our upcoming training camps and take your skills to the next level!
