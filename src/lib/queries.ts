@@ -266,148 +266,9 @@ export async function getHomePage() {
   }
 }
 
-const fetchTrainingPackages = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "trainingPackage" && active == true] | order(order asc) {
-        _id,
-        name,
-        description,
-        price,
-        originalPrice,
-        duration,
-        features,
-        popular,
-        order,
-        active
-      }
-    `);
-  },
-  ['training-packages'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches training packages from Sanity CMS
- *
- * Retrieves all active training packages ordered by their display order.
- * Each package includes pricing, features, and package details.
- *
- * @returns {Promise<Array>} Array of training package objects from Sanity, or [] on failure
- */
-export async function getTrainingPackages() {
-  try {
-    return await fetchTrainingPackages();
-  } catch (error) {
-    console.error('Error fetching training packages:', error);
-    return [];
-  }
-}
-
-const fetchUpcomingCamps = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "upcomingCamp" && active == true] | order(order asc) {
-        _id,
-        date,
-        type,
-        spots,
-        location,
-        earlyBird,
-        earlyBirdEnds,
-        order,
-        active
-      }
-    `);
-  },
-  ['upcoming-camps'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches upcoming training camps from Sanity CMS
- *
- * Retrieves all active upcoming camps ordered by their display order.
- * Each camp includes date, type, spots remaining, and early bird information.
- *
- * @returns {Promise<Array>} Array of upcoming camp objects from Sanity, or [] on failure
- */
-export async function getUpcomingCamps() {
-  try {
-    return await fetchUpcomingCamps();
-  } catch (error) {
-    console.error('Error fetching upcoming camps:', error);
-    return [];
-  }
-}
-
-const fetchPaymentOptions = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "paymentOption" && active == true] | order(order asc) {
-        _id,
-        name,
-        description,
-        discount,
-        order,
-        active
-      }
-    `);
-  },
-  ['payment-options'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches payment options from Sanity CMS
- *
- * Retrieves all active payment options ordered by their display order.
- * Each option includes name, description, and discount details.
- *
- * @returns {Promise<Array>} Array of payment option objects from Sanity, or [] on failure
- */
-export async function getPaymentOptions() {
-  try {
-    return await fetchPaymentOptions();
-  } catch (error) {
-    console.error('Error fetching payment options:', error);
-    return [];
-  }
-}
-
-const fetchWhatsIncluded = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "whatsIncluded" && active == true] | order(order asc) {
-        _id,
-        category,
-        items,
-        icon,
-        order,
-        active
-      }
-    `);
-  },
-  ['whats-included'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches what's included categories from Sanity CMS
- *
- * Retrieves all active what's included categories ordered by their display order.
- * Each category includes items and icon information.
- *
- * @returns {Promise<Array>} Array of what's included objects from Sanity, or [] on failure
- */
-export async function getWhatsIncluded() {
-  try {
-    return await fetchWhatsIncluded();
-  } catch (error) {
-    console.error("Error fetching what's included:", error);
-    return [];
-  }
-}
+// The trainingPackage/upcomingCamp/paymentOption/whatsIncluded queries were
+// removed in CMS-ification Wave 5 (docs/10-sanity-content-plan.md §5) along
+// with their schema types — /registration reads registrationPage + teamBlock.
 
 const fetchFAQs = unstable_cache(
   async () => {
@@ -708,5 +569,43 @@ export async function getContactPage(): Promise<ContactPageContent | null> {
   } catch (error) {
     console.error('Error fetching contact page:', error);
     return null;
+  }
+}
+
+/** MediaPageContent + gallery items (CMS-ification Wave 4). */
+export type MediaPageContent = {
+  heading?: string;
+  intro?: string;
+  note?: string;
+};
+
+export type MediaItem = {
+  _id: string;
+  image: SanityImageRef;
+  caption?: string;
+  alt?: string;
+};
+
+const fetchMediaPage = unstable_cache(
+  async (): Promise<{ page: MediaPageContent | null; items: MediaItem[] }> => {
+    return await client.fetch(`{
+      "page": *[_type == "mediaPage" && _id == "mediaPage"][0]{ heading, intro, note },
+      "items": *[_type == "mediaItem"] | order(order asc) { _id, image, caption, alt }
+    }`);
+  },
+  ['media-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/**
+ * Fetches the Media page copy and any published gallery items. Items stay
+ * empty until the photo-consent gate clears (01-roadmap.md Gate-4).
+ */
+export async function getMediaPage(): Promise<{ page: MediaPageContent | null; items: MediaItem[] }> {
+  try {
+    return await fetchMediaPage();
+  } catch (error) {
+    console.error('Error fetching media page:', error);
+    return { page: null, items: [] };
   }
 }

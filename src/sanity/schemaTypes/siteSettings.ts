@@ -18,16 +18,10 @@ export default defineType({
       type: 'text',
       description: 'A brief description of your site (used for SEO)'
     }),
-    defineField({
-      name: 'logo',
-      title: 'Site Logo',
-      type: 'image',
-      description: 'Upload your site logo here (recommended size: 240x80px)',
-      options: {
-        hotspot: true,
-        metadata: ['lqip', 'palette']
-      }
-    }),
+    // The inert `logo` field was removed in CMS-ification Wave 5 — the
+    // site's logo is the committed BrandLogo component + public/logo-mark.svg,
+    // so the field edited nothing (docs/09-architecture.md). footerLogo is
+    // kept for the future footer treatment.
     defineField({
       name: 'footerLogo',
       title: 'Footer Logo',

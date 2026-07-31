@@ -5,14 +5,10 @@ import {
   ClipboardIcon,
   UsersIcon,
   HelpCircleIcon,
-  CalendarIcon,
   StarIcon,
   TagIcon,
-  CheckmarkCircleIcon,
   UserIcon,
   DocumentTextIcon,
-  BulbOutlineIcon,
-  ErrorOutlineIcon,
 } from '@sanity/icons'
 
 /**
@@ -66,8 +62,7 @@ export const structure: StructureResolver = (S) =>
       // ——— Registration page ———————————————————————————————————
       // Wave 1 of the CMS-ification (docs/10-sanity-content-plan.md §5):
       // the page reads the pinned registrationPage singleton + teamBlock
-      // documents. The three legacy types below it render nowhere and are
-      // removed in Wave 5.
+      // documents (the only type allowed to carry prices).
       S.listItem()
         .title('Registration Page')
         .icon(ClipboardIcon)
@@ -92,31 +87,6 @@ export const structure: StructureResolver = (S) =>
                     .title('Team Blocks (pricing)')
                     .defaultOrdering(byOrder)
                 ),
-              S.divider(),
-              S.listItem()
-                .title('Training Packages (legacy — not rendered)')
-                .icon(TagIcon)
-                .child(
-                  S.documentTypeList('trainingPackage')
-                    .title('Training Packages (legacy — not rendered)')
-                    .defaultOrdering(byOrder)
-                ),
-              S.listItem()
-                .title('Upcoming Camps (legacy — not rendered)')
-                .icon(CalendarIcon)
-                .child(
-                  S.documentTypeList('upcomingCamp')
-                    .title('Upcoming Camps (legacy — not rendered)')
-                    .defaultOrdering(byOrder)
-                ),
-              S.listItem()
-                .title("What's Included (legacy — not rendered)")
-                .icon(CheckmarkCircleIcon)
-                .child(
-                  S.documentTypeList('whatsIncluded')
-                    .title("What's Included (legacy — not rendered)")
-                    .defaultOrdering(byOrder)
-                ),
             ])
         ),
 
@@ -131,45 +101,6 @@ export const structure: StructureResolver = (S) =>
             .schemaType('recruitingPage')
             .documentId('recruitingPage')
             .title('Recruiting Page Copy')
-        ),
-
-      // ——— Coaching page (legacy — renders nowhere) ————————————————
-      // /coaching was repurposed as /recruiting (O-16, 2026-07-29), whose
-      // copy is in code; no query reads these types anymore. The group stays
-      // visible (deprecated-not-hidden rule) until the Phase 1.5 schema
-      // reshape removes the types and their 3 remaining documents.
-      S.listItem()
-        .title('Coaching Page (legacy — not rendered)')
-        .icon(BulbOutlineIcon)
-        .child(
-          S.list()
-            .title('Coaching Page (legacy — not rendered)')
-            .items([
-              S.listItem()
-                .title('Coaching Programs')
-                .icon(TagIcon)
-                .child(
-                  S.documentTypeList('coachingProgram')
-                    .title('Coaching Programs')
-                    .defaultOrdering(byOrder)
-                ),
-              S.listItem()
-                .title('Why Choose Us (Benefits)')
-                .icon(CheckmarkCircleIcon)
-                .child(
-                  S.documentTypeList('coachingBenefit')
-                    .title('Why Choose Us (Benefits)')
-                    .defaultOrdering(byOrder)
-                ),
-              S.listItem()
-                .title('Athlete Testimonials')
-                .icon(StarIcon)
-                .child(
-                  S.documentTypeList('coachingTestimonial')
-                    .title('Athlete Testimonials')
-                    .defaultOrdering(byOrder)
-                ),
-            ])
         ),
 
       // ——— About page ——————————————————————————————————————————
@@ -245,23 +176,32 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
 
-      S.divider(),
-
-      // ——— Deprecated ——————————————————————————————————————————
-      // Surfaced rather than hidden so nothing disappears silently.
+      // ——— Media page (CMS-ification Wave 4) ————————————————————
+      // Gallery items stay unpublished until the photo-consent gate
+      // clears (01-roadmap.md Gate-4).
       S.listItem()
-        .title('Deprecated — do not use')
-        .icon(ErrorOutlineIcon)
+        .title('Media Page')
+        .icon(DocumentTextIcon)
         .child(
           S.list()
-            .title('Deprecated — do not use')
+            .title('Media Page')
             .items([
               S.listItem()
-                .title('Payment Options')
-                .icon(ErrorOutlineIcon)
+                .title('Page Copy')
+                .icon(DocumentTextIcon)
                 .child(
-                  S.documentTypeList('paymentOption')
-                    .title('Payment Options (deprecated)')
+                  S.document()
+                    .schemaType('mediaPage')
+                    .documentId('mediaPage')
+                    .title('Media Page Copy')
+                ),
+              S.listItem()
+                .title('Gallery Items')
+                .icon(DocumentTextIcon)
+                .child(
+                  S.documentTypeList('mediaItem')
+                    .title('Gallery Items')
+                    .defaultOrdering(byOrder)
                 ),
             ])
         ),
