@@ -528,9 +528,15 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
         )}
       </header>
 
-      {/* Main Content */}
+      {/* Main Content.
+          The hero pull-up must key off the transparentNav prop, not
+          pathname === '/': on Vercel the root route's function is invoked
+          with an internal pathname (usePathname() !== '/'), so a pathname
+          check that passes locally fails in production — the homepage
+          rendered with the pt-12 branch and a cream band above the hero,
+          with the nav's cream-over-video text invisible against it. */}
       <main className={`flex-grow ${
-        (pathname === '/' || pathname === '/faq' || pathname === '/about') ? '-mt-[4.5rem]' : 'pt-12'
+        (transparentNav || pathname === '/faq' || pathname === '/about') ? '-mt-[4.5rem]' : 'pt-12'
       }`}>
         {children}
       </main>
