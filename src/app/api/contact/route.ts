@@ -7,26 +7,78 @@ const hubspotClient = new Client({
   accessToken: process.env.HUBSPOT_ACCESS_TOKEN,
 });
 
+type ContactSegment = 'coach' | 'athlete' | 'partner' | 'other';
+
 interface ContactFormData {
+  segment?: ContactSegment;
   firstName: string;
   lastName: string;
   email: string;
-  subject: string;
+  // Coach / trip organiser path
+  program?: string;
+  state?: string;
+  squadSize?: string;
+  preferredWeeks?: string;
+  // Athlete & family path
+  gradYear?: string;
+  interest?: string;
+  // College / pro connect path
+  affiliation?: string;
+  connectionType?: string;
+  // Other path
+  subject?: string;
   message: string;
+}
+
+/** Subject-line tag + human label per segment, for inbox triage. */
+const SEGMENT_LABELS: Record<ContactSegment, string> = {
+  coach: 'Team enquiry',
+  athlete: 'Athlete & family',
+  partner: 'College/pro connect',
+  other: 'General',
+};
+
+/** The per-segment detail fields, as label/value pairs for the emails. */
+function segmentDetails(body: ContactFormData): Array<[string, string]> {
+  const rows: Array<[string, string | undefined]> = [];
+  switch (body.segment) {
+    case 'coach':
+      rows.push(['Program / School', body.program], ['State', body.state],
+                ['Squad size', body.squadSize], ['Preferred weeks', body.preferredWeeks]);
+      break;
+    case 'athlete':
+      rows.push(['Graduation year', body.gradYear], ['Interested in', body.interest]);
+      break;
+    case 'partner':
+      rows.push(['Affiliation', body.affiliation], ['Connection type', body.connectionType]);
+      break;
+    default:
+      rows.push(['Subject', body.subject]);
+  }
+  return rows.filter((r): r is [string, string] => Boolean(r[1] && r[1].trim()));
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: ContactFormData = await request.json();
-    const { firstName, lastName, email, subject, message } = body;
+    const { firstName, lastName, email, message } = body;
+    const segment: ContactSegment = body.segment && body.segment in SEGMENT_LABELS ? body.segment : 'other';
 
-    // Validate required fields
-    if (!firstName || !lastName || !email || !subject || !message) {
+    // Validate required fields (per-segment fields are validated client-side;
+    // identity + message gate the submission here)
+    if (!firstName || !lastName || !email || !message) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
       );
     }
+
+    const details = segmentDetails(body);
+    // Triage headline: "[Team enquiry] Desert Vista HS XC" beats a free-text subject.
+    const headline = details.length > 0 ? details[0][1] : `${firstName} ${lastName}`;
+    const subjectLine = `[${SEGMENT_LABELS[segment]}] ${headline}`;
+    const detailsHtml = details.map(([k, v]) => `<p><strong>${k}:</strong> ${v}</p>`).join('\n            ');
+    const detailsText = details.map(([k, v]) => `${k}: ${v}`).join('\n            ');
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,23 +100,23 @@ export async function POST(request: NextRequest) {
         // Send notification email to admin
         const adminMsg = {
           to: process.env.GMAIL_TO_EMAIL,
-          subject: `Contact Form: ${subject}`,
+          subject: subjectLine,
           html: `
-            <h2>New Contact Form Submission</h2>
+            <h2>New Contact Form Submission — ${SEGMENT_LABELS[segment]}</h2>
             <p><strong>Name:</strong> ${firstName} ${lastName}</p>
             <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Subject:</strong> ${subject}</p>
+            ${detailsHtml}
             <p><strong>Message:</strong></p>
             <p>${message.replace(/\n/g, '<br>')}</p>
             <hr>
             <p><em>This message was sent from the Elevate Training Camps contact form.</em></p>
           `,
           text: `
-            New Contact Form Submission
+            New Contact Form Submission — ${SEGMENT_LABELS[segment]}
 
             Name: ${firstName} ${lastName}
             Email: ${email}
-            Subject: ${subject}
+            ${detailsText}
             Message: ${message}
 
             This message was sent from the Elevate Training Camps contact form.
@@ -85,7 +137,7 @@ export async function POST(request: NextRequest) {
 
               <div style="background-color: #f0ead6; padding: 15px; border-radius: 8px; margin: 20px 0;">
                 <h3 style="color: #427b4d; margin-top: 0;">Your Message Details:</h3>
-                <p><strong>Subject:</strong> ${subject}</p>
+                ${detailsHtml}
                 <p><strong>Message:</strong></p>
                 <p style="background-color: white; padding: 10px; border-radius: 4px;">${message.replace(/\n/g, '<br>')}</p>
               </div>
@@ -109,7 +161,7 @@ export async function POST(request: NextRequest) {
             Thank you for reaching out to Elevate Training Camps. We have received your message and will get back to you as soon as possible.
 
             Your Message Details:
-            Subject: ${subject}
+            ${detailsText}
             Message: ${message}
 
             We typically respond within 24-48 hours. If you have any urgent questions, please don't hesitate to call us directly.
@@ -142,11 +194,11 @@ export async function POST(request: NextRequest) {
           firstname: firstName,
           lastname: lastName,
           email: email,
-          subject: subject,
-          message: message,
+          subject: subjectLine,
+          message: [detailsText, message].filter(Boolean).join('\n\n'),
           hs_lead_status: 'NEW',
           lifecyclestage: 'lead',
-          lead_source: 'Website Contact Form'
+          lead_source: `Website Contact Form — ${SEGMENT_LABELS[segment]}`
         };
 
         await hubspotClient.crm.contacts.basicApi.create({

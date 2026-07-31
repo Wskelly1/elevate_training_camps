@@ -14,6 +14,19 @@ export default defineType({
     defineField({ name: 'image', title: 'Image', type: 'image', options: { hotspot: true }, validation: (Rule) => Rule.required() }),
     defineField({ name: 'caption', title: 'Caption', type: 'string' }),
     defineField({ name: 'alt', title: 'Alt Text', type: 'string', description: 'Describe the image for screen readers.' }),
+    defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      description: 'Which chapter of the gallery this appears in.',
+      options: {
+        list: [
+          { title: 'Trails', value: 'trails' },
+          { title: 'Town', value: 'town' },
+          { title: 'Training', value: 'training' },
+        ],
+      },
+    }),
     defineField({ name: 'order', title: 'Display Order', type: 'number', validation: (Rule) => Rule.required().min(0) }),
   ],
   preview: { select: { title: 'caption', media: 'image' } },

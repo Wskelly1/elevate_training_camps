@@ -4,12 +4,15 @@ A working critique of the live site as of 2026-07-29, based on driving every
 page and interacting with every component (desktop 1440, mobile 390). Written
 to be blunt, because vague design feedback is useless.
 
-> **Status 2026-07-30:** this is a point-in-time document; the prioritised
+> **Status 2026-07-31:** this is a point-in-time document; the prioritised
 > list at the bottom is not all open. Items 1 (scroll hijack) and 3 (video
-> chrome) shipped in A2.5a; item 2's placeholder text was replaced with an
-> honest coming-soon page (the real gallery is still Phase 3); the
-> Registration critique was resolved by the 2026-07-30 rebuild. Items 5–10
-> remain open — tracked in `01-roadmap.md` Phase 2.5b.
+> chrome) shipped in A2.5a; item 2 has a chaptered CMS gallery awaiting
+> photos (Flagstaff shots blocked on consent — see docs/10); the
+> Registration critique was resolved by the 2026-07-30 rebuild; item 5's
+> carousel was replaced by an editorial team grid and /about + /faq moved
+> onto the A2.5a layout system in the 2026-07-31 audience rework. Still
+> open: the remaining inner-page passes and items 7–10 details — tracked in
+> `01-roadmap.md` Phase 2.5b.
 
 ---
 
