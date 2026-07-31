@@ -37,14 +37,9 @@ function convertToIntroductions(members: TeamMember[]): TeamIntroduction[] {
   });
 }
 
-const FALLBACK_TEAM_INTRODUCTIONS: TeamIntroduction[] = [
-  {
-    quote: "I'm passionate about helping athletes reach their full potential through altitude training.",
-    name: "Jane Doe",
-    designation: "Head Coach",
-    src: "/logo.svg",
-  },
-];
+// No placeholder team members: an empty CMS renders the section's neutral
+// empty state (docs/10 §5 rule 2 — a fabricated "Jane Doe" shipped from a
+// fallback like this once).
 
 /**
  * AboutPage - Main about page component for Elevate Training Camps
@@ -64,7 +59,7 @@ export default async function AboutPage() {
 
   const teamIntroductions = members && members.length > 0
     ? convertToIntroductions(members)
-    : FALLBACK_TEAM_INTRODUCTIONS;
+    : [];
 
   return (
     <Layout>

@@ -1,8 +1,60 @@
+/**
+ * Contact form data layer — segmented by audience (owner decision
+ * 2026-07-31): the form adapts to who is writing, and the segment plus its
+ * extra fields ride the email subject/body and the HubSpot lead so enquiries
+ * can be triaged without reading every message.
+ *
+ * The coach/organiser path deliberately captures program, state, squad size
+ * and preferred weeks — the exact inputs the team-block booking flow starts
+ * with, and the data the business plan's coach-validation questions (O-10)
+ * need.
+ */
+
+export type ContactSegment = 'coach' | 'athlete' | 'partner' | 'other';
+
+export const CONTACT_SEGMENTS: Array<{ id: ContactSegment; label: string; blurb: string }> = [
+  {
+    id: 'coach',
+    label: 'Coach or trip organiser',
+    blurb: "You're bringing (or thinking about bringing) a team to Flagstaff.",
+  },
+  {
+    id: 'athlete',
+    label: 'Athlete or family',
+    blurb: 'Questions about camp, or about the recruiting evaluation and advisory.',
+  },
+  {
+    id: 'partner',
+    label: 'College or pro connect',
+    blurb: 'Collegiate staff, professional groups, housing partners, local businesses.',
+  },
+  {
+    id: 'other',
+    label: 'Something else',
+    blurb: "General questions, press, anything that doesn't fit above.",
+  },
+];
+
+export const SQUAD_SIZE_OPTIONS = ['Under 8', '8–11', '12–15', '16–20', '20+'] as const;
+
 export interface ContactFormData {
+  segment: ContactSegment;
   firstName: string;
   lastName: string;
   email: string;
-  subject: string;
+  // Coach / trip organiser path
+  program?: string;
+  state?: string;
+  squadSize?: string;
+  preferredWeeks?: string;
+  // Athlete & family path
+  gradYear?: string;
+  interest?: string;
+  // College / pro connect path
+  affiliation?: string;
+  connectionType?: string;
+  // Other path
+  subject?: string;
   message: string;
 }
 
@@ -10,6 +62,8 @@ export interface ContactFormErrors {
   firstName?: string;
   lastName?: string;
   email?: string;
+  program?: string;
+  affiliation?: string;
   subject?: string;
   message?: string;
   general?: string;
@@ -25,7 +79,6 @@ export interface ContactFormResponse {
 export function validateContactForm(data: ContactFormData): ContactFormErrors {
   const errors: ContactFormErrors = {};
 
-  // Required field validation
   if (!data.firstName?.trim()) {
     errors.firstName = 'First name is required';
   }
@@ -37,14 +90,21 @@ export function validateContactForm(data: ContactFormData): ContactFormErrors {
   if (!data.email?.trim()) {
     errors.email = 'Email is required';
   } else {
-    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.email)) {
       errors.email = 'Please enter a valid email address';
     }
   }
 
-  if (!data.subject?.trim()) {
+  // Per-segment requirements: only the fields that genuinely gate a useful
+  // reply are required — everything else stays optional so the form is light.
+  if (data.segment === 'coach' && !data.program?.trim()) {
+    errors.program = 'Program or school is required';
+  }
+  if (data.segment === 'partner' && !data.affiliation?.trim()) {
+    errors.affiliation = 'Affiliation is required';
+  }
+  if (data.segment === 'other' && !data.subject?.trim()) {
     errors.subject = 'Subject is required';
   }
 
@@ -88,4 +148,3 @@ export async function submitContactForm(data: ContactFormData): Promise<ContactF
     };
   }
 }
-

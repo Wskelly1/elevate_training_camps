@@ -2,11 +2,10 @@
 
 import { useEffect } from "react";
 import { urlFor } from "../lib/sanity";
-import { AnimatedTeamIntroductions, type TeamIntroduction } from "./AnimatedCarousel";
+import { type TeamIntroduction } from "./AnimatedCarousel";
 import { AboutSection } from "../lib/queries";
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
-import { User } from "lucide-react";
 
 interface AboutPageContentProps {
   teamIntroductions: TeamIntroduction[];
@@ -21,11 +20,15 @@ interface AboutPageContentProps {
 }
 
 /**
- * AboutPageContent - client-side interactive body of the About page.
+ * AboutPageContent — full editorial rebuild (owner decision 2026-07-31),
+ * applying the A2.5a system that the homepage and /recruiting already use:
+ * left-aligned serif masthead, edge-bleeding alternating sections, an
+ * editorial team grid replacing the old AnimatedCarousel, and token colors
+ * throughout. This retires the "centered PowerPoint" composition the
+ * design review (docs/02) diagnosed.
  *
- * Receives already-fetched data as props (fetched server-side in
- * app/about/page.tsx) and owns only the hash-based scroll-to-section
- * behavior, which needs the browser.
+ * Owns only the hash-based scroll-to-section behavior (needs the browser);
+ * all data arrives as props from the server component.
  */
 export default function AboutPageContent({ teamIntroductions, aboutSections, hero }: AboutPageContentProps) {
   // Handle URL hash navigation on load (e.g. /about#our-team)
@@ -50,73 +53,103 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--muted-foreground)]/10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
-            <User className="h-16 w-16 mx-auto text-[var(--primary)] mb-6" />
-            <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
-              {hero?.heroHeading || "About Elevate Training Camps"}
-            </h1>
-            {hero?.heroIntro && (
-              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {hero.heroIntro}
-              </p>
-            )}
-          </div>
+      {/* ——— Masthead ————————————————————————————————————— */}
+      <section className="pt-20 pb-16 md:pt-28 md:pb-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">About Elevate</p>
+          <h1 className="mt-5 max-w-3xl text-5xl leading-[1.05] md:text-7xl">
+            {hero?.heroHeading || "About Elevate Training Camps"}
+          </h1>
+          {hero?.heroIntro && (
+            <p className="mt-7 max-w-2xl text-lg leading-[1.75] text-[#4a4a4a]">{hero.heroIntro}</p>
+          )}
           {hero?.statChips && hero.statChips.length > 0 && (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t border-[var(--border)] pt-5">
               {hero.statChips.map((chip) => (
-                <div key={chip} className="bg-white/80 backdrop-blur-sm rounded-lg px-6 py-3 shadow-lg">
-                  <p className="text-lg text-gray-900">{chip}</p>
-                </div>
+                <p key={chip} className="text-xs uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                  {chip}
+                </p>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      <section id="our-team" className="py-12 bg-[var(--surface)] scroll-mt-32">
-        <h2 className="text-5xl text-center mb-4">Our Team</h2>
-        {teamIntroductions.length > 0 ? (
-          <AnimatedTeamIntroductions
-            introductions={teamIntroductions}
-          />
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-lg text-gray-500">Team members will be added soon!</p>
-          </div>
-        )}
-      </section>
-
-      {aboutSections
-        .filter(section => !section.title.toLowerCase().includes('pricing'))
-        .map((section, index) => (
-        <section key={section._id} id={section.slug.current} className={`py-12 ${index % 2 !== 0 ? 'bg-[var(--surface)]' : 'bg-transparent'} scroll-mt-32`}>
-          <div className="container mx-auto px-4">
-            <div className={`flex flex-col items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-              <div className="md:w-1/2">
-                {section.image && (
-                  <Image
-                    src={urlFor(section.image).url()}
-                    alt={section.title}
-                    width={800}
-                    height={600}
-                    className="rounded-lg shadow-lg"
-                  />
-                )}
+      {/* ——— CMS sections — alternating, edge-bleeding ————————
+          The image column runs off one viewport edge, alternating sides, so
+          consecutive sections don't share a silhouette (A2.5a system). */}
+      {aboutSections.map((section, index) => {
+        const left = index % 2 !== 0;
+        return (
+          <section
+            key={section._id}
+            id={section.slug.current}
+            className={`scroll-mt-32 ${left ? "py-20 md:py-28" : "border-t border-[var(--border)] bg-[var(--surface)] py-16 md:py-24"}`}
+          >
+            <div
+              className={`grid items-center gap-12 px-6 md:grid-cols-12 md:gap-14 ${
+                left ? "md:pl-0 md:pr-[6vw]" : "md:pl-[6vw] md:pr-0"
+              }`}
+            >
+              <div className={left ? "md:col-span-7" : "md:order-2 md:col-span-7"}>
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  {section.image && (
+                    <Image
+                      src={urlFor(section.image).url()}
+                      alt={section.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width:768px) 100vw, 58vw"
+                    />
+                  )}
+                </div>
               </div>
-              <div className="md:w-1/2">
-                <h2 className="text-5xl mb-4">{section.title}</h2>
-                <div className="prose prose-lg max-w-none">
+              <div className={left ? "md:col-span-5" : "md:order-1 md:col-span-5"}>
+                <h2 className="text-[2.75rem] leading-[1.06] md:text-[3.25rem]">{section.title}</h2>
+                <div className="mt-6 [&_p]:mt-4 [&_p]:max-w-[52ch] [&_p]:text-[17px] [&_p]:leading-[1.75] [&_p]:text-[#4a4a4a] [&_p:first-child]:mt-0">
                   <PortableText value={section.content} />
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      ))}
+          </section>
+        );
+      })}
+
+      {/* ——— Team — editorial grid (replaces the carousel) ———————— */}
+      <section id="our-team" className="scroll-mt-32 border-t border-[var(--border)] py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">The people</p>
+          <h2 className="mt-5 text-[2.75rem] leading-[1.06] md:text-[3.25rem]">Our Team</h2>
+          {teamIntroductions.length > 0 ? (
+            <div className="mt-12 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+              {teamIntroductions.map((member) => (
+                <div key={member.name}>
+                  {member.src && (
+                    <div className="relative aspect-[4/5] w-full overflow-hidden">
+                      <Image
+                        src={member.src}
+                        alt={member.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+                      />
+                    </div>
+                  )}
+                  <h3 className="mt-5 text-[1.5rem] leading-snug">{member.name}</h3>
+                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[var(--accent-rock)]">
+                    {member.designation}
+                  </p>
+                  {member.quote && (
+                    <p className="mt-3 text-[15px] leading-[1.7] text-[#4a4a4a]">{member.quote}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 text-lg text-[var(--muted-foreground)]">Team members will be added soon.</p>
+          )}
+        </div>
+      </section>
     </>
   );
 }

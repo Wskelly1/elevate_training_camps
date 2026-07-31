@@ -297,7 +297,8 @@ const fetchFAQs = unstable_cache(
       *[_type == "faq"] | order(order asc) {
         _id,
         question,
-        answer
+        answer,
+        category
       }
     `);
   },
@@ -605,13 +606,14 @@ export type MediaItem = {
   image: SanityImageRef;
   caption?: string;
   alt?: string;
+  category?: string;
 };
 
 const fetchMediaPage = unstable_cache(
   async (): Promise<{ page: MediaPageContent | null; items: MediaItem[] }> => {
     return await client.fetch(`{
       "page": *[_type == "mediaPage" && _id == "mediaPage"][0]{ heading, intro, note },
-      "items": *[_type == "mediaItem"] | order(order asc) { _id, image, caption, alt }
+      "items": *[_type == "mediaItem"] | order(order asc) { _id, image, caption, alt, category }
     }`);
   },
   ['media-page'],
