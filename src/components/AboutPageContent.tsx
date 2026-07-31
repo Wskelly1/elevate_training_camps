@@ -52,10 +52,10 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
     <>
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#427b4d]/10 to-[#755f4f]/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--muted-foreground)]/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8">
-            <User className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
+            <User className="h-16 w-16 mx-auto text-[var(--primary)] mb-6" />
             <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
               {hero?.heroHeading || "About Elevate Training Camps"}
             </h1>
@@ -77,7 +77,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
         </div>
       </section>
 
-      <section id="our-team" className="py-12 bg-[#f0ead6] scroll-mt-32">
+      <section id="our-team" className="py-12 bg-[var(--surface)] scroll-mt-32">
         <h2 className="text-5xl text-center mb-4">Our Team</h2>
         {teamIntroductions.length > 0 ? (
           <AnimatedTeamIntroductions
@@ -93,7 +93,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
       {aboutSections
         .filter(section => !section.title.toLowerCase().includes('pricing'))
         .map((section, index) => (
-        <section key={section._id} id={section.slug.current} className={`py-12 ${index % 2 !== 0 ? 'bg-[#f0ead6]' : 'bg-transparent'} scroll-mt-32`}>
+        <section key={section._id} id={section.slug.current} className={`py-12 ${index % 2 !== 0 ? 'bg-[var(--surface)]' : 'bg-transparent'} scroll-mt-32`}>
           <div className="container mx-auto px-4">
             <div className={`flex flex-col items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
               <div className="md:w-1/2">

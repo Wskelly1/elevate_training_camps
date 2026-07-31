@@ -4,7 +4,6 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { getSiteSettings } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
-import FaviconProvider from "../components/FaviconProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,21 +48,39 @@ const displaySerif = Instrument_Serif({
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
+  /**
+   * The single source of the site icon.
+   *
+   * There used to be four competing mechanisms — this function, a hardcoded
+   * <head> block below, a client component that re-injected <link> tags at
+   * runtime, and two route handlers (/api/favicon and /icon, the latter on the
+   * edge runtime, which disabled static generation for that route). They partly
+   * contradicted each other, so changing the icon in one place did not reliably
+   * change what a browser showed.
+   *
+   * Now: upload a favicon in Site Settings and it wins; otherwise the static
+   * brand asset in public/ is used. One path, still fully CMS-editable.
+   */
+  const icon = settings.favicon
+    ? [{ url: urlFor(settings.favicon).width(64).height(64).format('png').url(), type: 'image/png' }]
+    : [
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/favicon.ico', sizes: 'any' },
+      ];
+
   return {
     title: settings.title || "Elevate Training Camps",
     description: settings.description || "Elevate Training Camps - High Altitude Training in Flagstaff",
     icons: {
-      icon: settings.favicon ? [
-        { url: urlFor(settings.favicon).url(), type: 'image/png' },
-      ] : [
-        { url: '/favicon.svg', type: 'image/svg+xml' },
-        { url: '/favicon.ico', sizes: 'any' },
-      ],
-      apple: [
-        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-        { url: '/apple-touch-icon-precomposed.png', sizes: '180x180', type: 'image/png' },
-      ],
+      icon,
+      apple: settings.favicon
+        ? [{ url: urlFor(settings.favicon).width(180).height(180).format('png').url(), sizes: '180x180', type: 'image/png' }]
+        : [
+            { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+            { url: '/apple-touch-icon-precomposed.png', sizes: '180x180', type: 'image/png' },
+          ],
     },
+    manifest: '/api/manifest',
   };
 }
 
@@ -89,20 +106,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSiteSettings();
-
+  // No hardcoded <head> icon links here. generateMetadata above owns the
+  // favicon and the manifest, so a CMS upload is not silently overridden by a
+  // static tag that Next renders after it.
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" />
-        <link rel="manifest" href="/api/manifest" />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${displaySerif.variable} antialiased`}
       >
-        <FaviconProvider favicon={settings.favicon} />
         {children}
       </body>
       {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (

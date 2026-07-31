@@ -77,14 +77,14 @@ export async function POST(request: NextRequest) {
           subject: `Thank you for contacting Elevate Training Camps`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #3c6e45; margin-bottom: 20px;">Thank You for Contacting Us!</h2>
+              <h2 style="color: #427b4d; margin-bottom: 20px;">Thank You for Contacting Us!</h2>
 
               <p>Dear ${firstName},</p>
 
               <p>Thank you for reaching out to Elevate Training Camps. We have received your message and will get back to you as soon as possible.</p>
 
               <div style="background-color: #f0ead6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="color: #3c6e45; margin-top: 0;">Your Message Details:</h3>
+                <h3 style="color: #427b4d; margin-top: 0;">Your Message Details:</h3>
                 <p><strong>Subject:</strong> ${subject}</p>
                 <p><strong>Message:</strong></p>
                 <p style="background-color: white; padding: 10px; border-radius: 4px;">${message.replace(/\n/g, '<br>')}</p>
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
               <p>Best regards,<br>
               The Elevate Training Camps Team</p>
 
-              <hr style="margin: 30px 0; border: none; border-top: 1px solid #e6dfd3;">
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid #d3c7b4;">
               <p style="font-size: 12px; color: #666;">
                 This is an automated confirmation email. Please do not reply to this message.
               </p>
