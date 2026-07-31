@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import Layout from "../../components/layout";
+import PageMasthead from "../../components/PageMasthead";
 import { getRecruitingPage } from "../../lib/queries";
 import { urlFor } from "../../lib/sanity";
 
@@ -67,29 +68,22 @@ export default async function RecruitingPage() {
   return (
     <Layout>
       {/* ——— Masthead ————————————————————————————————————— */}
-      <section className="pt-20 pb-16 md:pt-28 md:pb-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <Eyebrow>{content.eyebrow}</Eyebrow>
-          <h1 className="mt-5 max-w-3xl text-5xl leading-[1.05] md:text-7xl">{content.heading}</h1>
-          {content.intro && (
-            <p className="mt-7 max-w-2xl text-lg leading-[1.75] text-[#4a4a4a]">{content.intro}</p>
-          )}
-          <div className="mt-9 flex flex-wrap gap-4">
-            <Link
-              href="/contact"
-              className="rounded-md bg-[var(--primary)] px-7 py-3.5 text-base text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
-            >
-              {content.ctaPrimary || "Contact us"}
-            </Link>
-            <Link
-              href="/registration"
-              className="rounded-md border border-[var(--border)] px-7 py-3.5 text-base text-[var(--foreground)] transition hover:bg-[var(--surface)]"
-            >
-              {content.ctaSecondary || "Bring your team to camp"}
-            </Link>
-          </div>
+      <PageMasthead eyebrow={content.eyebrow} heading={content.heading} intro={content.intro}>
+        <div className="mt-9 flex flex-wrap gap-4">
+          <Link
+            href="/contact"
+            className="rounded-md bg-[var(--primary)] px-7 py-3.5 text-base text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
+          >
+            {content.ctaPrimary || "Contact us"}
+          </Link>
+          <Link
+            href="/registration"
+            className="rounded-md border border-[var(--accent-trail)]/40 px-7 py-3.5 text-base text-[var(--foreground)] transition hover:bg-[var(--background)]"
+          >
+            {content.ctaSecondary || "Bring your team to camp"}
+          </Link>
         </div>
-      </section>
+      </PageMasthead>
 
       {/* ——— Stat band · market reality ————————————————————— */}
       {content.stats && content.stats.length > 0 && (

@@ -1,5 +1,6 @@
 import Layout from "../../components/layout";
 import ContactForm from "../../components/ContactForm";
+import PageMasthead from "../../components/PageMasthead";
 import { getContactPage } from "../../lib/queries";
 
 /**
@@ -14,7 +15,14 @@ export default async function ContactPage() {
   const content = await getContactPage();
   return (
     <Layout>
-      <ContactForm heading={content?.heading} intro={content?.intro} />
+      <PageMasthead
+        eyebrow="Get in touch"
+        heading={content?.heading || "Contact Us"}
+        intro={content?.intro}
+      />
+      <div className="py-16">
+        <ContactForm />
+      </div>
     </Layout>
   );
 }

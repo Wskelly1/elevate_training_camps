@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Layout from "../../components/layout";
+import PageMasthead from "../../components/PageMasthead";
 import { getMediaPage, type MediaItem } from "../../lib/queries";
 import { urlFor } from "../../lib/sanity";
 
@@ -35,19 +36,11 @@ export default async function MediaPage() {
   return (
     <Layout>
       {/* ——— Masthead ————————————————————————————————————— */}
-      <section className="pt-20 pb-14 md:pt-28 md:pb-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">Photo & film</p>
-          <h1 className="mt-5 text-5xl leading-[1.05] md:text-6xl">{page?.heading || "Media"}</h1>
-          {page?.intro && (
-            <p className="mt-6 max-w-2xl text-lg leading-[1.75] text-[#4a4a4a]">{page.intro}</p>
-          )}
-        </div>
-      </section>
+      <PageMasthead eyebrow="Photo & film" heading={page?.heading || "Media"} intro={page?.intro} />
 
       {/* ——— Chapters ————————————————————————————————————— */}
       {(chapters.length > 0 || uncategorized.length > 0) && (
-        <section className="border-t border-[var(--border)] bg-[var(--surface)] py-16">
+        <section className="py-16">
           <div className="mx-auto max-w-6xl px-6">
             {chapters.map((chapter) => (
               <div key={chapter.id} className="mb-16 last:mb-0">
