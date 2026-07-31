@@ -23,13 +23,15 @@ decisions flow to which surface).
 | Surface | Source of copy | CMS role |
 |---|---|---|
 | `/` homepage | Code (until PR #14 lands, then `homePage` doc) | Media now; full copy after #14 |
-| `/recruiting` | Code (deliberate — Gate-7/Gate-5 constraints in the file header) | None |
+| `/recruiting` | **CMS (Wave 2)** — `recruitingPage` singleton, price-less schema (Gate-7 structural) | `recruitingPage` |
 | `/registration` | **CMS (Wave 1 shipped 2026-07-30)** — `registrationPage` singleton + `teamBlock` docs, seeded with the compliant copy; neutral empty state, no copy fallback | `registrationPage`, `teamBlock` (prices live here only; `npm run check:pricing` verifies) |
-| `/about` | Hybrid: hero in code, sections + team from CMS | `aboutSection`, `teamMember` |
-| `/faq` | CMS | `faq`, `siteSettings.faqPage` |
+| `/about` | **CMS (Wave 3)** — hero from `aboutPage`, sections + team as before | `aboutPage`, `aboutSection`, `teamMember` |
+| `/faq` | CMS | `faq`, `faqPage` (header — migrated out of siteSettings, Wave 3) |
 | Site-wide `<meta>`, manifest, favicon | CMS | `siteSettings` |
-| `/media`, `/contact`, `/style-guide` | Code | None |
-| Legacy types (`coachingProgram`/`Benefit`/`Testimonial`, `trainingPackage`, `upcomingCamp`, `paymentOption`, `whatsIncluded`) | — | **Render nowhere.** Coaching docs deleted 2026-07-30 (owner-approved); types come out in the Phase 1.5 reshape |
+| `/media` | **CMS (Wave 4)** — copy live; gallery renders `mediaItem` docs once Gates 3–4 clear | `mediaPage`, `mediaItem` |
+| `/contact` | **CMS (Wave 3)** — heading/intro; form labels stay in code | `contactPage` |
+| `/style-guide` | Code (internal reference, noindexed) | None |
+| Legacy types | — | **Removed entirely in Wave 5** (2026-07-30): schemas, queries and Studio groups for `coachingProgram`/`Benefit`/`Testimonial`, `trainingPackage`, `upcomingCamp`, `paymentOption`, `whatsIncluded` are gone |
 
 **Rule: check this table before writing copy anywhere.** If a surface is
 copy-in-code, editing the CMS does nothing; if it's CMS-driven, editing code
@@ -150,16 +152,24 @@ edit breaks deliverability silently). Revisit only if the owner asks.
    neutral empty state, `scripts/check-cms-pricing.mjs` + `npm run
    check:pricing` passing 4/4, built HTML verified identical to the
    pre-wave copy.
-2. **Wave 2 — `/recruiting`:** `recruitingPage` (price-less schema).
-3. **Wave 3 — `/about` hero + `/contact` + `faqPage`** (the siteSettings
-   FAQ-field migration is a content migration — do it in this wave).
-4. **Wave 4 — `/media`:** `mediaPage` + `mediaItem`, gated on Gates 3–4
-   (hosting decision + photo consent); this is roadmap Phase 3.
-5. **Wave 5 — cleanup:** remove legacy types (`coachingProgram`,
-   `coachingBenefit`, `coachingTestimonial`, `trainingPackage`,
-   `upcomingCamp`, `paymentOption`, `whatsIncluded`), their queries, the
-   inert `logo` field, and the favicon tangle; restructure the Studio
-   sidebar so each nav page maps to its singleton + lists.
+2. **Wave 2 — `/recruiting`: ✅ DONE 2026-07-30.** `recruitingPage`
+   singleton (price-less schema — Gate-7 structural), seeded with the
+   page's copy and both image assets, page wired, Studio section added.
+3. **Wave 3 — `/about` hero + `/contact` + `faqPage`: ✅ DONE 2026-07-30.**
+   Three singletons seeded (faqPage content migrated verbatim out of
+   siteSettings.faqPage; the dead siteSettings field removed); pages
+   wired; divergent FAQ intro fallback dropped.
+4. **Wave 4 — `/media`: ✅ shipped 2026-07-30 (copy + schema).**
+   `mediaPage` singleton live; `mediaItem` gallery schema exists but NO
+   items may be published until Gates 3–4 clear (hosting decision + photo
+   consent) — the page renders the gallery automatically once they exist.
+5. **Wave 5 — cleanup: ✅ DONE 2026-07-30** (except the favicon tangle,
+   deliberately left — that fix is in flight in another session's
+   worktree). Removed: `coachingProgram`, `coachingBenefit`,
+   `coachingTestimonial`, `trainingPackage`, `upcomingCamp`,
+   `paymentOption`, `whatsIncluded` types + queries + Studio groups, and
+   the inert `siteSettings.logo` field. The Studio sidebar now maps each
+   nav page to its singleton + lists.
 
 After Wave 5, `03-sanity-studio-guide.md` needs a rewrite (its sidebar tree
 and "feeds nothing" warnings all change) — budget that into the wave.

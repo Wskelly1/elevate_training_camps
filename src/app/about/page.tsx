@@ -2,7 +2,7 @@ import Layout from "../../components/layout";
 import { urlFor } from "../../lib/sanity";
 import { type TeamIntroduction } from "../../components/AnimatedCarousel";
 import AboutPageContent from "../../components/AboutPageContent";
-import { getTeamMembers, getAboutSections } from "../../lib/queries";
+import { getTeamMembers, getAboutSections, getAboutPage } from "../../lib/queries";
 import type { SanityImageRef } from "../../lib/types";
 
 // Type for team member from Sanity
@@ -56,9 +56,10 @@ const FALLBACK_TEAM_INTRODUCTIONS: TeamIntroduction[] = [
  * @returns {JSX.Element} The complete about page with all sections
  */
 export default async function AboutPage() {
-  const [members, aboutSections] = await Promise.all([
+  const [members, aboutSections, hero] = await Promise.all([
     getTeamMembers(),
     getAboutSections(),
+    getAboutPage(),
   ]);
 
   const teamIntroductions = members && members.length > 0
@@ -67,7 +68,7 @@ export default async function AboutPage() {
 
   return (
     <Layout>
-      <AboutPageContent teamIntroductions={teamIntroductions} aboutSections={aboutSections} />
+      <AboutPageContent teamIntroductions={teamIntroductions} aboutSections={aboutSections} hero={hero} />
     </Layout>
   );
 }

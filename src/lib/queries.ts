@@ -266,148 +266,9 @@ export async function getHomePage() {
   }
 }
 
-const fetchTrainingPackages = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "trainingPackage" && active == true] | order(order asc) {
-        _id,
-        name,
-        description,
-        price,
-        originalPrice,
-        duration,
-        features,
-        popular,
-        order,
-        active
-      }
-    `);
-  },
-  ['training-packages'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches training packages from Sanity CMS
- *
- * Retrieves all active training packages ordered by their display order.
- * Each package includes pricing, features, and package details.
- *
- * @returns {Promise<Array>} Array of training package objects from Sanity, or [] on failure
- */
-export async function getTrainingPackages() {
-  try {
-    return await fetchTrainingPackages();
-  } catch (error) {
-    console.error('Error fetching training packages:', error);
-    return [];
-  }
-}
-
-const fetchUpcomingCamps = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "upcomingCamp" && active == true] | order(order asc) {
-        _id,
-        date,
-        type,
-        spots,
-        location,
-        earlyBird,
-        earlyBirdEnds,
-        order,
-        active
-      }
-    `);
-  },
-  ['upcoming-camps'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches upcoming training camps from Sanity CMS
- *
- * Retrieves all active upcoming camps ordered by their display order.
- * Each camp includes date, type, spots remaining, and early bird information.
- *
- * @returns {Promise<Array>} Array of upcoming camp objects from Sanity, or [] on failure
- */
-export async function getUpcomingCamps() {
-  try {
-    return await fetchUpcomingCamps();
-  } catch (error) {
-    console.error('Error fetching upcoming camps:', error);
-    return [];
-  }
-}
-
-const fetchPaymentOptions = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "paymentOption" && active == true] | order(order asc) {
-        _id,
-        name,
-        description,
-        discount,
-        order,
-        active
-      }
-    `);
-  },
-  ['payment-options'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches payment options from Sanity CMS
- *
- * Retrieves all active payment options ordered by their display order.
- * Each option includes name, description, and discount details.
- *
- * @returns {Promise<Array>} Array of payment option objects from Sanity, or [] on failure
- */
-export async function getPaymentOptions() {
-  try {
-    return await fetchPaymentOptions();
-  } catch (error) {
-    console.error('Error fetching payment options:', error);
-    return [];
-  }
-}
-
-const fetchWhatsIncluded = unstable_cache(
-  async () => {
-    return await client.fetch(`
-      *[_type == "whatsIncluded" && active == true] | order(order asc) {
-        _id,
-        category,
-        items,
-        icon,
-        order,
-        active
-      }
-    `);
-  },
-  ['whats-included'],
-  { revalidate: REVALIDATE_SECONDS }
-);
-
-/**
- * Fetches what's included categories from Sanity CMS
- *
- * Retrieves all active what's included categories ordered by their display order.
- * Each category includes items and icon information.
- *
- * @returns {Promise<Array>} Array of what's included objects from Sanity, or [] on failure
- */
-export async function getWhatsIncluded() {
-  try {
-    return await fetchWhatsIncluded();
-  } catch (error) {
-    console.error("Error fetching what's included:", error);
-    return [];
-  }
-}
+// The trainingPackage/upcomingCamp/paymentOption/whatsIncluded queries were
+// removed in CMS-ification Wave 5 (docs/10-sanity-content-plan.md §5) along
+// with their schema types — /registration reads registrationPage + teamBlock.
 
 const fetchFAQs = unstable_cache(
   async () => {
@@ -443,15 +304,16 @@ export type FAQPageSettings = {
   faqPageImage?: SanityImageRef;
 };
 
+// Reads the faqPage singleton (Wave 3 — content migrated out of
+// siteSettings.faqPage on 2026-07-30). The image field is aliased to the
+// old faqPageImage name so the page component is unchanged.
 const fetchFAQPageSettings = unstable_cache(
-  async (): Promise<{ faqPage?: FAQPageSettings } | null> => {
+  async (): Promise<FAQPageSettings | null> => {
     return await client.fetch(`
-      *[_type == "siteSettings"][0] {
-        faqPage {
-          title,
-          introduction,
-          faqPageImage
-        }
+      *[_type == "faqPage" && _id == "faqPage"][0] {
+        title,
+        introduction,
+        "faqPageImage": image
       }
     `);
   },
@@ -467,7 +329,7 @@ const fetchFAQPageSettings = unstable_cache(
 export async function getFAQPageSettings(): Promise<FAQPageSettings> {
   try {
     const settings = await fetchFAQPageSettings();
-    return settings?.faqPage || {};
+    return settings || {};
   } catch (error) {
     console.error('Error fetching FAQ page settings:', error);
     return {};
@@ -571,5 +433,179 @@ export async function getRegistrationPage(): Promise<RegistrationPageContent | n
   } catch (error) {
     console.error('Error fetching registration page:', error);
     return null;
+  }
+}
+
+/**
+ * RecruitingPageContent — /recruiting copy + media (CMS-ification Wave 2).
+ * Deliberately carries no pricing anywhere: the recruitingPage schema has
+ * no price fields (Gate-7 — no rate card until the attach rate is measured).
+ */
+export type RecruitingPageContent = {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  ctaPrimary?: string;
+  ctaSecondary?: string;
+  stats?: Array<{ number?: string; label?: string; sub?: string }>;
+  whyEyebrow?: string;
+  whyHeading?: string;
+  whyParagraphs?: string[];
+  whyImage?: SanityImageRef;
+  whyImageAlt?: string;
+  watchEyebrow?: string;
+  watchHeading?: string;
+  watchIntro?: string;
+  watchItems?: Array<{ title?: string; body?: string }>;
+  evalEyebrow?: string;
+  evalHeading?: string;
+  evalBody?: string;
+  evalAccent?: string;
+  evalLinkLabel?: string;
+  evalImage?: SanityImageRef;
+  evalImageAlt?: string;
+  quoteLabel?: string;
+  quoteText?: string;
+  neverEyebrow?: string;
+  neverHeading?: string;
+  neverItems?: Array<{ title?: string; body?: string }>;
+  familyEyebrow?: string;
+  familyHeading?: string;
+  familyParagraphs?: string[];
+  coachEyebrow?: string;
+  coachHeading?: string;
+  coachBody?: string;
+  coachLinkLabel?: string;
+  closingHeading?: string;
+  closingBody?: string;
+  closingCtaLabel?: string;
+  footnote?: string;
+};
+
+const fetchRecruitingPage = unstable_cache(
+  async (): Promise<RecruitingPageContent | null> => {
+    return await client.fetch(`
+      *[_type == "recruitingPage" && _id == "recruitingPage"][0]{
+        eyebrow, heading, intro, ctaPrimary, ctaSecondary,
+        stats[]{ number, label, sub },
+        whyEyebrow, whyHeading, whyParagraphs, whyImage, whyImageAlt,
+        watchEyebrow, watchHeading, watchIntro,
+        watchItems[]{ title, body },
+        evalEyebrow, evalHeading, evalBody, evalAccent, evalLinkLabel,
+        evalImage, evalImageAlt,
+        quoteLabel, quoteText,
+        neverEyebrow, neverHeading,
+        neverItems[]{ title, body },
+        familyEyebrow, familyHeading, familyParagraphs,
+        coachEyebrow, coachHeading, coachBody, coachLinkLabel,
+        closingHeading, closingBody, closingCtaLabel, footnote
+      }
+    `);
+  },
+  ['recruiting-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/**
+ * Fetches the Recruiting page copy. Null on failure → the page renders a
+ * neutral empty state, never a copy-carrying fallback (docs/10 §5 rule 2).
+ */
+export async function getRecruitingPage(): Promise<RecruitingPageContent | null> {
+  try {
+    return await fetchRecruitingPage();
+  } catch (error) {
+    console.error('Error fetching recruiting page:', error);
+    return null;
+  }
+}
+
+/** AboutPageHero — the /about hero copy (Wave 3). */
+export type AboutPageHero = {
+  heroHeading?: string;
+  heroIntro?: string;
+  statChips?: string[];
+};
+
+const fetchAboutPage = unstable_cache(
+  async (): Promise<AboutPageHero | null> => {
+    return await client.fetch(`
+      *[_type == "aboutPage" && _id == "aboutPage"][0]{ heroHeading, heroIntro, statChips }
+    `);
+  },
+  ['about-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/** Null on failure → the hero renders a minimal neutral state (docs/10 §5 rule 2). */
+export async function getAboutPage(): Promise<AboutPageHero | null> {
+  try {
+    return await fetchAboutPage();
+  } catch (error) {
+    console.error('Error fetching about page:', error);
+    return null;
+  }
+}
+
+/** ContactPageContent — the /contact heading + intro (Wave 3). */
+export type ContactPageContent = {
+  heading?: string;
+  intro?: string;
+};
+
+const fetchContactPage = unstable_cache(
+  async (): Promise<ContactPageContent | null> => {
+    return await client.fetch(`
+      *[_type == "contactPage" && _id == "contactPage"][0]{ heading, intro }
+    `);
+  },
+  ['contact-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/** Null on failure → the form renders with a bare neutral heading. */
+export async function getContactPage(): Promise<ContactPageContent | null> {
+  try {
+    return await fetchContactPage();
+  } catch (error) {
+    console.error('Error fetching contact page:', error);
+    return null;
+  }
+}
+
+/** MediaPageContent + gallery items (CMS-ification Wave 4). */
+export type MediaPageContent = {
+  heading?: string;
+  intro?: string;
+  note?: string;
+};
+
+export type MediaItem = {
+  _id: string;
+  image: SanityImageRef;
+  caption?: string;
+  alt?: string;
+};
+
+const fetchMediaPage = unstable_cache(
+  async (): Promise<{ page: MediaPageContent | null; items: MediaItem[] }> => {
+    return await client.fetch(`{
+      "page": *[_type == "mediaPage" && _id == "mediaPage"][0]{ heading, intro, note },
+      "items": *[_type == "mediaItem"] | order(order asc) { _id, image, caption, alt }
+    }`);
+  },
+  ['media-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/**
+ * Fetches the Media page copy and any published gallery items. Items stay
+ * empty until the photo-consent gate clears (01-roadmap.md Gate-4).
+ */
+export async function getMediaPage(): Promise<{ page: MediaPageContent | null; items: MediaItem[] }> {
+  try {
+    return await fetchMediaPage();
+  } catch (error) {
+    console.error('Error fetching media page:', error);
+    return { page: null, items: [] };
   }
 }

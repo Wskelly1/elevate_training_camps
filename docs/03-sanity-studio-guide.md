@@ -17,23 +17,24 @@ So every content type is nested under the page it feeds.
 
 ```
 Elevate Training Camps
-├── Site Settings              ← global: logo, contact details, social links
-├── Home Page                  ← hero video, testimonials, content sections
+├── Site Settings              ← global: contact details, social links, meta
+├── Home Page                  ← hero video, content sections
 │   ─────────
 ├── Registration Page
-│   ├── Training Packages      ← the pricing tiers
-│   ├── Upcoming Camps         ← dated camp sessions
-│   └── What's Included        ← the four "what you get" columns
-├── Coaching Page
-│   ├── Coaching Programs      ← the programme cards
-│   ├── Why Choose Us          ← the four benefit tiles
-│   └── Athlete Testimonials   ← quotes with star ratings
+│   ├── Page Copy              ← every piece of /registration text
+│   └── Team Blocks (pricing)  ← the two products; the ONLY place prices live
+├── Recruiting Page            ← every piece of /recruiting text + images
 ├── About Page
+│   ├── Hero Copy              ← heading, intro, stat chips
 │   ├── Page Sections          ← the alternating image/text blocks
 │   └── Team Members           ← the staff carousel
-├── FAQ Page                   ← questions and answers
-│   ─────────
-└── Deprecated — do not use
+├── Contact Page               ← heading + intro (form labels are code)
+├── FAQ Page
+│   ├── Page Header            ← title, introduction, image
+│   └── FAQ Questions          ← the question/answer items
+└── Media Page
+    ├── Page Copy              ← heading, intro, note
+    └── Gallery Items          ← publish NOTHING until photo consent clears
 ```
 
 Three rules the structure follows:
@@ -46,18 +47,14 @@ Three rules the structure follows:
    under the last divider clearly labelled, so content never disappears
    silently — you can always see it still exists.
 
-> **What the Registration group feeds (since 2026-07-30, CMS-ification
-> Wave 1):** the **Page Copy** singleton and **Team Blocks (pricing)** are
-> live — editing them changes `/registration` (after the ~5-minute cache).
-> Prices live ONLY on Team Blocks and must match
-> `business-plan/PRICING.md`; a price edit is a business decision — change
-> PRICING.md and its CHANGELOG first, then the Team Block, then run
-> `npm run check:pricing`. The three items marked **legacy — not
-> rendered** under the same group (`trainingPackage`, `upcomingCamp`,
-> `whatsIncluded`) feed nothing, as does the entire **Coaching Page**
-> group (`/coaching` became `/recruiting`, O-16; its documents were
-> deleted 2026-07-30). Legacy types are removed in CMS-ification Wave 5 —
-> don't author content into them.
+> **Every page now has a Studio section (CMS-ification Waves 1–5,
+> 2026-07-30).** Editing a section changes its page after the ~5-minute
+> cache. Two hard rules: **prices live only on Team Blocks** and must
+> match `business-plan/PRICING.md` (change PRICING.md + its CHANGELOG
+> first, then the Team Block, then run `npm run check:pricing`); and
+> **Media → Gallery Items stays empty** until the photo-consent gate
+> clears (roadmap Gate-4). The legacy coaching/registration types were
+> removed entirely in Wave 5.
 
 ### Ordering
 

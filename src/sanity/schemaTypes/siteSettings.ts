@@ -18,16 +18,10 @@ export default defineType({
       type: 'text',
       description: 'A brief description of your site (used for SEO)'
     }),
-    defineField({
-      name: 'logo',
-      title: 'Site Logo',
-      type: 'image',
-      description: 'Upload your site logo here (recommended size: 240x80px)',
-      options: {
-        hotspot: true,
-        metadata: ['lqip', 'palette']
-      }
-    }),
+    // The inert `logo` field was removed in CMS-ification Wave 5 — the
+    // site's logo is the committed BrandLogo component + public/logo-mark.svg,
+    // so the field edited nothing (docs/09-architecture.md). footerLogo is
+    // kept for the future footer treatment.
     defineField({
       name: 'footerLogo',
       title: 'Footer Logo',
@@ -112,31 +106,10 @@ export default defineType({
         }
       ]
     }),
-    defineField({
-      name: 'faqPage',
-      title: 'FAQ Page Settings',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'title',
-          title: 'FAQ Page Title',
-          type: 'string',
-        }),
-        defineField({
-          name: 'introduction',
-          title: 'FAQ Page Introduction',
-          type: 'text',
-        }),
-        defineField({
-          name: 'faqPageImage',
-          title: 'FAQ Page Image',
-          type: 'image',
-          options: {
-            hotspot: true,
-          },
-        }),
-      ],
-    }),
+    // The FAQ page settings that used to be stranded here moved to the
+    // faqPage singleton (CMS-ification Wave 3, 2026-07-30). The old data
+    // remains harmlessly on existing documents; the field is gone so
+    // editors can't author into the dead location.
   ],
   preview: {
     select: {

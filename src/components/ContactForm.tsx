@@ -11,9 +11,11 @@ import { ContactFormData, ContactFormErrors, validateContactForm, submitContactF
  *
  * Split out from app/contact/page.tsx so that page can be a plain Server
  * Component (needed to render the now-async Layout directly) while this
- * component owns all the form state/validation/submission logic.
+ * component owns all the form state/validation/submission logic. The
+ * heading/intro copy arrives as props from the contactPage singleton
+ * (CMS-ification Wave 3); form labels stay in code.
  */
-export default function ContactForm() {
+export default function ContactForm({ heading, intro }: { heading?: string; intro?: string }) {
   const [formData, setFormData] = useState<ContactFormData>({
     firstName: '',
     lastName: '',
@@ -85,8 +87,8 @@ export default function ContactForm() {
   return (
     <>
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl mb-2 text-center">Contact Us</h1>
-        <p className="text-center text-gray-600 mb-8">We&apos;d love to hear from you! Please fill out the form below and we&apos;ll get back to you as soon as possible.</p>
+        <h1 className="text-3xl mb-2 text-center">{heading || "Contact Us"}</h1>
+        {intro && <p className="text-center text-gray-600 mb-8">{intro}</p>}
       </div>
       <div className="max-w-xl mx-auto p-8 bg-[#f0ead6] rounded-lg shadow-sm border-2 border-[#d3c7b4] border-t-[#3c6e45] mb-24">
         {/* Success Message */}

@@ -29,7 +29,7 @@ export default async function FAQPage() {
           <div className="w-1/2 text-black">
             <h1 className="text-4xl mb-4">{settings.title || 'Frequently Asked Questions'}</h1>
             <p className="text-lg opacity-90">
-              {settings.introduction || 'Answers to the questions coaches and parent organisers ask most about bringing a team to Flagstaff — booking, pricing, housing, and what a training block actually looks like.'}
+              {settings.introduction}
             </p>
           </div>
           <div className="w-1/2 flex justify-center">

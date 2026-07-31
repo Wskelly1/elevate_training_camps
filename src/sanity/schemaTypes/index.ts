@@ -4,17 +4,16 @@ import homePage from './homePage'
 import teamMember from './teamMember'
 import faq from './faq'
 import aboutSection from './aboutSection'
-import coachingProgram from './coachingProgram'
-import coachingBenefit from './coachingBenefit'
-import coachingTestimonial from './coachingTestimonial'
-import trainingPackage from './trainingPackage'
-import upcomingCamp from './upcomingCamp'
-import paymentOption from './paymentOption'
-import whatsIncluded from './whatsIncluded'
 import teamBlock from './teamBlock'
 import registrationPage from './registrationPage'
+import recruitingPage from './recruitingPage'
+import aboutPage from './aboutPage'
+import contactPage from './contactPage'
+import faqPage from './faqPage'
+import mediaPage from './mediaPage'
+import mediaItem from './mediaItem'
 
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [siteSettings, homePage, teamMember, faq, aboutSection, coachingProgram, coachingBenefit, coachingTestimonial, trainingPackage, upcomingCamp, paymentOption, whatsIncluded, teamBlock, registrationPage],
+  types: [siteSettings, homePage, teamMember, faq, aboutSection, teamBlock, registrationPage, recruitingPage, aboutPage, contactPage, faqPage, mediaPage, mediaItem],
 }

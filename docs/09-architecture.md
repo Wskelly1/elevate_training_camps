@@ -335,6 +335,8 @@ A short list of things that will bite someone who doesn't know them:
 - Defining a previously-undefined CSS token → may break components that
   depended on it resolving to nothing.
 - Polling Sanity content to confirm a deploy → false positives.
-- `paymentOption` is deprecated with 0 documents, but `/registration` still
-  renders it from a hardcoded fallback of invented instalment tiers. Schema,
-  query, type and page section must be removed together.
+- ~~`paymentOption` fallback trap~~ — resolved 2026-07-30: the type, its
+  query and the page section were removed together in CMS-ification Wave 5,
+  along with the other legacy types. Marketing pages now read per-page
+  singletons; if a query returns nothing the page renders a neutral empty
+  state, never a copy-carrying fallback.
