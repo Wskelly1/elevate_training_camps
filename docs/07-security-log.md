@@ -10,6 +10,33 @@ verification against `.env.example`.
 
 ---
 
+## 2026-07-30 — Catch-up entry (consistency-audit branch)
+
+**Cadence breach, recorded first:** Phases 1, 2 and 2.5a all merged (PRs
+#6–#13, #15, #17, #18) with **no end-of-phase sweep entries** — this log's own
+rule wasn't followed. This entry is a partial catch-up, not a full sweep; the
+next full sweep should run at the next phase close.
+
+- **`npm audit` (production deps):** 49 vulnerabilities — 2 low / 20
+  moderate / 25 high / 2 critical (was 24 high / 5 critical at baseline).
+  Spot-check shows the same shape as the baseline: DOMPurify, PrismJS,
+  picomatch — Studio/CLI toolchain, not visitor-serving code. Real
+  remediation remains the major `sanity` upgrade **queued behind Gate-1**.
+- **Secret scan (this branch's diff):** docs and marketing-copy changes
+  only; no credentials touched. Footer email switched to
+  `support@elevatetrainingcamps.com`; the residential street address was
+  removed from the public footer.
+- **Live credentials:** not re-verified in this entry (see `06-billing.md`
+  for last-known state: HubSpot 401 / O-3, Stripe absent / O-1). One
+  observation: the Sanity **content API answered reads normally** on
+  2026-07-30 via MCP — worth re-testing the site's own token, since the 402
+  billing block may have lifted.
+- **Content-liability fixes shipped on this branch** (not security, logged
+  for the record): fabricated `/registration` pricing removed; invented
+  operating history removed from `/about`, `/media` and the newsletter
+  auto-reply; dead footer legal links removed until Phase 4 ships real
+  policy pages.
+
 ## 2026-07-27 — Phase 0 closing sweep (baseline)
 
 - **Secret scan:** regex sweep over the complete Phase 0 diff (PRs #2–#4,

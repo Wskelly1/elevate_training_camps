@@ -4,6 +4,13 @@ A working critique of the live site as of 2026-07-29, based on driving every
 page and interacting with every component (desktop 1440, mobile 390). Written
 to be blunt, because vague design feedback is useless.
 
+> **Status 2026-07-30:** this is a point-in-time document; the prioritised
+> list at the bottom is not all open. Items 1 (scroll hijack) and 3 (video
+> chrome) shipped in A2.5a; item 2's placeholder text was replaced with an
+> honest coming-soon page (the real gallery is still Phase 3); the
+> Registration critique was resolved by the 2026-07-30 rebuild. Items 5–10
+> remain open — tracked in `01-roadmap.md` Phase 2.5b.
+
 ---
 
 ## The verdict in one paragraph

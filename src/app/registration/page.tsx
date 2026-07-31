@@ -1,581 +1,312 @@
-import Layout from "../../components/layout";
 import Link from "next/link";
-import { Calendar, Clock, MapPin, Users, CheckCircle, CreditCard, Zap, Award, Target, Heart, type LucideIcon } from "lucide-react";
-import { Button } from "../../components/ui/button";
-import { getTrainingPackages, getUpcomingCamps, getPaymentOptions, getWhatsIncluded } from "../../lib/queries";
+import type { Metadata } from "next";
+import Layout from "../../components/layout";
 
 /**
- * RegistrationPage - Comprehensive registration and pricing page for Elevate Training Camps
+ * Registration & Pricing — the team-block tariff, stated honestly.
  *
- * This component displays detailed registration information, pricing tiers, and upcoming
- * camp details. It provides users with complete information about costs, discounts,
- * payment options, and what to expect during the registration process.
+ * Rebuilt 2026-07-30. The previous page rendered hard-coded fallback data —
+ * invented per-person tiers ($1,200/$1,800/$2,800), 2025 session dates,
+ * "spots remaining" scarcity, early-bird discounts, payment plans, and
+ * lodging/meals/transport promises — none of which existed in the business
+ * plan, and several of which violated its guardrails outright. The Sanity
+ * types it queried (trainingPackage, upcomingCamp, paymentOption,
+ * whatsIncluded) hold zero documents, so the fabricated fallbacks always
+ * rendered. This page no longer queries them.
  *
- * Features:
- * - Detailed pricing tiers with feature comparisons
- * - Early bird discounts and special offers
- * - Registration timeline and important dates
- * - Payment options and policies
- * - What's included in each package
- * - Call-to-action for registration
+ * Copy is in code, not the CMS, for the same reason as the homepage and
+ * /recruiting: the schema still models the old per-person product, and the
+ * Phase 1.5 reshape (a teamBlock type carrying base fee + per-athlete rate +
+ * minimum squad) hasn't happened yet.
  *
- * @returns {JSX.Element} The comprehensive registration and pricing page
+ * Constraints this copy is written under — each is load-bearing:
+ *  - Prices come from business-plan/PRICING.md and nowhere else:
+ *    1-week $1,500 + $250/athlete · 3-week $3,000 + $500/athlete ·
+ *    minimum eight athletes. Never quote a range, never a per-person price.
+ *  - Programming only. No lodging, meals, transport or overnight
+ *    supervision promises — the team's own adults book housing from the
+ *    shortlist we provide and hold supervision (facilitate, don't operate).
+ *  - Sold to teams via their trip leader — coach or parent organiser —
+ *    never to individual athletes.
+ *  - No invented dates, scarcity, discounts or payment plans. Booking is
+ *    enquiry → deposit holds dates → roster and balance before arrival.
+ *  - No race-outcome claims; a summer block builds aerobic base.
+ *  - Cancellation/smoke posture is stated plainly; full refund terms travel
+ *    with the team agreement, provided before any deposit is taken.
  */
 
-// Icon mapping function
-const getIcon = (iconName: string) => {
-  const iconMap: Record<string, LucideIcon> = {
-    award: Award,
-    mappin: MapPin,
-    zap: Zap,
-    users: Users,
-    target: Target,
-    clock: Clock,
-    heart: Heart
-  };
-  return iconMap[iconName] || Award;
+export const metadata: Metadata = {
+  title: "Registration & Pricing | Elevate Training Camps",
+  description:
+    "Team altitude training blocks in Flagstaff, Arizona — a 3-week flagship block and a 1-week camp, priced as a team. Programming only; transparent pricing for coaches and parent organisers.",
 };
 
-// Fallback data if Sanity is empty
-const fallbackPackages = [
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">{children}</p>;
+}
+
+/** The two products, verbatim from business-plan/PRICING.md. */
+const BLOCKS = [
   {
-    _id: "fallback-package-1",
-    name: "Basic Camp",
-    description: "Perfect for athletes new to high-altitude training",
-    price: 1200,
-    originalPrice: 1400,
-    duration: "3 days",
-    features: [
-      "High-altitude training sessions",
-      "Basic performance testing",
-      "Group coaching sessions",
-      "Accommodation (shared rooms)",
-      "All meals included",
-      "Training gear rental",
-      "Welcome package"
-    ],
-    popular: false,
-    order: 0,
-    active: true
+    name: "Three-week block",
+    tagline: "The flagship. Long enough for real altitude adaptation.",
+    base: "$3,000",
+    perAthlete: "$500",
+    example: "A 15-athlete squad comes to $10,500 — about $700 per athlete.",
+    detail:
+      "Meaningful physiological adaptation takes roughly three weeks at this elevation. Week one lands the camp experience — orientation, the professional meet-and-greet, the D1 panel, the recruiting seminar. The following weeks are the actual work: coached volume on Flagstaff's trail network with recovery built around it.",
   },
   {
-    _id: "fallback-package-2",
-    name: "Premium Camp",
-    description: "Our most popular option with comprehensive training",
-    price: 1800,
-    originalPrice: 2200,
-    duration: "5 days",
-    features: [
-      "Everything in Basic Camp",
-      "Individual coaching sessions",
-      "Advanced performance testing",
-      "Nutrition consultation",
-      "Recovery and massage therapy",
-      "Private accommodation",
-      "Personalized training plan",
-      "Follow-up coaching (1 month)",
-      "Exclusive training gear"
-    ],
-    popular: true,
-    order: 1,
-    active: true
+    name: "One-week camp",
+    tagline: "The on-ramp. A serious week, without the three-week commitment.",
+    base: "$1,500",
+    perAthlete: "$250",
+    example: "A 15-athlete squad comes to $5,250 — about $350 per athlete.",
+    detail:
+      "A full training camp week — coached sessions, education blocks and team time at 7,000 feet. Built for programs that want to see how a Flagstaff block works before committing a squad to the full three weeks.",
   },
-  {
-    _id: "fallback-package-3",
-    name: "Elite Camp",
-    description: "Intensive training for serious athletes",
-    price: 2800,
-    originalPrice: 3200,
-    duration: "7 days",
-    features: [
-      "Everything in Premium Camp",
-      "Daily individual coaching",
-      "Comprehensive performance analysis",
-      "Mental performance coaching",
-      "Sports psychology sessions",
-      "Luxury accommodation",
-      "Personal chef consultation",
-      "Follow-up coaching (3 months)",
-      "Competition preparation",
-      "Priority booking for future camps"
-    ],
-    popular: false,
-    order: 2,
-    active: true
-  }
 ];
 
-const fallbackWhatsIncluded = [
+const INCLUDED = [
   {
-    _id: "fallback-included-1",
-    category: "Training & Coaching",
-    items: [
-      "High-altitude training sessions",
-      "Individual and group coaching",
-      "Performance testing and analysis",
-      "Personalized training plans",
-      "Mental performance coaching"
-    ],
-    icon: "award",
-    order: 0,
-    active: true
+    t: "Coached training",
+    d: "Two daily sessions on Flagstaff's trail network, planned around your coach's own program — it stays their team.",
   },
   {
-    _id: "fallback-included-2",
-    category: "Accommodation & Meals",
-    items: [
-      "Comfortable lodging in Flagstaff",
-      "All meals and snacks included",
-      "Nutrition consultation",
-      "Recovery facilities access"
-    ],
-    icon: "mappin",
-    order: 1,
-    active: true
+    t: "Education blocks",
+    d: "Altitude physiology, fueling, recovery and the recruiting calendar, delivered mid-day between sessions.",
   },
   {
-    _id: "fallback-included-3",
-    category: "Equipment & Gear",
-    items: [
-      "Training equipment rental",
-      "Performance tracking devices",
-      "Exclusive Elevate gear",
-      "Welcome package with essentials"
-    ],
-    icon: "zap",
-    order: 2,
-    active: true
+    t: "Pro and D1 access",
+    d: "Flagstaff's professional training groups and collegiate staff — panels and meet-and-greets a visiting coach can't self-provide.",
   },
   {
-    _id: "fallback-included-4",
-    category: "Support & Follow-up",
-    items: [
-      "24/7 support during camp",
-      "Follow-up coaching sessions",
-      "Progress tracking",
-      "Community access"
-    ],
-    icon: "users",
-    order: 3,
-    active: true
-  }
+    t: "A written evaluation for every camper",
+    d: "Every athlete leaves a block with an honest written assessment — included, never an upsell.",
+  },
+  {
+    t: "Local logistics",
+    d: "Routes, schedules, and the on-the-ground knowledge that makes three weeks in a new town run smoothly.",
+  },
+  {
+    t: "A housing shortlist — not housing",
+    d: "We hand your trip leader a vetted shortlist of local options sized for a squad. Your team books directly and your adults hold the reservation.",
+  },
 ];
 
-const fallbackCamps = [
-  {
-    _id: "fallback-camp-1",
-    date: "March 15-19, 2025",
-    type: "Premium Camp",
-    spots: "8 spots remaining",
-    location: "Flagstaff, AZ",
-    earlyBird: true,
-    earlyBirdEnds: "February 15, 2025",
-    order: 0,
-    active: true
-  },
-  {
-    _id: "fallback-camp-2",
-    date: "April 12-16, 2025",
-    type: "Basic Camp",
-    spots: "12 spots remaining",
-    location: "Flagstaff, AZ",
-    earlyBird: true,
-    earlyBirdEnds: "March 12, 2025",
-    order: 1,
-    active: true
-  },
-  {
-    _id: "fallback-camp-3",
-    date: "May 10-16, 2025",
-    type: "Elite Camp",
-    spots: "4 spots remaining",
-    location: "Flagstaff, AZ",
-    earlyBird: false,
-    earlyBirdEnds: null,
-    order: 2,
-    active: true
-  }
+const NOT_INCLUDED = [
+  "Lodging — booked by the team from the shortlist we provide",
+  "Meals and groceries — managed by the team's adults",
+  "Travel to and around Flagstaff",
+  "Overnight supervision — the team's accompanying adults hold it throughout",
 ];
 
-const fallbackPaymentOptions = [
+const STEPS = [
   {
-    _id: "fallback-1",
-    name: "Full Payment",
-    description: "Pay in full and receive an additional 5% discount on your total cost.",
-    discount: "Save 5%",
-    order: 0,
-    active: true
+    n: "01",
+    t: "Talk to us",
+    d: "A call with your coach or parent organiser: dates, squad size, what your program wants from the block.",
   },
   {
-    _id: "fallback-2",
-    name: "2-Payment Plan",
-    description: "Split your payment into two equal installments with no additional fees.",
-    discount: "50% + 50%",
-    order: 1,
-    active: true
+    n: "02",
+    t: "A deposit holds your dates",
+    d: "One team booking, one invoice. The team agreement — including refund and cancellation terms — comes first, before any money.",
   },
   {
-    _id: "fallback-3",
-    name: "Monthly Plan",
-    description: "Spread your payments over 3-6 months with a small processing fee.",
-    discount: "3-6 months",
-    order: 2,
-    active: true
-  }
+    n: "03",
+    t: "Roster and balance before arrival",
+    d: "Roster, medical forms and signed waivers land ahead of camp, with the balance due before the session starts.",
+  },
 ];
 
-export default async function RegistrationPage() {
-  const [trainingPackages, upcomingCampsData, paymentOptions, whatsIncluded] = await Promise.all([
-    getTrainingPackages(),
-    getUpcomingCamps(),
-    getPaymentOptions(),
-    getWhatsIncluded(),
-  ]);
-
-  // Use Sanity data if available, otherwise use fallback
-  const displayPackages = trainingPackages.length > 0 ? trainingPackages : fallbackPackages;
-  const displayCamps = upcomingCampsData.length > 0 ? upcomingCampsData : fallbackCamps;
-  const displayPaymentOptions = paymentOptions.length > 0 ? paymentOptions : fallbackPaymentOptions;
-  const displayWhatsIncluded = whatsIncluded.length > 0 ? whatsIncluded : fallbackWhatsIncluded;
-
+export default function RegistrationPage() {
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-[#fbf9f3] to-[#fff9eb]">
-        {/* Hero Section */}
-        <section className="relative py-20 md:py-32 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#427b4d]/10 to-[#755f4f]/10"></div>
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="mb-8">
-              <Calendar className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-              <h1 className="text-5xl md:text-6xl text-gray-900 mb-6">
-                Registration & Pricing
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Secure your spot for an unforgettable high-altitude training experience.
-                Choose from our comprehensive camp packages designed for every athlete.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                asChild
-                size="lg"
-                className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
-              >
-                <a href="#packages">Register Now</a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
-              >
-                <Link href="/contact">Download Brochure</Link>
-              </Button>
-            </div>
+      {/* ——— Masthead ————————————————————————————————————— */}
+      <section className="pt-20 pb-16 md:pt-28 md:pb-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <Eyebrow>Registration &amp; pricing · Summer 2027</Eyebrow>
+          <h1 className="mt-5 max-w-3xl text-5xl leading-[1.05] md:text-7xl">
+            Priced as a team, not per head.
+          </h1>
+          <p className="mt-7 max-w-2xl text-lg leading-[1.75] text-[#4a4a4a]">
+            Elevate sells altitude training blocks to teams — booked by the
+            coach, or by a parent organiser running the trip. One base fee
+            covers what&apos;s fixed for the squad; a per-athlete rate scales
+            with your roster. Minimum eight athletes.
+          </p>
+          <div className="mt-9 flex flex-wrap gap-4">
+            <Link
+              href="/contact"
+              className="rounded-md bg-[var(--primary)] px-7 py-3.5 text-base text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
+            >
+              Enquire about 2027 dates
+            </Link>
+            <Link
+              href="/recruiting"
+              className="rounded-md border border-[var(--border)] px-7 py-3.5 text-base text-[var(--foreground)] transition hover:bg-[var(--surface)]"
+            >
+              The recruiting advisory
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Pricing Section */}
-        <section id="packages" className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                Choose Your Training Package
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                All packages include accommodation, meals, and comprehensive training.
-                Early bird discounts available for limited time!
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-8">
-              {displayPackages.map((tier, index) => (
-                <div
-                  key={tier._id || index}
-                  className={`relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                    tier.popular ? 'ring-2 ring-[#427b4d] scale-105' : 'border border-gray-200'
-                  }`}
-                >
-                  {tier.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-[#427b4d] text-white px-6 py-2 rounded-full text-sm">
-                        Most Popular
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl text-gray-900 mb-2">{tier.name}</h3>
-                    <p className="text-gray-600 mb-6">{tier.description}</p>
-
-                    <div className="mb-4">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="text-4xl text-gray-900">${tier.price}</span>
-                        {tier.originalPrice && (
-                          <span className="text-lg text-gray-500 line-through">${tier.originalPrice}</span>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{tier.duration}</span>
-                      </div>
-                    </div>
+      {/* ——— 01 · The two blocks ————————————————————————— */}
+      <section className="border-t border-[var(--border)] bg-[var(--surface)] py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <Eyebrow>01 — Two formats</Eyebrow>
+          <h2 className="mt-5 max-w-2xl text-[2.25rem] leading-[1.1] md:text-[2.75rem]">
+            A three-week flagship, and a one-week way in.
+          </h2>
+          <div className="mt-12 grid gap-10 md:grid-cols-2">
+            {BLOCKS.map((b) => (
+              <div key={b.name} className="border-t-2 border-[var(--primary)] bg-[var(--background)] p-8">
+                <h3 className="text-[1.75rem] leading-snug">{b.name}</h3>
+                <p className="mt-2 text-[15px] text-[var(--accent-trail)]">{b.tagline}</p>
+                <div className="mt-7 flex items-baseline gap-6">
+                  <div>
+                    <div className="text-4xl leading-none">{b.base}</div>
+                    <div className="mt-2 text-sm text-[var(--muted-foreground)]">team base fee</div>
                   </div>
-
-                  <ul className="space-y-4 mb-8">
-                    {tier.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-start">
-                        <CheckCircle className="h-5 w-5 text-[#427b4d] mr-3 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Button
-                    asChild
-                    className={`w-full py-4 text-lg ${
-                      tier.popular
-                        ? 'bg-[#427b4d] hover:bg-[#387143] text-white'
-                        : 'bg-gray-900 hover:bg-gray-800 text-white'
-                    }`}
-                  >
-                    <Link href="/contact">Choose {tier.name}</Link>
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-
-          </div>
-        </section>
-
-        {/* Upcoming Camps */}
-        <section className="py-20 bg-[#fff9eb]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                Upcoming Training Camps
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Book your spot for our upcoming high-altitude training camps in Flagstaff, Arizona.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {displayCamps.map((camp, index) => (
-                <div key={camp._id || index} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs uppercase tracking-[0.14em] ${
-                      camp.earlyBird ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {camp.earlyBird ? 'Early Bird Available' : 'Regular Pricing'}
-                    </span>
-                    <span className="text-sm text-gray-600">{camp.spots}</span>
-                  </div>
-
-                  <h3 className="text-xl text-gray-900 mb-2">{camp.type}</h3>
-                  <div className="space-y-2 mb-6">
-                    <div className="flex items-center text-gray-600">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span>{camp.date}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{camp.location}</span>
-                    </div>
-                    {camp.earlyBird && camp.earlyBirdEnds && (
-                      <div className="flex items-center text-green-600">
-                        <Clock className="h-4 w-4 mr-2" />
-                        <span className="text-sm">Early bird ends {camp.earlyBirdEnds}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <Button asChild className="w-full bg-[#427b4d] hover:bg-[#387143] text-white">
-                    <Link href="/contact">Register for This Camp</Link>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* What's Included */}
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                What&apos;s Included
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Every training camp package includes comprehensive services and amenities
-                to ensure you get the most out of your high-altitude training experience.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {displayWhatsIncluded.map((category, index) => {
-                const IconComponent = getIcon(category.icon);
-                return (
-                  <div key={category._id || index} className="text-center">
-                    <div className="bg-[#fff9eb] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <IconComponent className="h-8 w-8 text-[#427b4d]" />
-                    </div>
-                    <h3 className="text-xl text-gray-900 mb-4">{category.category}</h3>
-                    <ul className="space-y-2 text-left">
-                      {category.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-start text-gray-600">
-                          <CheckCircle className="h-4 w-4 text-[#427b4d] mr-2 flex-shrink-0 mt-0.5" />
-                          <span className="text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Team & Group Pricing */}
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <Users className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-              <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-                Team & Group Pricing
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Special pricing for teams and groups. The more athletes you bring, the more you save!
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-12">
-              {/* Team/Group Pricing */}
-              <div className="bg-[#fff9eb] rounded-2xl p-8">
-                <h3 className="text-3xl text-gray-900 mb-6">Team / Group Pricing</h3>
-                <div className="space-y-6">
-                  <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">10 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,350 per person</p>
-                    <p className="text-gray-600 mb-3">4-week program with Airbnb-style housing</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Housing included</li>
-                      <li>• Van rental</li>
-                      <li>• Groceries</li>
-                      <li>• Training support</li>
-                    </ul>
-                  </div>
-
-                  <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">12-14 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,200 - $1,250 per person</p>
-                    <p className="text-gray-600 mb-3">Best value - shared housing and van rental costs</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Shared housing</li>
-                      <li>• Van rental split among group</li>
-                      <li>• Groceries</li>
-                      <li>• Training support</li>
-                    </ul>
-                  </div>
-
-                  <div className="border-l-4 border-[#427b4d] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">6-8 Athletes</h4>
-                    <p className="text-lg text-[#427b4d] mb-2">$1,500 - $1,600 per person</p>
-                    <p className="text-gray-600 mb-3">Smaller groups - higher per-person costs</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Housing included</li>
-                      <li>• Van rental</li>
-                      <li>• Groceries</li>
-                      <li>• Training support</li>
-                    </ul>
+                  <div className="text-2xl text-[var(--muted-foreground)]">+</div>
+                  <div>
+                    <div className="text-4xl leading-none">{b.perAthlete}</div>
+                    <div className="mt-2 text-sm text-[var(--muted-foreground)]">per athlete</div>
                   </div>
                 </div>
+                <p className="mt-5 text-[15px] leading-[1.7] text-[var(--accent-trail)]">{b.example}</p>
+                <p className="mt-5 text-[16px] leading-[1.7] text-[#4a4a4a]">{b.detail}</p>
               </div>
-
-              {/* Hostel-Style Option */}
-              <div className="bg-[#fff9eb] rounded-2xl p-8">
-                <h3 className="text-3xl text-gray-900 mb-6">Hostel-Style Option</h3>
-                <div className="space-y-6">
-                  <div className="border-l-4 border-[#755f4f] pl-6">
-                    <h4 className="text-xl text-gray-900 mb-2">Solo Athletes & Pairs</h4>
-                    <p className="text-lg text-[#755f4f] mb-2">$1,400 - $1,500 per person</p>
-                    <p className="text-gray-600 mb-3">4-week program with shared housing</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Shared housing with other athletes</li>
-                      <li>• Paired with athletes from other schools/teams</li>
-                      <li>• Transport included</li>
-                      <li>• Groceries included</li>
-                      <li>• Training support</li>
-        </ul>
-                  </div>
-
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h5 className=" text-yellow-800 mb-2">Important Note:</h5>
-                    <p className="text-sm text-yellow-700">
-                      Meals out, personal spending, and travel to Flagstaff are <strong>not included</strong> in these prices.
-                    </p>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h5 className=" text-blue-800 mb-2">Final Pricing:</h5>
-                    <p className="text-sm text-blue-700">
-                      Final cost depends on total headcount for the session.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-        </section>
+          <p className="mt-10 max-w-2xl text-[15px] leading-[1.7] text-[var(--muted-foreground)]">
+            Prices are for the 2027 season, programming only, minimum eight
+            athletes per team. The base fee covers what doesn&apos;t change
+            with squad size — the panels, the seminar, the coordination — so
+            small squads aren&apos;t subsidised by large ones.
+          </p>
+        </div>
+      </section>
 
-        {/* Payment Options */}
-        <section className="py-20 bg-[#fff9eb]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <CreditCard className="h-16 w-16 mx-auto text-[#427b4d] mb-6" />
-            <h2 className="text-4xl md:text-5xl text-gray-900 mb-6">
-              Flexible Payment Options
-            </h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              We offer flexible payment plans to make high-altitude training accessible to every athlete.
-            </p>
-
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              {displayPaymentOptions.map((option, index) => (
-                <div key={option._id || index} className="bg-white p-6 rounded-xl shadow-lg">
-                  <h3 className="text-xl text-gray-900 mb-4">{option.name}</h3>
-                  <div className="text-3xl text-[#427b4d] mb-2">{option.discount}</div>
-                  <p className="text-gray-600">{option.description}</p>
-                </div>
+      {/* ——— 02 · What's included / what isn't ———————————————— */}
+      <section className="py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <Eyebrow>02 — What the fee buys</Eyebrow>
+          <h2 className="mt-5 max-w-2xl text-[2.25rem] leading-[1.1] md:text-[2.75rem]">
+            The program. Deliberately not the beds.
+          </h2>
+          <p className="mt-6 max-w-2xl text-[17px] leading-[1.75] text-[#4a4a4a]">
+            We&apos;re a program provider, not a camp operator. Your team&apos;s
+            own adults hold housing and overnight supervision — that keeps
+            costs transparent, keeps the trip yours, and is the reason a
+            three-week block can cost what a five-day camp does elsewhere.
+          </p>
+          <div className="mt-12 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {INCLUDED.map((i) => (
+              <div key={i.t} className="border-t border-[var(--border)] pt-5">
+                <h3 className="text-[1.3rem] leading-snug">{i.t}</h3>
+                <p className="mt-3 text-[15px] leading-[1.7] text-[#4a4a4a]">{i.d}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-14 max-w-2xl border-l-2 border-[var(--accent-rock)] pl-6">
+            <h3 className="text-[1.3rem]">Not included — on purpose</h3>
+            <ul className="mt-4 space-y-2">
+              {NOT_INCLUDED.map((n) => (
+                <li key={n} className="text-[15px] leading-[1.7] text-[#4a4a4a]">
+                  {n}
+                </li>
               ))}
-            </div>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl text-gray-900 mb-4">Ready to Get Started?</h3>
-              <p className="text-gray-600 mb-6">
-                Contact us to discuss payment options and secure your spot in our next training camp.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-[#427b4d] hover:bg-[#387143] text-white px-8 py-4 text-lg"
-                >
-                  <Link href="/contact">Register Now</Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="border-[#427b4d] text-[#427b4d] hover:bg-[#427b4d] hover:text-white px-8 py-4 text-lg"
-                >
-                  <a href="tel:+16512074749">Call (651) 207-4749</a>
-                </Button>
+      {/* ——— 03 · How booking works ————————————————————————— */}
+      <section className="bg-[var(--primary-deep)] py-20 text-[#f0ead6]">
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-[#f0ead6]/70">03 — How booking works</p>
+          <h2 className="mt-5 max-w-2xl text-[2.25rem] leading-[1.1] md:text-[2.75rem]">
+            One conversation. One invoice.
+          </h2>
+          <div className="mt-12 grid gap-12 sm:grid-cols-3">
+            {STEPS.map((s) => (
+              <div key={s.n} className="border-t border-[#f0ead6]/25 pt-6">
+                <div className="text-sm tracking-[0.2em] text-[#f0ead6]/60">{s.n}</div>
+                <h3 className="mt-3 text-[1.4rem] leading-snug">{s.t}</h3>
+                <p className="mt-3 text-[15px] leading-[1.7] text-[#f0ead6]/80">{s.d}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ——— 04 · The honest fine print ————————————————————— */}
+      <section className="py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <Eyebrow>04 — Things we&apos;d rather say now than later</Eyebrow>
+          <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
+            <div className="border-t border-[var(--border)] pt-5">
+              <h3 className="text-[1.4rem] leading-snug">Smoke, weather and cancellations</h3>
+              <p className="mt-3 text-[16px] leading-[1.7] text-[#4a4a4a]">
+                This is the mountain West in summer: wildfire smoke or weather
+                can modify or cancel sessions, and we adjust training rather
+                than run athletes through bad air. Refund and cancellation
+                terms are written into the team agreement your trip leader
+                receives before any deposit — not negotiated after the fact.
+              </p>
+            </div>
+            <div className="border-t border-[var(--border)] pt-5">
+              <h3 className="text-[1.4rem] leading-snug">Adults travel with the team</h3>
+              <p className="mt-3 text-[16px] leading-[1.7] text-[#4a4a4a]">
+                Every team brings accompanying adults — the coach, parent
+                chaperones, or both — who hold housing and overnight
+                supervision for the whole block. It&apos;s in the team
+                agreement, and it&apos;s not negotiable.
+              </p>
+            </div>
+            <div className="border-t border-[var(--border)] pt-5">
+              <h3 className="text-[1.4rem] leading-snug">Iron screening before arrival</h3>
+              <p className="mt-3 text-[16px] leading-[1.7] text-[#4a4a4a]">
+                We ask that athletes have ferritin checked before a block. Low
+                iron makes altitude training useless or actively harmful, and
+                deficiency is common in adolescent distance runners — this is
+                basic due diligence, not an upsell.
+              </p>
+            </div>
+            <div className="border-t border-[var(--border)] pt-5">
+              <h3 className="text-[1.4rem] leading-snug">What a summer block is — and isn&apos;t</h3>
+              <p className="mt-3 text-[16px] leading-[1.7] text-[#4a4a4a]">
+                A June or July block builds aerobic base through the
+                highest-volume phase of the training year. It is not a promise
+                about November — anyone who sells altitude as a race-day
+                guarantee is overselling it.
+              </p>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
+      {/* ——— Closing CTA ————————————————————————————————— */}
+      <section className="border-t border-[var(--border)] bg-[var(--surface)] py-24">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <h2 className="text-[2.5rem] leading-[1.08] md:text-[3.25rem]">
+            Bring your squad to 7,000 feet.
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-[17px] leading-[1.75] text-[#4a4a4a]">
+            Tell us your program, your rough dates and your squad size, and
+            we&apos;ll come back with a concrete plan for a 2027 block —
+            including the housing shortlist your trip leader will book from.
+          </p>
+          <Link
+            href="/contact"
+            className="mt-9 inline-block rounded-md bg-[var(--primary)] px-8 py-4 text-base text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
+          >
+            Enquire about 2027 dates
+          </Link>
+        </div>
+      </section>
     </Layout>
   );
 }

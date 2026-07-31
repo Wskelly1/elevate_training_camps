@@ -5,19 +5,22 @@ is never stalled waiting on a key, decision, or approval. Engineering phases (§
 route around whatever is still pending. Maintained by Claude Code sessions;
 update it as phases complete rather than letting it rot.
 
-## Current state (as of 2026-07-29)
+## Current state (as of 2026-07-30)
 
 Live at https://elevatetrainingcamps.com (Vercel, auto-deploy from `main`).
 Shipped: site-wide crash fix, SendGrid→Gmail SMTP migration, GA4, CVE-2025-66478
 patch, Sanity caching refactor (all pages are cached Server Components), domain
-cutover with TLS, brand guide + A1 decisions, `:root` token layer, and the
+cutover with TLS, brand guide + A1 decisions, `:root` token layer, the
 **rebuilt homepage** (A2.5a — scroll-hijack deleted, ambient hero, editorial
-layout system, repositioned copy). Known-broken: Sanity billing-blocked (quota
+layout system, repositioned copy), `/recruiting` (O-16, PRs #15/#17), and the
+**rebuilt `/registration`** (2026-07-30 — canonical team-block tariff replaced
+the fabricated per-person tiers; `/media` and the About hero de-fabricated the
+invented history at the same time). Known-broken: Sanity billing-blocked (quota
 overage — billing team contacted), HubSpot token 401s (leads not reaching CRM),
 Stripe not yet created.
 
 **The site's positioning changed on 2026-07-29.** The business plan (now at
-`../business-plan/`, restructured and expanded the same day) establishes that
+`../../business-plan/`, restructured and expanded the same day) establishes that
 the buyer is a high school cross country *coach*, not an individual athlete;
 that the product is a team altitude block sold on a two-part tariff with
 lodging deliberately excluded; and that the **college recruiting advisory is
@@ -30,8 +33,8 @@ was actively selling the cut subscription until O-16 resolved it (repurposed
 as `/recruiting` — see §5.5). **Also 2026-07-29: the buyer definition was
 widened** — team blocks sell to the coach *or a parent organiser* where the
 coach can't travel; parent-led trips are first-class (see
-`../business-plan/CHANGELOG.md`). Read §5.5 before writing any copy, and
-`../business-plan/WEBSITE-SYNC.md` before acting on any business change.
+`../../business-plan/CHANGELOG.md`). Read §5.5 before writing any copy, and
+`../../business-plan/WEBSITE-SYNC.md` before acting on any business change.
 
 ---
 
@@ -68,7 +71,7 @@ website copy depends on them; see §5.5.
 | O-13 | **Refund / cancellation / AQI-and-smoke policy text**, legally reviewed. The risk plan requires it published at the point of sale, not negotiated during a smoke event | Gate-5, Phase 4, Phase 5 checkout |
 | O-14 | Verify **state-association summer contact rules** (AIA, CIF, NIAA, NMAA…) — they decide whether a team's own coaches may attend, which changes supervision, staffing and liability | FAQ content; supervision claims |
 | O-15 | Written **worker classification opinion** (1099 vs W-2) from an AZ attorney/CPA | Any site content describing staff; blocks counsellor hiring |
-| O-16 | ✅ **Decided 2026-07-29: repurpose for the recruiting advisory.** Implemented as `/recruiting` (with `/coaching` 308-redirected) in the `feat/recruiting-advisory` PR — awaiting screenshot approval + merge | ~~The single most urgent live content fix~~ |
+| O-16 | ✅ **Decided 2026-07-29: repurpose for the recruiting advisory.** Shipped: `/recruiting` live on `main`, `/coaching` 308-redirected — PR #15 merged 2026-07-29, plus PR #17 (which added the page file #15 shipped without; see the `git add` pathspec incident in project memory) | ~~The single most urgent live content fix~~ |
 
 **Tier 3 — approvals on demand:** brand-guide sign-off (A1), per-PR screenshot
 approvals, component picks from shortlist menus. Each takes minutes.
@@ -103,10 +106,10 @@ approvals, component picks from shortlist menus. Each takes minutes.
   exists — publishing pricing earlier inverts the sequence and risks building
   a surface for demand that was never measured.
 
-**Keeping this in sync.** `../business-plan/` is the source of truth for
+**Keeping this in sync.** `../../business-plan/` is the source of truth for
 product, price, audience and promises; this file is the source of truth for how
 the site gets built. When a business document changes, work through
-`../business-plan/WEBSITE-SYNC.md` — it maps each decision to a site surface
+`../../business-plan/WEBSITE-SYNC.md` — it maps each decision to a site surface
 and says whether it is a Sanity edit or a code change — then update §5.5 here.
 Check `CHANGELOG.md`'s *superseded assumptions* and *decisions taken* tables
 before proposing anything; they exist to stop settled questions being reopened.
@@ -161,15 +164,15 @@ touches visuals gets promoted to gated.
 |---|---|---|---|
 | **0 · Hygiene & docs** | Docs rewrite (this file, `04-email-setup.md`, README, `05-video-playback.md`), dead-code + unused-dep removal, version pairings, ESLint config + ~50 error fixes, `06-billing.md`/`07-security-log.md`, calendar renewal events | none | baseline sweep |
 | **1 · Brand guide** | Photo-derived palette, green/cream canonicalization, type scale, layout references, motion vocabulary; delivered as a committed `/style-guide` route | O-5 mid-phase | **A1** approval |
-| **1.5 · Positioning & IA** | See §5.5. Repositions the site from individual athletes to the coaches who buy; team-block product model; page-by-page IA; claims discipline; alumni-data capture; CMS schema reshape. **Opens with the two live inconsistencies** — `/coaching` selling a cut product, and `trainingPackage` unable to express a 3-week block | `../business-plan/` (source of truth); O-16 decides `/coaching`; O-10/O-11 refine the product model | **A1.5** positioning approval; Gate-5, Gate-6 |
-| **2 · Token migration + providers** | Fill the empty `:root` token layer, delete dead `tailwind.config.js`, migrate hardcoded hexes page-by-page, reconcile Sanity-schema + email-template palette copies, register Magic UI + Aceternity | A1 | **A2** regression approval + sweep |
+| **1.5 · Positioning & IA** | See §5.5. Repositions the site from individual athletes to the trip leaders who buy; team-block product model; page-by-page IA; claims discipline; alumni-data capture; CMS schema reshape. ~~Opens with the two live inconsistencies~~ — both fixed (O-16 shipped `/recruiting`; `2 weeks`/`3 weeks` added to `trainingPackage.duration`). Remaining: the CMS reshape (`teamBlock` type, `coachingProgram` retirement) and the page-by-page copy pass | `../../business-plan/` (source of truth); O-10/O-11 refine the product model | **A1.5** positioning approval; Gate-5, Gate-6 |
+| **2 · Token migration + providers** | Fill the empty `:root` token layer (done), ~~delete dead `tailwind.config.js`~~ (removed), migrate remaining hardcoded hexes page-by-page (~293 left), reconcile Sanity-schema + email-template palette copies, register Magic UI + Aceternity | A1 | **A2** regression approval + sweep |
 | **2.5 · UI & content-organisation overhaul** | Driven by `02-design-review.md`. **Homepage done** (A2.5a approved — scroll-hijack deleted, layout system landed). Remaining: apply the same system to the inner pages; rebuild the testimonial card; fix vertical rhythm and left-edge alignment; retire off-palette dark buttons; resolve CMS-authored `<strong>` marks | Phase 2 tokens; inner-page copy needs Phase 1.5 | ~~**A2.5a**~~ done, **A2.5b** per-page approval |
 | **3 · Media page** | Curate → optimize → gallery with provider scroll components | Phase 2, Gates 1/3/4 | **A3a** direction, **A3b** final + sweep |
 | **4 · Legal pages** | Privacy / ToS / Cookies (footer links are currently dead) **plus the refund/cancellation and wildfire-smoke-AQI policy** — the risk plan requires the latter published at the point of sale, so it is revenue-protecting, not boilerplate | O-7, O-13 | **A4** light + sweep, Gate-5 |
 | **5 · Stripe foundation** | **Re-scoped by Phase 1.5.** The sale is B2B and quote-based: two-part tariff (team base fee + per-athlete), squad minimum, non-refundable deposit at booking with balance before arrival. So: deposit/invoice flow rather than a per-head product checkout; signature-verified idempotent webhook; `/registration/success`; drop `paymentOption` schema | O-1, Phase 1.5, Gate-1 (or fallback); live: Phase 4 | payment security review + **A5** |
-| **6 · Real content** | Replace fabricated Registration/Coaching fallbacks (the invented $1,200/$1,800/$2,800 tiers are structurally wrong, not merely stale), honest empty-states, wire CTAs to the quote/deposit flow | O-8, Phase 1.5, Gate-1, Gate-6 | **A6** direction + approval + sweep |
+| **6 · Real content** | ~~Replace fabricated Registration fallbacks~~ — done 2026-07-30: `/registration` rebuilt copy-in-code with the canonical two-part tariff, no dates/scarcity/discounts, honest smoke/cancellation copy. Remaining: wire CTAs to the real quote/deposit flow once Phase 5 exists, and move copy into the CMS after the Phase 1.5 schema reshape | O-8, Phase 1.5, Gate-1, Gate-6 | **A6** direction + approval + sweep |
 | **7 · Blog** | `blogPost` schema, listing, post page, nav | Phase 2, Gate-1 | **A7** + sweep |
-| **8 · Recruiting advisory surface** | The principal service line (doc 04) gets a page + schema: four tiers, two different buyers, NCAA-compliant copy. **Phased** — Y1 ships only the free Tier-1 evaluation as camp copy; the priced rate card waits on a measured attach rate | Phase 1.5, Gate-7; O-16 if the page is a `/coaching` repurpose | **A8** direction + approval, Gate-5 rule 4 |
+| **8 · Recruiting advisory surface** | **Partly shipped** via O-16 (PRs #15/#17): `/recruiting` is live with the Y1-phased, no-pricing copy. Remaining: the priced rate card (waits on the Gate-7 measured attach rate), any schema backing, and the two-buyer split if the copy ever needs it | Phase 1.5, Gate-7 | **A8** direction + approval, Gate-5 rule 4 |
 
 **Critical path:** A1 → Phase 2 → all visual work; **Phase 1.5 → Phases 5/6/8**
 (the product model determines the checkout, the content and the service-line
@@ -191,7 +194,8 @@ resolved 2026-07-29 (repurpose → `/recruiting`).
 3. Typography scale (Geist Sans/Mono kept): display/h1–h4/body/small/caption.
 4. Layout references: researched menu, owner picks, guide annotates which
    patterns map to which pages.
-5. Motion vocabulary: cinematic scroll (the homepage scroll-hijack hero),
+5. Motion vocabulary: calm, cinematic scroll (the scroll-hijack hero was
+   deleted in A2.5a — do not reintroduce it; see `05-video-playback.md`),
    spring-based shared-layout transitions (testimonial modal), rules for
    marquee/velocity/parallax usage, `prefers-reduced-motion` requirements.
 6. Deliverable: a committed **`/style-guide` route** rendering live tokens,
@@ -214,21 +218,19 @@ resolved 2026-07-29 (repurpose → `/recruiting`).
   serif headlines, refined rustic — high-end and classy but unmistakably
   outdoors.
 
-**Open (rendered on `/style-guide` for the owner to pick):**
-- Serif display face: Fraunces (warm, wonky, rustic) vs Instrument Serif
-  (high-contrast, editorial, closest to the inspiration wordmark). Body/UI
-  stays Geist Sans either way.
-- Logo mark: twin peak vs single peak; plus which lockup and colour
-  treatment are primary. Concepts drafted as inline SVG; the approved mark
-  needs redrawing as a standalone optimised SVG asset with the wordmark
-  converted to outlines before it replaces the current Sanity-hosted logo.
+**Since decided (both shipped; recorded here 2026-07-30):**
+- Serif display face: **Instrument Serif** — shipped in the Phase 2 work
+  (`09-architecture.md` documents its weight-400-only constraint).
+- Logo mark: **twin peak** — `public/logo-mark.svg` exists and is in use.
+  Residual item: confirm the wordmark-to-outlines conversion is done before
+  any print use.
 
 ## §5.5 — Positioning & information architecture (Phase 1.5 detail)
 
 Phase 1 settled how the site looks. Phase 1.5 settles **what it says and who
 it says it to.**
 
-### Source of truth — `../business-plan/`
+### Source of truth — `../../business-plan/`
 
 The business plan is **not in this repo**. It lives one level up, and it is the
 source of truth for what the business sells, at what price, to whom, and with
@@ -284,7 +286,7 @@ and proximity for AZ/NV/NM/W-TX. Say that; don't lead with bagel-shop runs.
 
 ### Claims discipline (Gate-5) — five rules, each load-bearing
 
-Mirrors the guardrails in `../business-plan/WEBSITE-SYNC.md`. Each is a
+Mirrors the guardrails in `../../business-plan/WEBSITE-SYNC.md`. Each is a
 liability or credibility exposure, not a style preference.
 
 1. **Never claim lodging or supervision is provided.** "Facilitate, don't
@@ -311,12 +313,13 @@ liability or credibility exposure, not a style preference.
    truncate one. Refund terms must be published at the point of sale, not
    negotiated afterwards (05 §05).
 
-### 🔴 Two live inconsistencies — fix before anything else
+### ✅ Two live inconsistencies — resolved (historical)
 
-Both raised by `../business-plan/WEBSITE-SYNC.md` and confirmed against the
-running site on 2026-07-29. **Both fixed in the `feat/recruiting-advisory`
-PR** (O-16 resolved as a repurpose → `/recruiting`; `2 weeks`/`3 weeks` added
-to `trainingPackage.duration`) — the history below is kept for context.
+Both raised by `../../business-plan/WEBSITE-SYNC.md` and confirmed against the
+running site on 2026-07-29. **Both fixed and merged to `main`** — PR #15 plus
+follow-up PR #17 (O-16 resolved as a repurpose → `/recruiting`;
+`2 weeks`/`3 weeks` added to `trainingPackage.duration`). The history below is
+kept for context only.
 
 **1. `/coaching` sells the product that was cut — and undercuts the buyer.**
 
@@ -486,4 +489,4 @@ Leave room in the IA; build nothing.
 **Do not park these — they are decided, not deferred:** a remote coaching
 subscription, a paid alumni membership, individual housing referrals, and any
 501(c)(3) or hybrid structure. All were analysed and rejected; see
-`../business-plan/CHANGELOG.md`.
+`../../business-plan/CHANGELOG.md`.

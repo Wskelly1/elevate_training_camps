@@ -98,13 +98,17 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
 
-      // ——— Coaching page ———————————————————————————————————————
+      // ——— Coaching page (legacy — renders nowhere) ————————————————
+      // /coaching was repurposed as /recruiting (O-16, 2026-07-29), whose
+      // copy is in code; no query reads these types anymore. The group stays
+      // visible (deprecated-not-hidden rule) until the Phase 1.5 schema
+      // reshape removes the types and their 3 remaining documents.
       S.listItem()
-        .title('Coaching Page')
+        .title('Coaching Page (legacy — not rendered)')
         .icon(BulbOutlineIcon)
         .child(
           S.list()
-            .title('Coaching Page')
+            .title('Coaching Page (legacy — not rendered)')
             .items([
               S.listItem()
                 .title('Coaching Programs')
