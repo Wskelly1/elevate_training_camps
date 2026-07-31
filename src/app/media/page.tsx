@@ -34,9 +34,14 @@ export default async function MediaPage() {
   );
 
   return (
-    <Layout>
+    <Layout transparentNav>
       {/* ——— Masthead ————————————————————————————————————— */}
-      <PageMasthead eyebrow="Photo & film" heading={page?.heading || "Media"} intro={page?.intro} />
+      <PageMasthead
+        imageUrl={page?.mastheadImageUrl}
+        eyebrow="Photo & film"
+        heading={page?.heading || "Media"}
+        intro={page?.intro}
+      />
 
       {/* ——— Chapters ————————————————————————————————————— */}
       {(chapters.length > 0 || uncategorized.length > 0) && (
@@ -47,10 +52,10 @@ export default async function MediaPage() {
                 <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">
                   {chapter.title}
                 </p>
-                <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-6 grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
                   {chapter.items.map((item) => (
                     <figure key={item._id}>
-                      <div className="relative aspect-[4/3] w-full overflow-hidden">
+                      <div className="img-live relative aspect-[4/3] w-full overflow-hidden">
                         <Image
                           src={urlFor(item.image).width(1200).url()}
                           alt={item.alt || item.caption || ""}
@@ -60,7 +65,7 @@ export default async function MediaPage() {
                         />
                       </div>
                       {item.caption && (
-                        <figcaption className="mt-2 text-sm text-[var(--muted-foreground)]">
+                        <figcaption className="mt-2 mb-4 px-1 text-sm text-[var(--muted-foreground)]">
                           {item.caption}
                         </figcaption>
                       )}
@@ -70,10 +75,10 @@ export default async function MediaPage() {
               </div>
             ))}
             {uncategorized.length > 0 && (
-              <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-6 grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
                 {uncategorized.map((item) => (
                   <figure key={item._id}>
-                    <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <div className="img-live relative aspect-[4/3] w-full overflow-hidden">
                       <Image
                         src={urlFor(item.image).width(1200).url()}
                         alt={item.alt || item.caption || ""}

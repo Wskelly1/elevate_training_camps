@@ -536,19 +536,19 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           rendered with the pt-12 branch and a cream band above the hero,
           with the nav's cream-over-video text invisible against it. */}
       <main className={`flex-grow ${
-        (transparentNav || pathname === '/faq' || pathname === '/about') ? '-mt-[4.5rem]' : 'pt-12'
+        transparentNav ? '-mt-[4.5rem]' : 'pt-12'
       }`}>
         {children}
       </main>
 
       {/* Footer */}
-      <footer style={{ backgroundColor: customColors.headerFooterBg, color: customColors.navText }} className="relative border-t border-[#e6dfd3] transition-colors duration-300">
+      <footer style={{ backgroundColor: 'var(--primary-deep)', color: '#f0ead6' }} className="relative transition-colors duration-300">
         <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
           <div className="grid gap-12 md:grid-cols-1 lg:grid-cols-2">
             {/* Contact/newsletter section */}
-            <div className="relative" style={{ backgroundColor: 'rgba(168, 152, 133, 0.2)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
-              <h2 className="mb-4 text-3xl tracking-tight" style={{ color: '#000000' }}>Stay Connected</h2>
-              <p className="mb-6" style={{ color: customColors.primary }}>
+            <div className="relative" style={{ backgroundColor: 'rgba(240,234,214,0.08)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
+              <h2 className="mb-4 text-3xl tracking-tight" style={{ color: '#f0ead6' }}>Stay Connected</h2>
+              <p className="mb-6" style={{ color: 'rgba(240,234,214,0.75)' }}>
                 Join our newsletter for the latest updates and exclusive offers.
               </p>
 
@@ -606,47 +606,47 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
 
             <div className="grid gap-12 md:grid-cols-3">
               <div>
-                <h3 className="mb-4 text-lg" style={{ color: '#000000' }}>Quick Links</h3>
+                <h3 className="mb-4 text-lg" style={{ color: '#f0ead6' }}>Quick Links</h3>
                 <nav className="space-y-2 text-sm">
-                  <Link href="/" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Home
                   </Link>
-                  <Link href="/about" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/about" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     About Us
                   </Link>
-                  <Link href="/recruiting" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/recruiting" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Recruiting
                   </Link>
-                  <Link href="/registration" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/registration" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Registration
                   </Link>
-                  <Link href="/media" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/media" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Media
                   </Link>
-                  <Link href="/faq" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/faq" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Frequently Asked Questions
                   </Link>
-                  <Link href="/contact" className="block transition-colors hover:text-[#583e2e]" style={{ color: customColors.primary }}>
+                  <Link href="/contact" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Contact
                   </Link>
                 </nav>
               </div>
               <div>
-                <h3 className="mb-4 text-lg" style={{ color: '#000000' }}>Contact Us</h3>
-                <address className="space-y-2 text-sm not-italic" style={{ color: customColors.primary }}>
+                <h3 className="mb-4 text-lg" style={{ color: '#f0ead6' }}>Contact Us</h3>
+                <address className="space-y-2 text-sm not-italic" style={{ color: 'rgba(240,234,214,0.75)' }}>
                   <p>Flagstaff, AZ</p>
                   <p>Phone: 651-207-4749</p>
                   <p>Email: support@elevatetrainingcamps.com</p>
                 </address>
               </div>
               <div className="relative">
-                <h3 className="mb-4 text-lg" style={{ color: '#000000' }}>Follow Us</h3>
+                <h3 className="mb-4 text-lg" style={{ color: '#f0ead6' }}>Follow Us</h3>
                 <div className="mb-6 flex space-x-4">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
-                          <Facebook className="h-4 w-4 text-[#a89885]" />
+                        <Button variant="outline" size="icon" className="rounded-full border-[#f0ead6]/40 bg-transparent hover:bg-[#f0ead6]/10 hover:border-[#f0ead6]">
+                          <Facebook className="h-4 w-4 text-[#f0ead6]" />
                           <span className="sr-only">Facebook</span>
                         </Button>
                       </TooltipTrigger>
@@ -658,8 +658,8 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
-                          <Twitter className="h-4 w-4 text-[#a89885]" />
+                        <Button variant="outline" size="icon" className="rounded-full border-[#f0ead6]/40 bg-transparent hover:bg-[#f0ead6]/10 hover:border-[#f0ead6]">
+                          <Twitter className="h-4 w-4 text-[#f0ead6]" />
                           <span className="sr-only">Twitter</span>
                         </Button>
                       </TooltipTrigger>
@@ -671,8 +671,8 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="rounded-full border-[#d3c7b4] hover:bg-[#e9e0d2] hover:border-[#a89885]">
-                          <Instagram className="h-4 w-4 text-[#a89885]" />
+                        <Button variant="outline" size="icon" className="rounded-full border-[#f0ead6]/40 bg-transparent hover:bg-[#f0ead6]/10 hover:border-[#f0ead6]">
+                          <Instagram className="h-4 w-4 text-[#f0ead6]" />
                           <span className="sr-only">Instagram</span>
                         </Button>
                       </TooltipTrigger>
@@ -688,8 +688,8 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           {/* Legal links (Privacy / Terms / Refunds) return here once the
               Phase 4 legal pages exist — dead "#" links misrepresent
               policies we haven't published yet. */}
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#e6dfd3] pt-8 text-center md:flex-row">
-            <p className="text-sm" style={{ color: customColors.primary }}>
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#f0ead6]/20 pt-8 text-center md:flex-row">
+            <p className="text-sm" style={{ color: 'rgba(240,234,214,0.75)' }}>
               © 2026 Elevate Training Camps. All rights reserved.
             </p>
           </div>

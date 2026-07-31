@@ -285,3 +285,22 @@ details[open] > .faq-summary::before {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ——— Cinematic Lodge motion (2026-07-31 direction decision) ————
+   Entrance reveals for masthead copy and slow zoom-on-hover for imagery.
+   Both disabled under prefers-reduced-motion. */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+.rise { animation: riseIn 700ms cubic-bezier(0.2, 0.6, 0.2, 1) both; }
+.rise-1 { animation-delay: 80ms; }
+.rise-2 { animation-delay: 180ms; }
+.rise-3 { animation-delay: 300ms; }
+.img-live { overflow: hidden; }
+.img-live img { transition: transform 1200ms cubic-bezier(0.2, 0.6, 0.2, 1); }
+.img-live:hover img { transform: scale(1.04); }
+@media (prefers-reduced-motion: reduce) {
+  .rise { animation: none; }
+  .img-live img { transition: none; }
+}
