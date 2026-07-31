@@ -9,7 +9,16 @@ the pages that read them. It complements `03-sanity-studio-guide.md` (how the
 Studio works) and `../../business-plan/WEBSITE-SYNC.md` (what business
 decisions flow to which surface).
 
-## 1. Surface ownership — who renders what, today
+> **Owner decision 2026-07-30: everything goes into Sanity.** Almost all
+> content — every piece of text and media an owner could reasonably want to
+> change — must be manageable from the Studio, with a section per page. The
+> copy-in-code state of `/`, `/recruiting` and `/registration` is an
+> **interim liability fix**, not the destination: copy went into code only
+> because the old schema modelled the wrong business and its CMS content
+> violated the guardrails. Section 5 is the migration plan; section 1 is the
+> interim state it retires.
+
+## 1. Surface ownership — who renders what, today (interim)
 
 | Surface | Source of copy | CMS role |
 |---|---|---|
@@ -85,28 +94,70 @@ registration/FAQ/about/media/footer).
   then discard the draft. Prefer unpublish-only when there is any doubt —
   it is reversible.
 
-## 5. Phase 1.5 schema reshape (the structural fix)
+## 5. Full CMS-ification (the Phase 1.5 reshape, expanded per the 2026-07-30 owner decision)
 
-The reshape in `01-roadmap.md` §5.5, sequenced:
+Target: **one Studio section per page**, every text and media field
+editable, no marketing copy living in `.tsx` files. Executed as one wave per
+page, each wave = schema + seeded content + wiring + verification in a
+single PR (rule from §3).
 
-1. Add a **`teamBlock`** type: base fee, per-athlete rate, minimum squad,
-   season label, duration (`1 week`/`3 weeks`). This is the only shape that
-   can express the two-part tariff — today the CMS literally cannot state
-   the real prices.
-2. Author the two blocks in Studio from `../../business-plan/PRICING.md`,
-   then wire `/registration` to read them **with the code copy as fallback**
-   only after the documents exist and match.
-3. Add a **CMS drift check**: a script (sibling to the package
-   `check-sync.sh` scripts) that GROQ-queries `teamBlock` and diffs against
-   PRICING.md's canonical block, so CMS prices get the same protection as
-   document prices.
-4. Remove the legacy types + their Studio groups: `coachingProgram`,
-   `coachingBenefit`, `coachingTestimonial` (documents already deleted),
-   `trainingPackage`, `upcomingCamp`, `paymentOption`, `whatsIncluded` — and
-   drop their queries/fallbacks (`queries.ts`, `registration` imports).
-5. Fix the three known schema defects from `03-sanity-studio-guide.md`:
-   FAQ-page fields stranded in `siteSettings`, the inert `logo` field, the
-   CMS favicon tangle.
+### Content model (per-page singletons + shared documents)
+
+| Type | Kind | Carries |
+|---|---|---|
+| `siteSettings` | singleton (exists) | Title/meta, footer contact (phone, email, city line), social links, legal-page links once Phase 4 ships them |
+| `homePage` | singleton (exists; PR #14 wires it) | Hero heading/sub/video, editorial sections, stats, standards, CTA |
+| `registrationPage` | singleton (new) | Masthead, intro, included/not-included lists, booking steps, fine-print cards, CTA — plus references to `teamBlock` |
+| `teamBlock` | document (new) | Name, tagline, base fee, per-athlete rate, example line, detail, season label. **The only place prices live.** |
+| `recruitingPage` | singleton (new) | Masthead, stat band, watched/never card lists, pull quote, family/coach sections, CTA, NCAA footnote. **Schema has NO price fields — that is Gate-7 enforced structurally.** |
+| `aboutPage` | singleton (new) | Hero copy + stat chips (currently hard-coded in `AboutPageContent.tsx`); keeps existing `aboutSection` + `teamMember` lists |
+| `mediaPage` | singleton + `mediaItem` docs (new) | Intro copy; gallery items (image or Mux video, caption, order) — lands with Phase 3 / Gates 3–4 |
+| `contactPage` | singleton (new) | Heading, intro, any explanatory copy around the form (field labels stay in code — they're UI, not content) |
+| `faq` / `faqPage` | exists / new | Move the FAQ page title/intro/image out of `siteSettings` into a proper `faqPage` singleton (fixes known defect #1) |
+
+Email templates (`api/contact`, `api/newsletter` bodies) are the one
+deliberate exception — they stay in code (they're transactional, and a bad
+edit breaks deliverability silently). Revisit only if the owner asks.
+
+### The rules that prevent a repeat of the fabrication incident
+
+1. **Seed before wire.** For each page: create + publish the CMS documents
+   with the current compliant copy (via MCP `create_documents`/`publish`),
+   verify in Studio, and only then merge the code that reads them. A page
+   never ships reading an empty type.
+2. **No copy-carrying fallbacks, ever.** If a query returns nothing, render
+   a minimal neutral empty state (or omit the section) — never a parallel
+   hard-coded copy of the content. Divergent fallbacks are exactly how the
+   invented $1,200/$1,800/$2,800 tiers ended up live.
+3. **Prices only in `teamBlock`,** and a **CMS drift check** (sibling of the
+   package `check-sync.sh` scripts) that GROQ-queries `teamBlock` and diffs
+   against `../../business-plan/PRICING.md`'s canonical block. Run it in CI
+   or at minimum before every content session ends.
+4. **Guardrails travel into the Studio.** Every guardrail-sensitive field
+   gets a `description` stating its constraint (e.g. recruiting fields: "no
+   placement promises, no pricing — see WEBSITE-SYNC.md guardrails"), and
+   `recruitingPage` simply has no fields that could hold a price.
+5. **Verify by diffing rendered HTML.** After each wave, the built page must
+   render byte-identical copy to the pre-wave code version (whitespace
+   aside). Any diff is either a seeding mistake or an unapproved copy change.
+
+### Wave order (after #19 → #16 → #14 merge, one PR each)
+
+1. **Wave 1 — `/registration`:** `teamBlock` + `registrationPage` + drift
+   check. Highest value: puts the canonical tariff under Studio control.
+2. **Wave 2 — `/recruiting`:** `recruitingPage` (price-less schema).
+3. **Wave 3 — `/about` hero + `/contact` + `faqPage`** (the siteSettings
+   FAQ-field migration is a content migration — do it in this wave).
+4. **Wave 4 — `/media`:** `mediaPage` + `mediaItem`, gated on Gates 3–4
+   (hosting decision + photo consent); this is roadmap Phase 3.
+5. **Wave 5 — cleanup:** remove legacy types (`coachingProgram`,
+   `coachingBenefit`, `coachingTestimonial`, `trainingPackage`,
+   `upcomingCamp`, `paymentOption`, `whatsIncluded`), their queries, the
+   inert `logo` field, and the favicon tangle; restructure the Studio
+   sidebar so each nav page maps to its singleton + lists.
+
+After Wave 5, `03-sanity-studio-guide.md` needs a rewrite (its sidebar tree
+and "feeds nothing" warnings all change) — budget that into the wave.
 
 ## 6. Write-safety and permissions
 
@@ -123,11 +174,14 @@ Working agreement:
   naming what changes ("fix the FAQ housing answer", "delete the coaching
   docs"). Batch them: propose the exact copy, get one approval, apply the
   batch. This is the default and it stayed workable today.
-- **Optional convenience:** if prompt fatigue becomes real, allowlist
-  `mcp__Sanity__patch_documents` and `mcp__Sanity__publish_documents` in
-  `.claude/settings.local.json` (keep `unpublish`/`discard`/`deploy_schema`
-  prompted — destructive ops should stay gated). Trade-off: any future
-  session can then edit live content without asking. Decide deliberately;
-  don't add it as a reflex after one blocked call.
+- **Allowlist in force (owner decision 2026-07-30):**
+  `mcp__Sanity__patch_documents` and `mcp__Sanity__publish_documents` are
+  allowlisted in the owner's user-level Claude Code settings, so sessions
+  can patch and publish content without prompting. This makes the
+  single-writer rules in §4 (re-query first, `ifRevisionId`, record
+  migrations in memory) **mandatory, not advisory** — the permission layer
+  no longer catches a stale or conflicting write. Destructive ops
+  (`unpublish_documents`, `discard_drafts`) and schema deploys remain
+  prompted.
 - **Schema deploys** (`deploy_schema`/`deploy_studio`) always ride a PR and
   a human approval — never allowlist.
