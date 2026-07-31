@@ -573,3 +573,86 @@ export async function getRegistrationPage(): Promise<RegistrationPageContent | n
     return null;
   }
 }
+
+/**
+ * RecruitingPageContent — /recruiting copy + media (CMS-ification Wave 2).
+ * Deliberately carries no pricing anywhere: the recruitingPage schema has
+ * no price fields (Gate-7 — no rate card until the attach rate is measured).
+ */
+export type RecruitingPageContent = {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  ctaPrimary?: string;
+  ctaSecondary?: string;
+  stats?: Array<{ number?: string; label?: string; sub?: string }>;
+  whyEyebrow?: string;
+  whyHeading?: string;
+  whyParagraphs?: string[];
+  whyImage?: SanityImageRef;
+  whyImageAlt?: string;
+  watchEyebrow?: string;
+  watchHeading?: string;
+  watchIntro?: string;
+  watchItems?: Array<{ title?: string; body?: string }>;
+  evalEyebrow?: string;
+  evalHeading?: string;
+  evalBody?: string;
+  evalAccent?: string;
+  evalLinkLabel?: string;
+  evalImage?: SanityImageRef;
+  evalImageAlt?: string;
+  quoteLabel?: string;
+  quoteText?: string;
+  neverEyebrow?: string;
+  neverHeading?: string;
+  neverItems?: Array<{ title?: string; body?: string }>;
+  familyEyebrow?: string;
+  familyHeading?: string;
+  familyParagraphs?: string[];
+  coachEyebrow?: string;
+  coachHeading?: string;
+  coachBody?: string;
+  coachLinkLabel?: string;
+  closingHeading?: string;
+  closingBody?: string;
+  closingCtaLabel?: string;
+  footnote?: string;
+};
+
+const fetchRecruitingPage = unstable_cache(
+  async (): Promise<RecruitingPageContent | null> => {
+    return await client.fetch(`
+      *[_type == "recruitingPage" && _id == "recruitingPage"][0]{
+        eyebrow, heading, intro, ctaPrimary, ctaSecondary,
+        stats[]{ number, label, sub },
+        whyEyebrow, whyHeading, whyParagraphs, whyImage, whyImageAlt,
+        watchEyebrow, watchHeading, watchIntro,
+        watchItems[]{ title, body },
+        evalEyebrow, evalHeading, evalBody, evalAccent, evalLinkLabel,
+        evalImage, evalImageAlt,
+        quoteLabel, quoteText,
+        neverEyebrow, neverHeading,
+        neverItems[]{ title, body },
+        familyEyebrow, familyHeading, familyParagraphs,
+        coachEyebrow, coachHeading, coachBody, coachLinkLabel,
+        closingHeading, closingBody, closingCtaLabel, footnote
+      }
+    `);
+  },
+  ['recruiting-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/**
+ * Fetches the Recruiting page copy. Null on failure → the page renders a
+ * neutral empty state, never a copy-carrying fallback (docs/10 §5 rule 2).
+ */
+export async function getRecruitingPage(): Promise<RecruitingPageContent | null> {
+  try {
+    return await fetchRecruitingPage();
+  } catch (error) {
+    console.error('Error fetching recruiting page:', error);
+    return null;
+  }
+}

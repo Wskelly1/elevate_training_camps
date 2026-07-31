@@ -120,6 +120,19 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
 
+      // ——— Recruiting page (CMS-ification Wave 2) ——————————————————
+      // Copy for /recruiting lives in the pinned recruitingPage singleton.
+      // The schema deliberately has no price fields (Gate-7).
+      S.listItem()
+        .title('Recruiting Page')
+        .icon(StarIcon)
+        .child(
+          S.document()
+            .schemaType('recruitingPage')
+            .documentId('recruitingPage')
+            .title('Recruiting Page Copy')
+        ),
+
       // ——— Coaching page (legacy — renders nowhere) ————————————————
       // /coaching was repurposed as /recruiting (O-16, 2026-07-29), whose
       // copy is in code; no query reads these types anymore. The group stays
