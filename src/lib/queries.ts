@@ -185,67 +185,88 @@ export async function getAboutSections(): Promise<AboutSection[]> {
   }
 }
 
+export type HomeLink = { label?: string; href?: string };
+
+export type EditorialSection = {
+  _key?: string;
+  eyebrow?: string;
+  heading?: string;
+  body?: PortableTextBlock[];
+  metaLine?: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  imageSide?: 'left' | 'right';
+  linkLabel?: string;
+  linkHref?: string;
+};
+
+export type HomePage = {
+  heroEyebrow?: string;
+  heroHeadline?: string;
+  heroStandfirst?: string;
+  heroPlaybackId?: string;
+  heroImageUrl?: string;
+  heroPrimaryCta?: HomeLink;
+  heroSecondaryCta?: HomeLink;
+  editorialSections?: EditorialSection[];
+  fullBleed?: { eyebrow?: string; quote?: string; imageUrl?: string };
+  stats?: Array<{ _key?: string; value?: string; label?: string; note?: string }>;
+  standardsEyebrow?: string;
+  standardsHeading?: string;
+  standards?: Array<{ _key?: string; title?: string; description?: string }>;
+  closingCta?: { heading?: string; body?: string; label?: string; href?: string };
+};
+
 /**
- * Homepage query for Sanity CMS
+ * Homepage query (CMS-ification: the homePage document carries the full
+ * A2.5a composition, migrated 2026-07-30).
  *
- * GROQ query that retrieves all homepage content including hero section,
- * testimonials, and content sections. This is the main query for the homepage.
+ * Image URLs are resolved in GROQ rather than in the component so the page
+ * stays free of urlFor() calls and Sanity types.
  *
- * @type {string} GROQ query string for homepage data
+ * `heroPlaybackId` coalesces the new `heroVideo` field over the deprecated
+ * `expandMuxVideo`. The production document still stores the Mux asset in the
+ * old field; this keeps the video playing until the asset is copied across.
+ * Once it is, the legacy branch and the schema field can both go.
  */
 export const homePageQuery = groq`
   *[_type == "homePage"][0] {
     _id,
     title,
-    useScrollExpandMedia,
-    expandMediaType,
-    expandMuxVideo {
-      asset->{
-        playbackId,
-        status
-      }
-    },
-    expandTitle,
-    expandSubtitle,
-    scrollToExpandText,
-    heroImage {
-      asset->{
-        _id,
-        url
-      }
-    },
-    heroHeading,
-    heroSubheading,
-    testimonials[] {
+    heroEyebrow,
+    heroHeadline,
+    heroStandfirst,
+    "heroPlaybackId": coalesce(heroVideo.asset->playbackId, expandMuxVideo.asset->playbackId),
+    "heroImageUrl": heroImage.asset->url,
+    heroPrimaryCta { label, href },
+    heroSecondaryCta { label, href },
+    editorialSections[] {
       _key,
-      name,
-      text,
-      image {
-        asset->{
-          _id,
-          url
-        }
-      }
-    },
-    contentSections[] {
-      _key,
+      eyebrow,
       heading,
-      subheading,
-      text,
-      image {
-        asset->{
-          _id,
-          url
-        }
-      },
-      buttonText,
-      buttonLink
-    }
+      body,
+      metaLine,
+      "imageUrl": image.asset->url,
+      "imageAlt": image.asset->altText,
+      imageSide,
+      linkLabel,
+      linkHref
+    },
+    fullBleed {
+      eyebrow,
+      quote,
+      "imageUrl": image.asset->url
+    },
+    stats[] { _key, value, label, note },
+    standardsEyebrow,
+    standardsHeading,
+    standards[] { _key, title, description },
+    closingCta { heading, body, label, href }
   }
 `;
 
 const fetchHomePage = unstable_cache(
-  async () => {
+  async (): Promise<HomePage | null> => {
     return await client.fetch(homePageQuery);
   },
   ['home-page'],
@@ -253,11 +274,11 @@ const fetchHomePage = unstable_cache(
 );
 
 /**
- * Fetches homepage content from Sanity CMS
- *
- * @returns {Promise<Object|null>} Homepage document, or null on failure
+ * Fetches homepage content from Sanity CMS. Null on failure — the page
+ * renders a neutral empty state, never a copy-carrying fallback
+ * (docs/10-sanity-content-plan.md §5 rule 2).
  */
-export async function getHomePage() {
+export async function getHomePage(): Promise<HomePage | null> {
   try {
     return await fetchHomePage();
   } catch (error) {
