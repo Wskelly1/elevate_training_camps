@@ -64,6 +64,10 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
 
       // ——— Registration page ———————————————————————————————————
+      // Wave 1 of the CMS-ification (docs/10-sanity-content-plan.md §5):
+      // the page reads the pinned registrationPage singleton + teamBlock
+      // documents. The three legacy types below it render nowhere and are
+      // removed in Wave 5.
       S.listItem()
         .title('Registration Page')
         .icon(ClipboardIcon)
@@ -72,27 +76,45 @@ export const structure: StructureResolver = (S) =>
             .title('Registration Page')
             .items([
               S.listItem()
-                .title('Training Packages')
+                .title('Page Copy')
+                .icon(ClipboardIcon)
+                .child(
+                  S.document()
+                    .schemaType('registrationPage')
+                    .documentId('registrationPage')
+                    .title('Registration Page Copy')
+                ),
+              S.listItem()
+                .title('Team Blocks (pricing)')
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList('teamBlock')
+                    .title('Team Blocks (pricing)')
+                    .defaultOrdering(byOrder)
+                ),
+              S.divider(),
+              S.listItem()
+                .title('Training Packages (legacy — not rendered)')
                 .icon(TagIcon)
                 .child(
                   S.documentTypeList('trainingPackage')
-                    .title('Training Packages')
+                    .title('Training Packages (legacy — not rendered)')
                     .defaultOrdering(byOrder)
                 ),
               S.listItem()
-                .title('Upcoming Camps')
+                .title('Upcoming Camps (legacy — not rendered)')
                 .icon(CalendarIcon)
                 .child(
                   S.documentTypeList('upcomingCamp')
-                    .title('Upcoming Camps')
+                    .title('Upcoming Camps (legacy — not rendered)')
                     .defaultOrdering(byOrder)
                 ),
               S.listItem()
-                .title("What's Included")
+                .title("What's Included (legacy — not rendered)")
                 .icon(CheckmarkCircleIcon)
                 .child(
                   S.documentTypeList('whatsIncluded')
-                    .title("What's Included")
+                    .title("What's Included (legacy — not rendered)")
                     .defaultOrdering(byOrder)
                 ),
             ])

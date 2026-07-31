@@ -24,7 +24,7 @@ decisions flow to which surface).
 |---|---|---|
 | `/` homepage | Code (until PR #14 lands, then `homePage` doc) | Media now; full copy after #14 |
 | `/recruiting` | Code (deliberate — Gate-7/Gate-5 constraints in the file header) | None |
-| `/registration` | Code (rebuilt 2026-07-30 — canonical tariff in the file header) | None until the `teamBlock` reshape |
+| `/registration` | **CMS (Wave 1 shipped 2026-07-30)** — `registrationPage` singleton + `teamBlock` docs, seeded with the compliant copy; neutral empty state, no copy fallback | `registrationPage`, `teamBlock` (prices live here only; `npm run check:pricing` verifies) |
 | `/about` | Hybrid: hero in code, sections + team from CMS | `aboutSection`, `teamMember` |
 | `/faq` | CMS | `faq`, `siteSettings.faqPage` |
 | Site-wide `<meta>`, manifest, favicon | CMS | `siteSettings` |
@@ -143,8 +143,13 @@ edit breaks deliverability silently). Revisit only if the owner asks.
 
 ### Wave order (after #19 → #16 → #14 merge, one PR each)
 
-1. **Wave 1 — `/registration`:** `teamBlock` + `registrationPage` + drift
-   check. Highest value: puts the canonical tariff under Studio control.
+1. **Wave 1 — `/registration`: ✅ DONE 2026-07-30** (on the PR #19 branch,
+   which already owned the route). `teamBlock` + `registrationPage` schemas,
+   documents seeded and published with the compliant copy (fixed IDs
+   `teamBlock-3wk`, `teamBlock-1wk`, `registrationPage`), page wired with a
+   neutral empty state, `scripts/check-cms-pricing.mjs` + `npm run
+   check:pricing` passing 4/4, built HTML verified identical to the
+   pre-wave copy.
 2. **Wave 2 — `/recruiting`:** `recruitingPage` (price-less schema).
 3. **Wave 3 — `/about` hero + `/contact` + `faqPage`** (the siteSettings
    FAQ-field migration is a content migration — do it in this wave).

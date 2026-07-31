@@ -216,7 +216,7 @@ src/app/
   page.tsx              /              homepage — ambient hero + editorial sections
   about/                /about         team carousel + CMS sections
   recruiting/           /recruiting    recruiting advisory, copy-in-code (replaced /coaching, O-16)
-  registration/         /registration  team-block pricing, copy-in-code (rebuilt 2026-07-30)
+  registration/         /registration  team-block pricing — CMS-driven (registrationPage + teamBlock, Wave 1)
   faq/                  /faq
   contact/              /contact       ContactForm island
   media/                /media         honest coming-soon placeholder (real gallery = Phase 3)

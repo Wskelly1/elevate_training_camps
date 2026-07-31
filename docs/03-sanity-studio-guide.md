@@ -46,16 +46,18 @@ Three rules the structure follows:
    under the last divider clearly labelled, so content never disappears
    silently — you can always see it still exists.
 
-> **Two groups currently feed nothing.** The **Coaching Page** group is a
-> deliberate leftover: `/coaching` was repurposed as `/recruiting` (O-16,
-> 2026-07-29), whose copy lives in code, and no coaching query remains in
-> `queries.ts` — the group's documents render nowhere. The **Registration
-> Page** group is in the same state since the 2026-07-30 rebuild:
-> `/registration` is copy-in-code and no longer reads `trainingPackage`,
-> `upcomingCamp` or `whatsIncluded`. Both groups stay visible (rule 3) until
-> the Phase 1.5 schema reshape replaces them with types the site actually
-> reads — don't author new content into them; it will not appear on the
-> site.
+> **What the Registration group feeds (since 2026-07-30, CMS-ification
+> Wave 1):** the **Page Copy** singleton and **Team Blocks (pricing)** are
+> live — editing them changes `/registration` (after the ~5-minute cache).
+> Prices live ONLY on Team Blocks and must match
+> `business-plan/PRICING.md`; a price edit is a business decision — change
+> PRICING.md and its CHANGELOG first, then the Team Block, then run
+> `npm run check:pricing`. The three items marked **legacy — not
+> rendered** under the same group (`trainingPackage`, `upcomingCamp`,
+> `whatsIncluded`) feed nothing, as does the entire **Coaching Page**
+> group (`/coaching` became `/recruiting`, O-16; its documents were
+> deleted 2026-07-30). Legacy types are removed in CMS-ification Wave 5 —
+> don't author content into them.
 
 ### Ordering
 

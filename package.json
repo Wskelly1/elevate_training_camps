@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:pricing": "node scripts/check-cms-pricing.mjs"
   },
   "dependencies": {
     "@hubspot/api-client": "^13.2.0",
