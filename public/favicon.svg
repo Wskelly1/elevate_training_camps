@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" fill="#427b4d" rx="4"/>
-  <text x="16" y="22" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">E</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#24422a" rx="28"/>
+  <g transform="translate(20,20) scale(0.8)">
+    <path d="M100 16 L196 184 L140 184 L100 112 L60 184 L4 184 Z" fill="#f0ead6"/>
+    <path d="M100 132 L134 184 L66 184 Z" fill="#f0ead6"/>
+  </g>
 </svg>

@@ -304,3 +304,18 @@ details[open] > .faq-summary::before {
   .rise { animation: none; }
   .img-live img { transition: none; }
 }
+
+/* ——— Sponsor marquee (homepage partner band) ————————————————
+   Two identical rows slide left by one row-width for a seamless loop.
+   Hover pauses; reduced-motion gets a static wrapped row instead. */
+@keyframes marquee-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+.marquee .marquee-row { animation: marquee-slide 36s linear infinite; }
+.marquee:hover .marquee-row { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .marquee { flex-wrap: wrap; justify-content: center; }
+  .marquee .marquee-row { animation: none; flex-wrap: wrap; justify-content: center; }
+  .marquee .marquee-row[aria-hidden="true"] { display: none; }
+}

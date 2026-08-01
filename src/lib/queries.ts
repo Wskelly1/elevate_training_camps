@@ -21,8 +21,8 @@ const REVALIDATE_SECONDS = 300;
  *
  * @property {string} title - The main site title
  * @property {string} [description] - Optional site description
- * @property {any} [logo] - Main site logo image
- * @property {any} [footerLogo] - Footer-specific logo image
+ * @property {string} [logoUrl] - Uploaded nav logo (light backgrounds)
+ * @property {string} [logoOnDarkUrl] - Uploaded nav logo for over-imagery
  * @property {any} [aboutUsImage] - Image for the about us section
  * @property {any} [favicon] - Site favicon
  * @property {string} [contactEmail] - Contact email address
@@ -33,8 +33,8 @@ const REVALIDATE_SECONDS = 300;
 export type SiteSettings = {
   title: string;
   description?: string;
-  logo?: SanityImageRef;
-  footerLogo?: SanityImageRef;
+  logoUrl?: string;
+  logoOnDarkUrl?: string;
   aboutUsImage?: SanityImageRef;
   favicon?: SanityImageRef;
   contactEmail?: string;
@@ -52,20 +52,8 @@ const fetchSiteSettings = unstable_cache(
       *[_type == "siteSettings"][0]{
         title,
         description,
-        logo {
-          ...,
-          asset->{
-            ...,
-            metadata
-          }
-        },
-        footerLogo {
-          ...,
-          asset->{
-            ...,
-            metadata
-          }
-        },
+        "logoUrl": logo.asset->url,
+        "logoOnDarkUrl": logoOnDark.asset->url,
         aboutUsImage,
         favicon,
         contactEmail,
@@ -214,7 +202,17 @@ export type HomePage = {
   standardsEyebrow?: string;
   standardsHeading?: string;
   standards?: Array<{ _key?: string; title?: string; description?: string }>;
+  sponsorsHeading?: string;
+  sponsors?: Sponsor[];
   closingCta?: { heading?: string; body?: string; label?: string; href?: string };
+};
+
+/** A partner logo on the homepage marquee band. */
+export type Sponsor = {
+  _id: string;
+  name: string;
+  logoUrl: string;
+  url?: string;
 };
 
 /**
@@ -261,6 +259,13 @@ export const homePageQuery = groq`
     standardsEyebrow,
     standardsHeading,
     standards[] { _key, title, description },
+    sponsorsHeading,
+    "sponsors": *[_type == "sponsor" && defined(logo.asset)] | order(order asc) {
+      _id,
+      name,
+      url,
+      "logoUrl": logo.asset->url
+    },
     closingCta { heading, body, label, href }
   }
 `;
