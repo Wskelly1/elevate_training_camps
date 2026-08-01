@@ -68,7 +68,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
       {/* ——— Intro — large type on paper, straight off the image ————— */}
       {hero?.heroIntro && (
         <section className="mx-auto max-w-6xl px-6 py-14 md:py-16">
-          <p className="max-w-3xl text-[22px] leading-[1.6] md:text-[26px]">{hero.heroIntro}</p>
+          <p className="max-w-3xl font-serif text-[24px] leading-[1.55] md:text-[30px]">{hero.heroIntro}</p>
         </section>
       )}
 

@@ -57,21 +57,22 @@ export default async function FAQPage() {
       {/* ——— Grouped questions ———————————————————————————— */}
       <section className="py-16">
         <div className="mx-auto max-w-3xl px-6">
-          {grouped.map((cat) => (
-            <div key={cat.id} className="mb-14 last:mb-0">
-              <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">
-                {cat.title}
+          {grouped.map((cat, idx) => (
+            <div key={cat.id} className="mb-16 last:mb-0">
+              <p className="text-[11px] uppercase tracking-[0.3em] text-[var(--accent-rock)]">
+                {String(idx + 1).padStart(2, "0")} · {cat.title}
               </p>
-              <div className="mt-5 space-y-3">
+              <h2 className="mt-4 text-[2rem] leading-[1.1] md:text-[2.5rem]">{cat.title}</h2>
+              <div className="mt-7 space-y-3">
                 {cat.items.map((faq) => (
                   <details
                     key={faq._id}
                     className="group rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-sm overflow-hidden"
                   >
-                    <summary className="faq-summary cursor-pointer pl-10 pr-4 py-3.5 text-lg leading-snug rounded-lg group-open:rounded-b-none focus:outline-none">
+                    <summary className="faq-summary cursor-pointer pl-10 pr-4 py-4 font-serif text-xl leading-snug rounded-lg group-open:rounded-b-none focus:outline-none">
                       {faq.question}
                     </summary>
-                    <div className="px-10 pb-5 text-[16px] leading-[1.7] text-[#4a4a4a]">
+                    <div className="px-10 pb-5 text-[16px] leading-[1.75] text-[#4a4a4a]">
                       {faq.answer}
                     </div>
                   </details>

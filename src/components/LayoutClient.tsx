@@ -11,7 +11,6 @@ import {
   NavigationMenuTrigger,
 } from "../components/ui/navigation-menu"
 import { Input } from "../components/ui/input";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -655,46 +654,32 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
               </div>
               <div className="relative">
                 <h3 className="mb-4 text-lg" style={{ color: '#f0ead6' }}>Follow Us</h3>
+                {/* Rendered from siteSettings.socialLinks — only platforms
+                    that actually exist in the Studio render, as real links.
+                    (The old block was three dead buttons for accounts the
+                    business doesn't have.) */}
                 <div className="mb-6 flex space-x-4">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="rounded-full border-[#f0ead6]/40 bg-transparent hover:bg-[#f0ead6]/10 hover:border-[#f0ead6]">
-                          <Facebook className="h-4 w-4 text-[#f0ead6]" />
-                          <span className="sr-only">Facebook</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Follow us on Facebook</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="rounded-full border-[#f0ead6]/40 bg-transparent hover:bg-[#f0ead6]/10 hover:border-[#f0ead6]">
-                          <Twitter className="h-4 w-4 text-[#f0ead6]" />
-                          <span className="sr-only">Twitter</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Follow us on Twitter</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="rounded-full border-[#f0ead6]/40 bg-transparent hover:bg-[#f0ead6]/10 hover:border-[#f0ead6]">
-                          <Instagram className="h-4 w-4 text-[#f0ead6]" />
-                          <span className="sr-only">Instagram</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Follow us on Instagram</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {(siteSettings?.socialLinks ?? []).map((link) => {
+                    const platform = link.platform?.toLowerCase() ?? '';
+                    const Icon =
+                      platform === 'instagram' ? Instagram :
+                      platform === 'facebook' ? Facebook :
+                      platform === 'twitter' || platform === 'x' ? Twitter :
+                      Send;
+                    if (!link.url) return null;
+                    return (
+                      <a
+                        key={platform + link.url}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Follow us on ${link.platform}`}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f0ead6]/40 transition hover:border-[#f0ead6] hover:bg-[#f0ead6]/10"
+                      >
+                        <Icon className="h-4 w-4 text-[#f0ead6]" />
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </div>

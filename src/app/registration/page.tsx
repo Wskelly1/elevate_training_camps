@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import Layout from "../../components/layout";
@@ -28,8 +29,10 @@ import { getRegistrationPage } from "../../lib/queries";
 export const metadata: Metadata = {
   title: "Registration & Pricing | Elevate Training Camps",
   description:
-    "Team altitude training blocks in Flagstaff, Arizona — a 3-week flagship block and a 1-week camp, priced as a team. Programming only; transparent pricing for coaches and parent organisers.",
+    "Team altitude training camps in Flagstaff, Arizona: a three-week block and a one-week camp, priced as a team. Transparent pricing for coaches and parents planning a trip.",
 };
+
+const CDN = "https://cdn.sanity.io/images/yvqe54iq/production";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   if (!children) return null;
@@ -94,7 +97,7 @@ export default async function RegistrationPage() {
 
       {/* ——— 01 · The team blocks ————————————————————————— */}
       {blocks.length > 0 && (
-        <section className="py-20">
+        <section className="border-t border-[var(--border)] bg-[var(--surface)] py-20">
           <div className="mx-auto max-w-6xl px-6">
             <Eyebrow>{content.pricingEyebrow}</Eyebrow>
             {content.pricingHeading && (
@@ -109,12 +112,12 @@ export default async function RegistrationPage() {
                   {b.tagline && <p className="mt-2 text-[15px] text-[var(--accent-trail)]">{b.tagline}</p>}
                   <div className="mt-7 flex items-baseline gap-6">
                     <div>
-                      <div className="text-4xl leading-none">{formatUsd(b.baseFee)}</div>
+                      <div className="font-serif text-4xl leading-none">{formatUsd(b.baseFee)}</div>
                       <div className="mt-2 text-sm text-[var(--muted-foreground)]">team base fee</div>
                     </div>
                     <div className="text-2xl text-[var(--muted-foreground)]">+</div>
                     <div>
-                      <div className="text-4xl leading-none">{formatUsd(b.perAthleteRate)}</div>
+                      <div className="font-serif text-4xl leading-none">{formatUsd(b.perAthleteRate)}</div>
                       <div className="mt-2 text-sm text-[var(--muted-foreground)]">per athlete</div>
                     </div>
                   </div>
@@ -148,13 +151,24 @@ export default async function RegistrationPage() {
               <p className="mt-6 max-w-2xl text-[17px] leading-[1.75] text-[#4a4a4a]">{content.includedIntro}</p>
             )}
             {content.includedItems && content.includedItems.length > 0 && (
-              <div className="mt-12 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                {content.includedItems.map((i) => (
-                  <div key={i.title} className="border-t border-[var(--border)] pt-5">
-                    <h3 className="text-[1.3rem] leading-snug">{i.title}</h3>
-                    {i.body && <p className="mt-3 text-[15px] leading-[1.7] text-[#4a4a4a]">{i.body}</p>}
-                  </div>
-                ))}
+              <div className="mt-12 grid items-start gap-12 md:grid-cols-12 md:gap-14">
+                <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 md:col-span-8">
+                  {content.includedItems.map((i) => (
+                    <div key={i.title} className="border-t border-[var(--border)] pt-5">
+                      <h3 className="text-[1.3rem] leading-snug">{i.title}</h3>
+                      {i.body && <p className="mt-3 text-[15px] leading-[1.7] text-[#4a4a4a]">{i.body}</p>}
+                    </div>
+                  ))}
+                </div>
+                <div className="img-live relative hidden aspect-[3/4] w-full overflow-hidden md:col-span-4 md:block">
+                  <Image
+                    src={`${CDN}/3232ca8cf5c84a311f49a525e1e447b89429e670-1536x2304.jpg`}
+                    alt="Runners on an open gravel trail through golden grassland"
+                    fill
+                    className="object-cover"
+                    sizes="33vw"
+                  />
+                </div>
               </div>
             )}
             {content.notIncludedItems && content.notIncludedItems.length > 0 && (
@@ -200,7 +214,7 @@ export default async function RegistrationPage() {
 
       {/* ——— 04 · The honest fine print ————————————————————— */}
       {content.finePrintCards && content.finePrintCards.length > 0 && (
-        <section className="py-20">
+        <section className="border-t border-[var(--border)] bg-[var(--surface)] py-20">
           <div className="mx-auto max-w-6xl px-6">
             <Eyebrow>{content.finePrintEyebrow}</Eyebrow>
             <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
@@ -216,7 +230,7 @@ export default async function RegistrationPage() {
       )}
 
       {/* ——— Closing CTA ————————————————————————————————— */}
-      <section className="border-t border-[var(--border)] bg-[var(--surface)] py-24">
+      <section className="py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
           {content.closingHeading && (
             <h2 className="text-[2.5rem] leading-[1.08] md:text-[3.25rem]">{content.closingHeading}</h2>

@@ -1,11 +1,11 @@
-import Image from "next/image";
 import Layout from "../../components/layout";
+import MediaGallery from "../../components/MediaGallery";
 import PageMasthead from "../../components/PageMasthead";
 import { getMediaPage, type MediaItem } from "../../lib/queries";
-import { urlFor } from "../../lib/sanity";
 
 /**
- * MediaPage — chaptered editorial gallery (owner decision 2026-07-31).
+ * MediaPage — editorial mosaic gallery with lightbox (owner request
+ * 2026-08-01: varied frame sizes + click-to-expand; see MediaGallery).
  * Copy lives in the mediaPage singleton; the gallery renders published
  * mediaItem documents grouped into chapters (Trails / Town / Training).
  *
@@ -43,61 +43,14 @@ export default async function MediaPage() {
         intro={page?.intro}
       />
 
-      {/* ——— Chapters ————————————————————————————————————— */}
+      {/* ——— Chapters — editorial mosaic + lightbox ——————————— */}
       {(chapters.length > 0 || uncategorized.length > 0) && (
-        <section className="py-16">
-          <div className="mx-auto max-w-6xl px-6">
-            {chapters.map((chapter) => (
-              <div key={chapter.id} className="mb-16 last:mb-0">
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--accent-rock)]">
-                  {chapter.title}
-                </p>
-                <div className="mt-6 grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
-                  {chapter.items.map((item) => (
-                    <figure key={item._id}>
-                      <div className="img-live relative aspect-[4/3] w-full overflow-hidden">
-                        <Image
-                          src={urlFor(item.image).width(1200).url()}
-                          alt={item.alt || item.caption || ""}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
-                        />
-                      </div>
-                      {item.caption && (
-                        <figcaption className="mt-2 mb-4 px-1 text-sm text-[var(--muted-foreground)]">
-                          {item.caption}
-                        </figcaption>
-                      )}
-                    </figure>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {uncategorized.length > 0 && (
-              <div className="mt-6 grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
-                {uncategorized.map((item) => (
-                  <figure key={item._id}>
-                    <div className="img-live relative aspect-[4/3] w-full overflow-hidden">
-                      <Image
-                        src={urlFor(item.image).width(1200).url()}
-                        alt={item.alt || item.caption || ""}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
-                      />
-                    </div>
-                    {item.caption && (
-                      <figcaption className="mt-2 text-sm text-[var(--muted-foreground)]">
-                        {item.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+        <MediaGallery
+          chapters={[
+            ...chapters,
+            ...(uncategorized.length > 0 ? [{ id: "more", title: "More", items: uncategorized }] : []),
+          ]}
+        />
       )}
 
       {items.length === 0 && page?.note && (

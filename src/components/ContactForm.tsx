@@ -215,7 +215,7 @@ export default function ContactForm() {
             />
           </Field>
 
-          {/* ——— Coach / trip organiser ————————————————— */}
+          {/* ——— Coach / trip organizer ————————————————— */}
           {segment === 'coach' && (
             <>
               <div className="flex gap-4">
