@@ -19,7 +19,7 @@ export default defineType({
       name: 'logo',
       title: 'Logo',
       type: 'image',
-      description: 'Transparent PNG or SVG reads best; rendered ~44px tall on the cream band.',
+      description: 'Rendered full-color, centered inside a white card on the deep-green partner band. Transparent PNG or SVG reads best.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({ name: 'url', title: 'Website', type: 'url', description: 'Optional — the logo links here when set.' }),
