@@ -1,51 +1,63 @@
 /**
- * SponsorMarquee — the auto-rotating partner-logo band on the homepage
- * (owner request 2026-07-31). The row is duplicated and slides by 50%
- * on a linear loop, so the rotation is seamless; hover pauses it, and
- * prefers-reduced-motion replaces it with a static wrapped row (see
- * globals.css). Logos render muted and lift to full strength on hover.
+ * SponsorMarquee — the partner band on the homepage, restyled 2026-08-01
+ * to the owner's reference: a centered heading over white logo cards
+ * (rounded, hairline border, generous padding, full-color logos) on the
+ * deep-green lodge ground.
  *
- * Renders nothing without sponsors — an empty band is a broken promise,
- * and an invented one is a guardrail violation.
+ * With four or fewer sponsors the cards render as a static centered grid —
+ * there is nothing meaningful to rotate. With more than four, the same
+ * cards ride the auto-scrolling marquee (duplicated row, seamless CSS
+ * loop, pause on hover; reduced-motion gets the static grid regardless —
+ * see globals.css).
+ *
+ * Renders nothing without sponsors — an invented partner is a guardrail
+ * violation, so the band exists only when real logos are published.
  */
 import type { Sponsor } from "../lib/queries";
+
+function Card({ sponsor }: { sponsor: Sponsor }) {
+  const inner = (
+    <div className="flex h-44 w-64 items-center justify-center rounded-xl border border-black/5 bg-white p-8 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
+      {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary partner-logo aspect ratios; contained box */}
+      <img src={sponsor.logoUrl} alt={sponsor.name} className="max-h-20 w-auto max-w-[80%] object-contain" />
+    </div>
+  );
+  return sponsor.url ? (
+    <a href={sponsor.url} target="_blank" rel="noopener noreferrer" aria-label={sponsor.name}>
+      {inner}
+    </a>
+  ) : (
+    <span aria-label={sponsor.name}>{inner}</span>
+  );
+}
 
 export default function SponsorMarquee({ heading, sponsors }: { heading?: string; sponsors: Sponsor[] }) {
   if (!sponsors.length) return null;
 
-  const row = (ariaHidden: boolean) => (
-    <div className="marquee-row flex shrink-0 items-center" aria-hidden={ariaHidden}>
-      {sponsors.map((s) => {
-        const img = (
-          // eslint-disable-next-line @next/next/no-img-element -- arbitrary partner-logo aspect ratios; fixed height, auto width
-          <img
-            src={s.logoUrl}
-            alt={ariaHidden ? "" : s.name}
-            className="mx-10 h-11 w-auto opacity-60 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
-          />
-        );
-        return s.url ? (
-          <a key={s._id} href={s.url} target="_blank" rel="noopener noreferrer">
-            {img}
-          </a>
-        ) : (
-          <span key={s._id}>{img}</span>
-        );
-      })}
-    </div>
-  );
+  const scrolls = sponsors.length > 4;
 
   return (
-    <section className="border-t border-[var(--border)] py-14">
+    <section className="bg-[var(--primary-deep)] py-16 md:py-20">
       {heading && (
-        <p className="mb-9 text-center text-[11px] uppercase tracking-[0.3em] text-[var(--accent-rock)]">
-          {heading}
-        </p>
+        <h2 className="mb-10 text-center text-[2rem] text-[#f0ead6] md:text-[2.5rem]">{heading}</h2>
       )}
-      <div className="marquee flex overflow-hidden">
-        {row(false)}
-        {row(true)}
-      </div>
+      {scrolls ? (
+        <div className="marquee flex overflow-hidden">
+          {[false, true].map((hidden) => (
+            <div key={String(hidden)} className="marquee-row flex shrink-0 items-center gap-6 pr-6" aria-hidden={hidden}>
+              {sponsors.map((s) => (
+                <Card key={s._id + (hidden ? "-dup" : "")} sponsor={s} />
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-6 px-6">
+          {sponsors.map((s) => (
+            <Card key={s._id} sponsor={s} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
