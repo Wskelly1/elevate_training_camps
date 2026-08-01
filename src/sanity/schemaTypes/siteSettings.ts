@@ -27,7 +27,7 @@ export default defineType({
       title: 'Nav Logo (light backgrounds)',
       type: 'image',
       description:
-        'Shown in the header on light/cream backgrounds. Leave empty to use the built-in twin-peak brand logo. Landscape lockups work best; rendered at 40px tall.',
+        'The header logo on light/cream backgrounds — currently the brand lockup. Swap the image to change the nav; if emptied, the built-in twin-peak logo renders instead. Rendered at 40px tall.',
       options: { hotspot: true },
     }),
     defineField({
@@ -35,7 +35,7 @@ export default defineType({
       title: 'Nav Logo (over imagery)',
       type: 'image',
       description:
-        'Shown while the header floats over a masthead photo — needs to read on dark. Falls back to the light-background logo, then to the built-in brand logo.',
+        'The header logo while floating over a masthead photo — needs to read on dark; currently the cream brand lockup. Falls back to the light-background logo, then to the built-in brand logo.',
       options: { hotspot: true },
     }),
     defineField({
