@@ -24,7 +24,8 @@ import {
  * rides the email subject and the HubSpot lead for triage.
  *
  * Split out from app/contact/page.tsx so that page can be a plain Server
- * Component; the page renders the CMS heading/intro in its PageMasthead.
+ * Component; the page renders the CMS heading/intro in its PageMasthead and
+ * places this form in the lodge editorial split beside the details column.
  * Form labels stay in code — UI, not content.
  */
 
@@ -60,7 +61,7 @@ function Field({
 }) {
   return (
     <div className="flex-1">
-      <label className="block mb-1 text-black" htmlFor={id}>
+      <label className="mb-2 block text-[11px] uppercase tracking-[0.18em] text-[var(--muted-foreground)]" htmlFor={id}>
         {label}{required ? ' *' : ''}
       </label>
       {children}
@@ -139,10 +140,10 @@ export default function ContactForm() {
 
   return (
     <>
-      <div className="max-w-2xl mx-auto p-8 bg-[var(--surface)] rounded-lg shadow-sm border-2 border-[var(--border)] border-t-[var(--primary)] mb-24">
+      <div className="w-full">
         {/* ——— Segment picker ————————————————————————————— */}
         <fieldset className="mb-8">
-          <legend className="block mb-3 text-black">I am a…</legend>
+          <legend className="mb-4 block text-[11px] uppercase tracking-[0.3em] text-[var(--accent-rock)]">I am a…</legend>
           <div className="grid grid-cols-2 gap-3">
             {CONTACT_SEGMENTS.map((s) => (
               <button
@@ -150,10 +151,10 @@ export default function ContactForm() {
                 type="button"
                 onClick={() => pickSegment(s.id)}
                 aria-pressed={segment === s.id}
-                className={`rounded-md border px-4 py-3 text-left text-sm transition ${
+                className={`border px-4 py-3.5 text-left text-sm transition ${
                   segment === s.id
-                    ? 'border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]'
-                    : 'border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:border-[var(--primary)]'
+                    ? 'border-[var(--primary-deep)] bg-[var(--primary-deep)] text-[#f0ead6]'
+                    : 'border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:border-[var(--primary-deep)]'
                 }`}
               >
                 {s.label}
@@ -161,7 +162,7 @@ export default function ContactForm() {
             ))}
           </div>
           {activeSegment && (
-            <p className="mt-3 text-sm text-[var(--muted-foreground)]">{activeSegment.blurb}</p>
+            <p className="mt-3 text-[14px] leading-relaxed text-[var(--muted-foreground)]">{activeSegment.blurb}</p>
           )}
         </fieldset>
 
@@ -361,7 +362,7 @@ export default function ContactForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-12 text-base bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-12 w-full rounded-md bg-[var(--primary)] text-base text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto md:px-10"
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </Button>

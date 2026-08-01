@@ -31,7 +31,7 @@ export default function PageMasthead({
 }) {
   return (
     <section
-      className="relative flex min-h-[440px] w-full flex-col justify-end overflow-hidden md:h-[62vh] md:min-h-[520px]"
+      className="relative flex min-h-[440px] w-full flex-col justify-end overflow-hidden md:min-h-[62vh]"
       style={{ backgroundColor: "var(--primary-deep)" }}
     >
       {imageUrl && (
