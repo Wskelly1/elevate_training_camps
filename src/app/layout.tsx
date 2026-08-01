@@ -77,6 +77,8 @@ export async function generateMetadata(): Promise<Metadata> {
     description: settings.description || "Elevate Training Camps - High Altitude Training in Flagstaff",
     icons: {
       icon,
+      // Safari and some crawlers only trust /favicon.ico — always declare it.
+      shortcut: '/favicon.ico',
       apple: settings.favicon
         ? [{ url: urlFor(settings.favicon).width(180).height(180).format('png').url(), sizes: '180x180', type: 'image/png' }]
         : [

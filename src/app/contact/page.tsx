@@ -50,10 +50,9 @@ export default async function ContactPage() {
               </div>
             </div>
             <p className="mt-8 max-w-[36ch] text-[15px] leading-[1.75] text-[#4a4a4a]">
-              We typically reply within a day or two. Coaches and trip
-              organisers planning a block: the more you can tell us about your
-              squad and your weeks, the faster we can come back with a real
-              plan.
+              We typically reply within a day or two. Coaches and parents
+              planning a block: the more you can tell us about your squad and
+              your weeks, the faster we can come back with a real plan.
             </p>
           </div>
 

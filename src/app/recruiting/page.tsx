@@ -96,7 +96,7 @@ export default async function RecruitingPage() {
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-6 sm:grid-cols-3">
             {content.stats.map((s) => (
               <div key={s.label} className="border-t border-[#f0ead6]/25 pt-6">
-                <div className="text-6xl leading-none">{s.number}</div>
+                <div className="font-serif text-6xl leading-none">{s.number}</div>
                 <div className="mt-3 text-lg leading-snug">{s.label}</div>
                 {s.sub && <div className="mt-2 text-sm text-[#f0ead6]/65">{s.sub}</div>}
               </div>
@@ -214,7 +214,7 @@ export default async function RecruitingPage() {
             {content.quoteLabel && (
               <p className="text-xs uppercase tracking-[0.24em] text-[#f0ead6]/70">{content.quoteLabel}</p>
             )}
-            <p className="mt-5 max-w-3xl text-[2rem] leading-[1.28] text-[#f0ead6] md:text-[2.75rem]">
+            <p className="mt-5 max-w-3xl font-serif text-[2rem] leading-[1.28] text-[#f0ead6] md:text-[2.75rem]">
               {content.quoteText}
             </p>
           </div>
