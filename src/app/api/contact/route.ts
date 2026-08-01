@@ -7,7 +7,7 @@ const hubspotClient = new Client({
   accessToken: process.env.HUBSPOT_ACCESS_TOKEN,
 });
 
-type ContactSegment = 'coach' | 'athlete' | 'partner' | 'other';
+type ContactSegment = 'coach' | 'athlete' | 'partner' | 'local' | 'other';
 
 interface ContactFormData {
   segment?: ContactSegment;
@@ -25,6 +25,9 @@ interface ContactFormData {
   // College / pro connect path
   affiliation?: string;
   connectionType?: string;
+  // Housing partner / local business path
+  businessName?: string;
+  businessType?: string;
   // Other path
   subject?: string;
   message: string;
@@ -35,6 +38,7 @@ const SEGMENT_LABELS: Record<ContactSegment, string> = {
   coach: 'Team enquiry',
   athlete: 'Athlete & family',
   partner: 'College/pro connect',
+  local: 'Housing/local partner',
   other: 'General',
 };
 
@@ -51,6 +55,9 @@ function segmentDetails(body: ContactFormData): Array<[string, string]> {
       break;
     case 'partner':
       rows.push(['Affiliation', body.affiliation], ['Connection type', body.connectionType]);
+      break;
+    case 'local':
+      rows.push(['Business / property', body.businessName], ['Partner type', body.businessType]);
       break;
     default:
       rows.push(['Subject', body.subject]);

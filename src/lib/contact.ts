@@ -4,18 +4,18 @@
  * extra fields ride the email subject/body and the HubSpot lead so enquiries
  * can be triaged without reading every message.
  *
- * The coach/organiser path deliberately captures program, state, squad size
+ * The coach/organizer path deliberately captures program, state, squad size
  * and preferred weeks — the exact inputs the team-block booking flow starts
  * with, and the data the business plan's coach-validation questions (O-10)
  * need.
  */
 
-export type ContactSegment = 'coach' | 'athlete' | 'partner' | 'other';
+export type ContactSegment = 'coach' | 'athlete' | 'partner' | 'local' | 'other';
 
 export const CONTACT_SEGMENTS: Array<{ id: ContactSegment; label: string; blurb: string }> = [
   {
     id: 'coach',
-    label: 'Coach or trip organiser',
+    label: 'Coach or trip organizer',
     blurb: "You're bringing (or thinking about bringing) a team to Flagstaff.",
   },
   {
@@ -26,7 +26,12 @@ export const CONTACT_SEGMENTS: Array<{ id: ContactSegment; label: string; blurb:
   {
     id: 'partner',
     label: 'College or pro connect',
-    blurb: 'Collegiate staff, professional groups, housing partners, local businesses.',
+    blurb: 'Collegiate staff and professional athletes or groups.',
+  },
+  {
+    id: 'local',
+    label: 'Housing partner or local business',
+    blurb: 'Hosts, landlords, and Flagstaff businesses interested in working with visiting teams.',
   },
   {
     id: 'other',
@@ -53,6 +58,9 @@ export interface ContactFormData {
   // College / pro connect path
   affiliation?: string;
   connectionType?: string;
+  // Housing partner / local business path
+  businessName?: string;
+  businessType?: string;
   // Other path
   subject?: string;
   message: string;
@@ -64,6 +72,7 @@ export interface ContactFormErrors {
   email?: string;
   program?: string;
   affiliation?: string;
+  businessName?: string;
   subject?: string;
   message?: string;
   general?: string;
@@ -103,6 +112,9 @@ export function validateContactForm(data: ContactFormData): ContactFormErrors {
   }
   if (data.segment === 'partner' && !data.affiliation?.trim()) {
     errors.affiliation = 'Affiliation is required';
+  }
+  if (data.segment === 'local' && !data.businessName?.trim()) {
+    errors.businessName = 'Business or property name is required';
   }
   if (data.segment === 'other' && !data.subject?.trim()) {
     errors.subject = 'Subject is required';

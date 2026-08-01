@@ -42,6 +42,8 @@ const EMPTY_FORM = (segment: ContactSegment): ContactFormData => ({
   interest: '',
   affiliation: '',
   connectionType: '',
+  businessName: '',
+  businessType: '',
   subject: '',
   message: '',
 });
@@ -304,7 +306,7 @@ export default function ContactForm() {
                 <Input
                   id="affiliation"
                   name="affiliation"
-                  placeholder="e.g. NAU Track & Field, HYPO2, host property"
+                  placeholder="e.g. NAU Track & Field, HYPO2"
                   value={formData.affiliation}
                   onChange={handleInputChange}
                   className={errors.affiliation ? 'border-red-500' : ''}
@@ -321,9 +323,38 @@ export default function ContactForm() {
                   <option value="">Select…</option>
                   <option value="Collegiate program">Collegiate program</option>
                   <option value="Professional athlete/group">Professional athlete/group</option>
+                  <option value="Other">Other</option>
+                </select>
+              </Field>
+            </div>
+          )}
+
+          {/* ——— Housing partner / local business ————————— */}
+          {segment === 'local' && (
+            <div className="flex gap-4">
+              <Field id="businessName" label="Business / property name" required error={errors.businessName}>
+                <Input
+                  id="businessName"
+                  name="businessName"
+                  placeholder="e.g. Ponderosa Vacation Rentals"
+                  value={formData.businessName}
+                  onChange={handleInputChange}
+                  className={errors.businessName ? 'border-red-500' : ''}
+                />
+              </Field>
+              <Field id="businessType" label="What kind of partner?">
+                <select
+                  id="businessType"
+                  name="businessType"
+                  value={formData.businessType}
+                  onChange={handleInputChange}
+                  className={selectClass}
+                >
+                  <option value="">Select…</option>
                   <option value="Housing partner">Housing partner</option>
                   <option value="Local business">Local business</option>
-                  <option value="Other partnership">Other partnership</option>
+                  <option value="Sponsorship">Sponsorship</option>
+                  <option value="Other">Other</option>
                 </select>
               </Field>
             </div>
