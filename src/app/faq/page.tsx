@@ -67,9 +67,9 @@ export default async function FAQPage() {
                 {cat.items.map((faq) => (
                   <details
                     key={faq._id}
-                    className="group rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-sm overflow-hidden"
+                    className="group border border-[var(--border)] bg-[var(--surface)] shadow-sm overflow-hidden"
                   >
-                    <summary className="faq-summary cursor-pointer pl-10 pr-4 py-4 font-serif text-xl leading-snug rounded-lg group-open:rounded-b-none focus:outline-none">
+                    <summary className="faq-summary cursor-pointer pl-10 pr-4 py-4 font-serif text-xl leading-snug focus:outline-none">
                       {faq.question}
                     </summary>
                     <div className="px-10 pb-5 text-[16px] leading-[1.75] text-[#4a4a4a]">

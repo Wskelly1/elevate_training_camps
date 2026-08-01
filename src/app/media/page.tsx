@@ -1,11 +1,12 @@
 import Layout from "../../components/layout";
 import MediaGallery from "../../components/MediaGallery";
 import PageMasthead from "../../components/PageMasthead";
-import { getMediaPage, type MediaItem } from "../../lib/queries";
+import { getMediaPage } from "../../lib/queries";
 
 /**
- * MediaPage — editorial mosaic gallery with lightbox (owner request
- * 2026-08-01: varied frame sizes + click-to-expand; see MediaGallery).
+ * MediaPage — one continuous mosaic wall with lightbox (owner direction
+ * 2026-08-01: no chapter sections; the photos tile edge-to-edge — see
+ * MediaGallery). Categories remain in the Studio for organization only.
  * Copy lives in the mediaPage singleton; the gallery renders published
  * mediaItem documents grouped into chapters (Trails / Town / Training).
  *
@@ -16,22 +17,8 @@ import { getMediaPage, type MediaItem } from "../../lib/queries";
  * With zero published items the page shows only the intro copy.
  */
 
-const CHAPTERS: Array<{ id: string; title: string }> = [
-  { id: "trails", title: "Trails" },
-  { id: "town", title: "Town" },
-  { id: "training", title: "Training" },
-];
-
 export default async function MediaPage() {
   const { page, items } = await getMediaPage();
-
-  const chapters = CHAPTERS.map((c) => ({
-    ...c,
-    items: items.filter((i: MediaItem) => i.category === c.id),
-  })).filter((c) => c.items.length > 0);
-  const uncategorized = items.filter(
-    (i: MediaItem) => !i.category || !CHAPTERS.some((c) => c.id === i.category)
-  );
 
   return (
     <Layout transparentNav>
@@ -43,15 +30,8 @@ export default async function MediaPage() {
         intro={page?.intro}
       />
 
-      {/* ——— Chapters — editorial mosaic + lightbox ——————————— */}
-      {(chapters.length > 0 || uncategorized.length > 0) && (
-        <MediaGallery
-          chapters={[
-            ...chapters,
-            ...(uncategorized.length > 0 ? [{ id: "more", title: "More", items: uncategorized }] : []),
-          ]}
-        />
-      )}
+      {/* ——— The wall — one continuous mosaic ————————————————— */}
+      <MediaGallery items={items} />
 
       {items.length === 0 && page?.note && (
         <section className="pb-20">
