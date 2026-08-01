@@ -62,7 +62,11 @@ export async function generateMetadata(): Promise<Metadata> {
    * brand asset in public/ is used. One path, still fully CMS-editable.
    */
   const icon = settings.favicon
-    ? [{ url: urlFor(settings.favicon).width(64).height(64).format('png').url(), type: 'image/png' }]
+    ? [
+        { url: urlFor(settings.favicon).width(32).height(32).format('png').url(), sizes: '32x32', type: 'image/png' },
+        { url: urlFor(settings.favicon).width(64).height(64).format('png').url(), sizes: '64x64', type: 'image/png' },
+        { url: urlFor(settings.favicon).width(192).height(192).format('png').url(), sizes: '192x192', type: 'image/png' },
+      ]
     : [
         { url: '/favicon.svg', type: 'image/svg+xml' },
         { url: '/favicon.ico', sizes: 'any' },
