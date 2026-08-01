@@ -316,7 +316,21 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           <div className="flex flex-row h-auto items-center justify-between px-6 py-3">
             {/* Logo container */}
             <div className="flex items-center h-12">
-              <BrandLogo markSize={38} variant={navOverHero ? 'onDark' : 'onLight'} />
+              {(() => {
+                /* Uploaded nav logo wins; the committed BrandLogo is the
+                   fallback so the header never degrades to plain text. */
+                const uploaded = navOverHero
+                  ? (siteSettings?.logoOnDarkUrl ?? siteSettings?.logoUrl)
+                  : siteSettings?.logoUrl;
+                return uploaded ? (
+                  <Link href="/" aria-label="Elevate Training Camps home">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary editor-uploaded aspect ratio; plain img with fixed height */}
+                    <img src={uploaded} alt="Elevate Training Camps" className="h-10 w-auto" />
+                  </Link>
+                ) : (
+                  <BrandLogo markSize={38} variant={navOverHero ? 'onDark' : 'onLight'} />
+                );
+              })()}
             </div>
 
             {/* Desktop Navigation */}

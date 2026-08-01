@@ -4,6 +4,7 @@ import { PortableText } from "@portabletext/react";
 import Layout from "../components/layout";
 import HeroVideo from "../components/HeroVideo";
 import { getHomePage, type EditorialSection } from "../lib/queries";
+import SponsorMarquee from "../components/SponsorMarquee";
 
 /**
  * Home — Elevate Training Camps. CMS-driven (completes the homepage wave of
@@ -256,6 +257,9 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* ——— Sponsors / partners marquee ————————————————————— */}
+      <SponsorMarquee heading={data.sponsorsHeading} sponsors={data.sponsors ?? []} />
 
       {/* ——— Closing CTA ————————————————————————————————— */}
       {data.closingCta?.heading && (

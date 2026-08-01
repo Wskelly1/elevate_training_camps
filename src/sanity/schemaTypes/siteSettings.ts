@@ -18,18 +18,25 @@ export default defineType({
       type: 'text',
       description: 'A brief description of your site (used for SEO)'
     }),
-    // The inert `logo` field was removed in CMS-ification Wave 5 — the
-    // site's logo is the committed BrandLogo component + public/logo-mark.svg,
-    // so the field edited nothing (docs/09-architecture.md). footerLogo is
-    // kept for the future footer treatment.
+    // Nav logo (owner request 2026-07-31): uploadable again, with the
+    // committed BrandLogo component as the fallback when empty — so an
+    // unreachable CMS can never reduce the header to plain text, which is
+    // why the field was once removed. footerLogo was deleted as unused.
     defineField({
-      name: 'footerLogo',
-      title: 'Footer Logo',
+      name: 'logo',
+      title: 'Nav Logo (light backgrounds)',
       type: 'image',
-      description: 'Optional: Upload a different logo for the footer (if not provided, the main logo will be used)',
-      options: {
-        hotspot: true
-      }
+      description:
+        'Shown in the header on light/cream backgrounds. Leave empty to use the built-in twin-peak brand logo. Landscape lockups work best; rendered at 40px tall.',
+      options: { hotspot: true },
+    }),
+    defineField({
+      name: 'logoOnDark',
+      title: 'Nav Logo (over imagery)',
+      type: 'image',
+      description:
+        'Shown while the header floats over a masthead photo — needs to read on dark. Falls back to the light-background logo, then to the built-in brand logo.',
+      options: { hotspot: true },
     }),
     defineField({
       name: 'aboutUsImage',

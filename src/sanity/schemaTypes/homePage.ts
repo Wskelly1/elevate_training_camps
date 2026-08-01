@@ -288,6 +288,13 @@ export default defineType({
 
     /* ——— Closing CTA ————————————————————————————————— */
     defineField({
+      name: 'sponsorsHeading',
+      title: 'Sponsors Band Heading',
+      type: 'string',
+      description:
+        'Small heading over the partner-logo marquee (e.g. "Our partners"). The band only renders when at least one Sponsor document is published.',
+    }),
+    defineField({
       name: 'closingCta',
       title: 'Closing CTA',
       type: 'object',

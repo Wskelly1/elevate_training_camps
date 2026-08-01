@@ -52,9 +52,26 @@ export const structure: StructureResolver = (S) =>
         .title('Home Page')
         .icon(HomeIcon)
         .child(
-          S.documentList()
+          S.list()
             .title('Home Page')
-            .filter('_type == "homePage"')
+            .items([
+              S.listItem()
+                .title('Page Content')
+                .icon(HomeIcon)
+                .child(
+                  S.documentList()
+                    .title('Home Page')
+                    .filter('_type == "homePage"')
+                ),
+              S.listItem()
+                .title('Sponsors / Partners')
+                .icon(StarIcon)
+                .child(
+                  S.documentTypeList('sponsor')
+                    .title('Sponsors / Partners')
+                    .defaultOrdering(byOrder)
+                ),
+            ])
         ),
 
       S.divider(),
