@@ -52,18 +52,17 @@ function scrollToSection(sectionId: string, e: React.MouseEvent<HTMLAnchorElemen
 }
 
 const customColors = {
-  primary: '#755f4f',
-  secondary: '#a89885',
-  muted: '#cbccb5',
-  darkAccent: '#7f6f51',
-  headerFooterBg: '#f0ead6', // Richer cream for header/footer
-  mainBg: '#fbf9f3',       // Lighter cream for main content
-  foreground: '#333333',
+  primary: 'var(--muted-foreground)',
+  muted: 'var(--border)',
+  darkAccent: 'var(--accent-trail)',
+  headerFooterBg: 'var(--surface)', // Richer cream for header/footer
+  mainBg: 'var(--background)',       // Lighter cream for main content
+  foreground: 'var(--foreground)',
   navText: 'var(--primary-deep)', // Matches the logo wordmark
-  elevateGreen: '#427b4d', // Forest green
-  darkerElevateGreen: '#387143', // Darker green for hover
-  accent: '#d1c3a1', // Darker cream for dropdown hover
-  hoverBrown: '#755f4f', // Brown color for hover
+  elevateGreen: 'var(--primary)', // Forest green
+  darkerElevateGreen: 'var(--primary-hover)', // Darker green for hover (canonical #33603c)
+  accent: 'var(--border)', // Dropdown hover (absorbed per A1)
+  hoverBrown: 'var(--muted-foreground)', // Brown color for hover
   navHoverBg: 'rgba(117, 95, 79, 0.1)', // Light brown background for hover
 }
 
@@ -399,7 +398,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                                               WebkitMaskImage: 'linear-gradient(to bottom, black 20%, rgba(0,0,0,0.1) 70%)',
                                             }}
                                           />
-                                          <div className="absolute inset-0 border-0 group-hover:border-4 transition-all duration-200 rounded-md border-transparent group-hover:border-[#d1c3a1] cursor-pointer">
+                                          <div className="absolute inset-0 border-0 group-hover:border-4 transition-all duration-200 rounded-md border-transparent group-hover:border-[var(--border)] cursor-pointer">
                                           </div>
                                         </>
                                       )}
@@ -555,14 +554,18 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
       </main>
 
       {/* Footer */}
-      <footer style={{ backgroundColor: 'var(--primary-deep)', color: '#f0ead6' }} className="relative transition-colors duration-300">
+      <footer style={{ backgroundColor: 'var(--primary-deep)', color: 'var(--surface)' }} className="relative transition-colors duration-300">
         <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
           <div className="grid gap-12 md:grid-cols-1 lg:grid-cols-2">
             {/* Contact/newsletter section */}
             <div className="relative" style={{ backgroundColor: 'rgba(240,234,214,0.08)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
-              <h2 className="mb-4 text-3xl tracking-tight" style={{ color: '#f0ead6' }}>Stay Connected</h2>
+              <h2 className="mb-4 text-3xl tracking-tight" style={{ color: 'var(--surface)' }}>Stay Connected</h2>
               <p className="mb-6" style={{ color: 'rgba(240,234,214,0.75)' }}>
-                Join our newsletter for the latest updates and exclusive offers.
+                A short monthly letter from Flagstaff: camp news, training notes, and what&apos;s
+                happening at altitude. Past issues live on the{' '}
+                <Link href="/newsletter" className="underline transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.9)' }}>
+                  newsletter page
+                </Link>.
               </p>
 
               {/* Newsletter Status Messages */}
@@ -599,7 +602,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                   disabled={isNewsletterSubmitting}
                   className="absolute right-1 top-1 h-8 w-8 rounded-full"
                   style={{
-                    backgroundColor: isNewsletterSubmitting ? '#9ca3af' : customColors.primary,
+                    backgroundColor: isNewsletterSubmitting ? 'var(--border)' : customColors.primary,
                     color: '#fff',
                     cursor: isNewsletterSubmitting ? 'not-allowed' : 'pointer'
                   }}
@@ -619,33 +622,36 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
 
             <div className="grid gap-12 md:grid-cols-3">
               <div>
-                <h3 className="mb-4 text-lg" style={{ color: '#f0ead6' }}>Quick Links</h3>
+                <h3 className="mb-4 text-lg" style={{ color: 'var(--surface)' }}>Quick Links</h3>
                 <nav className="space-y-2 text-sm">
-                  <Link href="/" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                  <Link href="/" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Home
                   </Link>
-                  <Link href="/about" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                  <Link href="/about" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     About Us
                   </Link>
-                  <Link href="/recruiting" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                  <Link href="/recruiting" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Recruiting
                   </Link>
-                  <Link href="/registration" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                  <Link href="/registration" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Registration
                   </Link>
-                  <Link href="/media" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                  <Link href="/media" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Media
                   </Link>
-                  <Link href="/faq" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                  <Link href="/faq" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Frequently Asked Questions
                   </Link>
-                  <Link href="/contact" className="block transition-colors hover:text-[#e0b48e]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                  <Link href="/newsletter" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
+                    Newsletter
+                  </Link>
+                  <Link href="/contact" className="block transition-colors hover:text-[var(--accent-amber)]" style={{ color: 'rgba(240,234,214,0.75)' }}>
                     Contact
                   </Link>
                 </nav>
               </div>
               <div>
-                <h3 className="mb-4 text-lg" style={{ color: '#f0ead6' }}>Contact Us</h3>
+                <h3 className="mb-4 text-lg" style={{ color: 'var(--surface)' }}>Contact Us</h3>
                 <address className="space-y-2 text-sm not-italic" style={{ color: 'rgba(240,234,214,0.75)' }}>
                   <p>Flagstaff, AZ</p>
                   <p>Phone: 651-207-4749</p>
@@ -653,7 +659,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                 </address>
               </div>
               <div className="relative">
-                <h3 className="mb-4 text-lg" style={{ color: '#f0ead6' }}>Follow Us</h3>
+                <h3 className="mb-4 text-lg" style={{ color: 'var(--surface)' }}>Follow Us</h3>
                 {/* Rendered from siteSettings.socialLinks — only platforms
                     that actually exist in the Studio render, as real links.
                     (The old block was three dead buttons for accounts the
@@ -674,9 +680,9 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`Follow us on ${link.platform}`}
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f0ead6]/40 transition hover:border-[#f0ead6] hover:bg-[#f0ead6]/10"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--surface)]/40 transition hover:border-[var(--surface)] hover:bg-[var(--surface)]/10"
                       >
-                        <Icon className="h-4 w-4 text-[#f0ead6]" />
+                        <Icon className="h-4 w-4 text-[var(--surface)]" />
                       </a>
                     );
                   })}
@@ -687,7 +693,7 @@ const LayoutClient: React.FC<LayoutClientProps> = ({
           {/* Legal links (Privacy / Terms / Refunds) return here once the
               Phase 4 legal pages exist — dead "#" links misrepresent
               policies we haven't published yet. */}
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#f0ead6]/20 pt-8 text-center md:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[var(--surface)]/20 pt-8 text-center md:flex-row">
             <p className="text-sm" style={{ color: 'rgba(240,234,214,0.75)' }}>
               © 2026 Elevate Training Camps. All rights reserved.
             </p>

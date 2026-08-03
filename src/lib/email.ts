@@ -17,15 +17,18 @@ function getTransporter() {
 
 interface SendMailOptions {
   to: string;
+  /** Newsletter sends batch recipients here so addresses stay hidden from each other. */
+  bcc?: string[];
   subject: string;
   html: string;
   text: string;
 }
 
-export async function sendMail({ to, subject, html, text }: SendMailOptions) {
+export async function sendMail({ to, bcc, subject, html, text }: SendMailOptions) {
   return getTransporter().sendMail({
     from: `"Elevate Training Camps" <${process.env.GMAIL_FROM_EMAIL}>`,
     to,
+    ...(bcc && bcc.length > 0 ? { bcc } : {}),
     subject,
     html,
     text,

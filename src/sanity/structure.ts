@@ -222,4 +222,36 @@ export const structure: StructureResolver = (S) =>
                 ),
             ])
         ),
+
+      // ——— Newsletter ——————————————————————————————————————————
+      // Issues publish to the /newsletter archive; sending to subscribers
+      // is a separate secret-gated step (docs/04-email-setup.md). The
+      // subscriber list itself lives in HubSpot, NOT here — this project's
+      // dataset is public, so emails must never be stored in it.
+      S.listItem()
+        .title('Newsletter')
+        .icon(DocumentTextIcon)
+        .child(
+          S.list()
+            .title('Newsletter')
+            .items([
+              S.listItem()
+                .title('Page Settings')
+                .icon(CogIcon)
+                .child(
+                  S.document()
+                    .schemaType('newsletterPage')
+                    .documentId('newsletterPage')
+                    .title('Newsletter Page')
+                ),
+              S.listItem()
+                .title('Issues')
+                .icon(DocumentTextIcon)
+                .child(
+                  S.documentTypeList('newsletterIssue')
+                    .title('Issues')
+                    .defaultOrdering([{ field: 'issueDate', direction: 'desc' }])
+                ),
+            ])
+        ),
     ])

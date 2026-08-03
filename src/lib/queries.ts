@@ -646,3 +646,77 @@ export async function getMediaPage(): Promise<{ page: MediaPageContent | null; i
     return { page: null, items: [] };
   }
 }
+
+/** Newsletter archive page copy (newsletterPage singleton). */
+export type NewsletterPageContent = {
+  title?: string;
+  intro?: string;
+  emptyStateNote?: string;
+  mastheadImageUrl?: string;
+};
+
+/** An issue as listed on the /newsletter archive. */
+export type NewsletterIssueSummary = {
+  _id: string;
+  title: string;
+  slug: string;
+  issueDate?: string;
+  intro?: string;
+  heroImageUrl?: string;
+};
+
+/** A full issue as rendered at /newsletter/[slug]. */
+export type NewsletterIssue = NewsletterIssueSummary & {
+  body?: PortableTextBlock[];
+};
+
+const fetchNewsletterPage = unstable_cache(
+  async (): Promise<{ page: NewsletterPageContent | null; issues: NewsletterIssueSummary[] }> => {
+    return await client.fetch(`{
+      "page": *[_type == "newsletterPage" && _id == "newsletterPage"][0]{
+        title, intro, emptyStateNote, "mastheadImageUrl": mastheadImage.asset->url
+      },
+      "issues": *[_type == "newsletterIssue" && defined(slug.current)] | order(issueDate desc) {
+        _id, title, "slug": slug.current, issueDate, intro, "heroImageUrl": heroImage.asset->url
+      }
+    }`);
+  },
+  ['newsletter-page'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/** Archive copy + published issues; empty issue list before the first send. */
+export async function getNewsletterPage(): Promise<{ page: NewsletterPageContent | null; issues: NewsletterIssueSummary[] }> {
+  try {
+    return await fetchNewsletterPage();
+  } catch (error) {
+    console.error('Error fetching newsletter page:', error);
+    return { page: null, issues: [] };
+  }
+}
+
+// The slug argument is part of unstable_cache's cache key, so each issue
+// caches independently.
+const fetchNewsletterIssue = unstable_cache(
+  async (slug: string): Promise<NewsletterIssue | null> => {
+    return await client.fetch(
+      `*[_type == "newsletterIssue" && slug.current == $slug][0]{
+        _id, title, "slug": slug.current, issueDate, intro,
+        "heroImageUrl": heroImage.asset->url, body
+      }`,
+      { slug }
+    );
+  },
+  ['newsletter-issue'],
+  { revalidate: REVALIDATE_SECONDS }
+);
+
+/** One issue by slug, or null → the issue page 404s. */
+export async function getNewsletterIssue(slug: string): Promise<NewsletterIssue | null> {
+  try {
+    return await fetchNewsletterIssue(slug);
+  } catch (error) {
+    console.error('Error fetching newsletter issue:', error);
+    return null;
+  }
+}

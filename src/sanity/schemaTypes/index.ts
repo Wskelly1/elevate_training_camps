@@ -13,8 +13,10 @@ import faqPage from './faqPage'
 import mediaPage from './mediaPage'
 import mediaItem from './mediaItem'
 import sponsor from './sponsor'
+import newsletterPage from './newsletterPage'
+import newsletterIssue from './newsletterIssue'
 
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [siteSettings, homePage, teamMember, faq, aboutSection, teamBlock, registrationPage, recruitingPage, aboutPage, contactPage, faqPage, mediaPage, mediaItem, sponsor],
+  types: [siteSettings, homePage, teamMember, faq, aboutSection, teamBlock, registrationPage, recruitingPage, aboutPage, contactPage, faqPage, mediaPage, mediaItem, sponsor, newsletterPage, newsletterIssue],
 }
