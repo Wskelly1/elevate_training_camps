@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { TeamIntroduction } from "./AnimatedCarousel";
+/** A team member as displayed by the rotator (name, role, bio, photo). */
+export type TeamIntroduction = {
+  quote: string;
+  name: string;
+  designation: string;
+  src: string;
+};
 
 /**
  * TeamRotator — rotational team showcase (owner request 2026-07-31:

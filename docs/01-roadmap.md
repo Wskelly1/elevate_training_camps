@@ -5,7 +5,7 @@ is never stalled waiting on a key, decision, or approval. Engineering phases (§
 route around whatever is still pending. Maintained by Claude Code sessions;
 update it as phases complete rather than letting it rot.
 
-## Current state (as of 2026-07-30)
+## Current state (as of 2026-08-02)
 
 Live at https://elevatetrainingcamps.com (Vercel, auto-deploy from `main`).
 Shipped: site-wide crash fix, SendGrid→Gmail SMTP migration, GA4, CVE-2025-66478
@@ -45,7 +45,7 @@ coach can't travel; parent-led trips are first-class (see
 | # | Action | Unblocks |
 |---|---|---|
 | O-1 | Create Stripe account, start business verification (takes days) | Phase 5 build (test keys) and go-live (live keys) |
-| O-2 | Sanity billing — forward the billing team's reply when it arrives | Gate-1; all CMS schema/content writes (Phases 3, 5, 6, 7) |
+| O-2 | ✅ **Resolved 2026-07-30** — the billing block lifted; the CMS has taken schema deploys and content writes continuously since | ~~Gate-1; CMS writes~~ |
 | O-3 | Regenerate HubSpot private-app token (Settings → Integrations → Private Apps), provide new token (~10 min) | CRM lead capture working again |
 | O-4 | Vercel preview access: issue a protection-bypass secret (recommended) or disable deployment protection | Preview rung of the verification ladder (Gate-2) |
 
@@ -78,15 +78,16 @@ approvals, component picks from shortlist menus. Each takes minutes.
 
 ## §1 — Decision Gates
 
-- **Gate-1 · CMS stay/leave.** Inputs: Sanity billing reply (O-2), custom-CRM
-  details (O-9), and a measured comparison of post-caching API usage vs.
-  free-tier limits. Resolves before Phase 3. If stalled: Phases 0–2 and 4 are
-  CMS-agnostic; Phase 5 can fall back to Stripe metadata + email.
+- **Gate-1 · CMS stay/leave. ✅ Resolved: STAY (2026-08-02).** The billing
+  block lifted (O-2), the full CMS-ification shipped on Sanity (every page
+  Studio-editable, sync-checked 143/143), and post-caching API usage sits
+  comfortably inside the free tier. Reversing this now would mean redoing
+  the entire content layer; do not reopen without a new forcing event.
 - **Gate-2 · Preview verification** (= O-4). Until resolved, verification runs
   local → production-post-merge only.
-- **Gate-3 · Media hosting.** Default (confirm or veto): don't upload ~200
-  originals into Sanity while billing is unstable — curate 40–60, optimize to
-  WebP, serve from `public/` via `next/image`.
+- **Gate-3 · Media hosting. ✅ Superseded (2026-08-02).** Billing stabilised
+  and curated photos now live on Sanity's CDN (12 uploaded and serving on
+  /media). The public/-folder fallback is no longer planned.
 - **Gate-4 · Photo consent** (= O-6).
 - **Gate-5 · Claims gate.** No page may state a safety practice, a credential,
   or a track record as fact until it is true: insurance bound with A&M (O-12),
@@ -164,15 +165,18 @@ touches visuals gets promoted to gated.
 |---|---|---|---|
 | **0 · Hygiene & docs** | Docs rewrite (this file, `04-email-setup.md`, README, `05-video-playback.md`), dead-code + unused-dep removal, version pairings, ESLint config + ~50 error fixes, `06-billing.md`/`07-security-log.md`, calendar renewal events | none | baseline sweep |
 | **1 · Brand guide** | Photo-derived palette, green/cream canonicalization, type scale, layout references, motion vocabulary; delivered as a committed `/style-guide` route | O-5 mid-phase | **A1** approval |
-| **1.5 · Positioning & IA** | See §5.5. Repositions the site from individual athletes to the trip leaders who buy; team-block product model; page-by-page IA; claims discipline; alumni-data capture; CMS schema reshape. ~~Opens with the two live inconsistencies~~ — both fixed (O-16 shipped `/recruiting`; `2 weeks`/`3 weeks` added to `trainingPackage.duration`). **Scope expanded 2026-07-30 (owner): full CMS-ification — nearly all text/media becomes Studio-editable, one section per page; the copy-in-code pages are interim. Plan and wave order: `10-sanity-content-plan.md` §5** | `../../business-plan/` (source of truth); O-10/O-11 refine the product model | **A1.5** positioning approval; Gate-5, Gate-6 |
-| **2 · Token migration + providers** | Fill the empty `:root` token layer (done), ~~delete dead `tailwind.config.js`~~ (removed), migrate remaining hardcoded hexes page-by-page (~293 left), reconcile Sanity-schema + email-template palette copies, register Magic UI + Aceternity | A1 | **A2** regression approval + sweep |
-| **2.5 · UI & content-organisation overhaul** | Driven by `02-design-review.md`. **Homepage done** (A2.5a approved — scroll-hijack deleted, layout system landed). Remaining: apply the same system to the inner pages; rebuild the testimonial card; fix vertical rhythm and left-edge alignment; retire off-palette dark buttons; resolve CMS-authored `<strong>` marks | Phase 2 tokens; inner-page copy needs Phase 1.5 | ~~**A2.5a**~~ done, **A2.5b** per-page approval |
-| **3 · Media page** | Curate → optimize → gallery with provider scroll components | Phase 2, Gates 1/3/4 | **A3a** direction, **A3b** final + sweep |
+| **1.5 · Positioning & IA** | See §5.5. Repositions the site from individual athletes to the trip leaders who buy; team-block product model; page-by-page IA; claims discipline; alumni-data capture; CMS schema reshape. ~~Opens with the two live inconsistencies~~ — both fixed (O-16 shipped `/recruiting`; `2 weeks`/`3 weeks` added to `trainingPackage.duration`). **✅ CMS-ification COMPLETE 2026-07-31 — all five waves shipped (`10-sanity-content-plan.md` §5); every page is Studio-editable and `npm run check:content` verifies it** | `../../business-plan/` (source of truth); O-10/O-11 refine the product model | **A1.5** positioning approval; Gate-5, Gate-6 |
+| **2 · Token migration + providers** | ✅ Essentially complete 2026-08-02: `:root` layer live, page hexes migrated across the lodge rebuilds, email palette reconciled, LayoutClient migrated in the roadmap-refresh PR. Residual: deliberate literal cream/scrim values inside dark sections, and Magic UI / Aceternity remain unregistered until a component actually needs them | A1 | ~~A2~~ done |
+| **2.5 · UI & content-organisation overhaul** | ✅ Complete 2026-08-02 via the Cinematic Lodge system (PRs #23–#31): every inner page on the lodge grammar, TeamRotator replaced the carousel, off-palette buttons gone, `<strong>` marks styled deliberately | — | done |
+| **3 · Media page** | ✅ Built 2026-08-01: continuous mosaic wall + lightbox, CMS-managed items, 12 Colorado photos live. **Remaining: Flagstaff photography** — the staged library has zero usable Flagstaff shots (the two that exist are consent-blocked portraits), so this closes with O-6 consent or a people-free Flagstaff shoot | Gate-4 for any photo with a recognisable athlete | — |
 | **4 · Legal pages** | Privacy / ToS / Cookies (footer links are currently dead) **plus the refund/cancellation and wildfire-smoke-AQI policy** — the risk plan requires the latter published at the point of sale, so it is revenue-protecting, not boilerplate | O-7, O-13 | **A4** light + sweep, Gate-5 |
 | **5 · Stripe foundation** | **Re-scoped by Phase 1.5.** The sale is B2B and quote-based: two-part tariff (team base fee + per-athlete), squad minimum, non-refundable deposit at booking with balance before arrival. So: deposit/invoice flow rather than a per-head product checkout; signature-verified idempotent webhook; `/registration/success`; drop `paymentOption` schema | O-1, Phase 1.5, Gate-1 (or fallback); live: Phase 4 | payment security review + **A5** |
-| **6 · Real content** | ~~Replace fabricated Registration fallbacks~~ — done 2026-07-30: `/registration` rebuilt copy-in-code with the canonical two-part tariff, no dates/scarcity/discounts, honest smoke/cancellation copy. Remaining: wire CTAs to the real quote/deposit flow once Phase 5 exists, and move copy into the CMS after the Phase 1.5 schema reshape | O-8, Phase 1.5, Gate-1, Gate-6 | **A6** direction + approval + sweep |
-| **7 · Blog** | `blogPost` schema, listing, post page, nav | Phase 2, Gate-1 | **A7** + sweep |
+| **6 · Real content** | ✅ Complete 2026-08-01: canonical tariff live from the CMS, all copy Studio-editable, tone pass applied. Only the Phase-5 CTA wiring (quote/deposit flow) remains, tracked under Phase 5 | Gate-6 still governs 3-week-specific investment | done |
 | **8 · Recruiting advisory surface** | **Partly shipped** via O-16 (PRs #15/#17): `/recruiting` is live with the Y1-phased, no-pricing copy. Remaining: the priced rate card (waits on the Gate-7 measured attach rate), any schema backing, and the two-buyer split if the copy ever needs it | Phase 1.5, Gate-7 | **A8** direction + approval, Gate-5 rule 4 |
+
+**Cut from the roadmap:** Phase 7 (Blog) — owner decision 2026-08-02, not
+necessary; the monthly newsletter (issues authored in the Studio, archived at
+`/newsletter`) covers recurring content instead. Do not re-propose.
 
 **Critical path:** A1 → Phase 2 → all visual work; **Phase 1.5 → Phases 5/6/8**
 (the product model determines the checkout, the content and the service-line

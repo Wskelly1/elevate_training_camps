@@ -1,6 +1,6 @@
 import Layout from "../../components/layout";
 import { urlFor } from "../../lib/sanity";
-import { type TeamIntroduction } from "../../components/AnimatedCarousel";
+import { type TeamIntroduction } from "../../components/TeamRotator";
 import AboutPageContent from "../../components/AboutPageContent";
 import { getTeamMembers, getAboutSections, getAboutPage } from "../../lib/queries";
 import type { SanityImageRef } from "../../lib/types";

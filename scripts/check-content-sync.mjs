@@ -191,6 +191,21 @@ const ROUTES = [
       check('/contact', 'contactEmail', d.settings?.contactEmail, h);
     },
   ],
+  [
+    '/newsletter',
+    `{"page": *[_type == "newsletterPage" && _id == "newsletterPage"][0]{title, intro, emptyStateNote, "masthead": mastheadImage.asset._ref},
+      "issues": *[_type == "newsletterIssue" && defined(slug.current)] | order(issueDate desc) {title, intro}}`,
+    (d, h) => {
+      check('/newsletter', 'title', d.page?.title, h);
+      check('/newsletter', 'intro', d.page?.intro, h);
+      check('/newsletter', 'masthead image', d.page?.masthead, h, { image: true });
+      // The empty-state note only renders while no issues exist.
+      if ((d.issues ?? []).length === 0) {
+        check('/newsletter', 'emptyStateNote', d.page?.emptyStateNote, h);
+      }
+      for (const i of d.issues ?? []) check('/newsletter', `issue "${i.title}"`, i.title, h);
+    },
+  ],
 ];
 
 // ——— Site-wide: nav logo + favicon come from siteSettings ————————————

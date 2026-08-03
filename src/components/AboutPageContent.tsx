@@ -2,8 +2,7 @@
 
 import { useEffect } from "react";
 import { urlFor } from "../lib/sanity";
-import { type TeamIntroduction } from "./AnimatedCarousel";
-import TeamRotator from "./TeamRotator";
+import TeamRotator, { type TeamIntroduction } from "./TeamRotator";
 import PageMasthead from "./PageMasthead";
 import { AboutSection } from "../lib/queries";
 import { PortableText } from '@portabletext/react';
@@ -107,7 +106,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
                 <div className="mx-auto w-full max-w-6xl px-6">
                   <div className="max-w-lg p-9 backdrop-blur-[2px] md:p-10" style={{ backgroundColor: "rgba(28,36,25,0.82)", color: "#f0ead6" }}>
                     <p className="text-[11px] uppercase tracking-[0.3em] text-[#e0b48e]">{section.title}</p>
-                    <div className="mt-5 [&_p]:mt-4 [&_p]:text-[17px] [&_p]:leading-[1.75] [&_p]:text-[#f0ead6]/90 [&_p:first-child]:mt-0">
+                    <div className="mt-5 [&_p]:mt-4 [&_p]:text-[17px] [&_p]:leading-[1.75] [&_p]:text-[#f0ead6]/90 [&_p:first-child]:mt-0 [&_strong]:font-semibold [&_strong]:text-[var(--primary-deep)]">
                       <PortableText value={section.content} />
                     </div>
                   </div>
@@ -134,7 +133,7 @@ export default function AboutPageContent({ teamIntroductions, aboutSections, her
               </div>
               <div className="md:col-span-5">
                 <p className="text-[11px] uppercase tracking-[0.3em] text-[var(--accent-rock)]">{section.title}</p>
-                <div className="mt-5 [&_p]:mt-4 [&_p]:max-w-[52ch] [&_p]:text-[17px] [&_p]:leading-[1.75] [&_p]:text-[#4a4a4a] [&_p:first-child]:mt-0">
+                <div className="mt-5 [&_p]:mt-4 [&_p]:max-w-[52ch] [&_p]:text-[17px] [&_p]:leading-[1.75] [&_p]:text-[#4a4a4a] [&_p:first-child]:mt-0 [&_strong]:font-semibold [&_strong]:text-[var(--primary-deep)]">
                   <PortableText value={section.content} />
                 </div>
               </div>

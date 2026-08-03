@@ -84,3 +84,51 @@ check both flags, not just the top-level success.
   scopes; regenerate the private-app token and update Vercel envs.
 - **Works locally, fails in production** — env vars missing in Vercel; run
   `vercel env ls production` and compare against the list above.
+
+## Monthly newsletter (issues + sending)
+
+The newsletter has two halves, deliberately decoupled (built 2026-08-02,
+replacing the cut Phase 7 blog):
+
+**Authoring & the archive.** Issues are `newsletterIssue` documents in the
+Studio (Newsletter → Issues). Publishing one makes it appear at
+`/newsletter` (archive) and `/newsletter/<slug>` (permanent issue page) —
+it does NOT email anyone. The page copy for the archive lives in the
+`newsletterPage` singleton (Newsletter → Page Settings).
+
+**Sending.** `POST /api/newsletter/send` emails a *published* issue to the
+subscriber list, rendered into branded HTML, with recipients in BCC batches
+of 50 so addresses are never exposed to each other.
+
+```bash
+curl -X POST https://elevatetrainingcamps.com/api/newsletter/send \
+  -H "Authorization: Bearer $NEWSLETTER_SEND_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"slug":"august-2026"}'
+```
+
+- Auth: `NEWSLETTER_SEND_SECRET` env var (Vercel). Endpoint returns 503
+  until it is set, 401 on a wrong bearer.
+- Recipients come from HubSpot: every contact the signup route flagged with
+  `newsletter_subscription = true`. Until the HubSpot token is fixed
+  (roadmap O-3), pass an explicit list instead:
+  `{"slug":"...", "recipients":["a@b.com","c@d.com"]}`.
+- Re-send protection: after a successful send the issue's `sentAt` is
+  stamped (requires `SANITY_API_WRITE_TOKEN`; without it the send works but
+  the response notes the stamp was skipped) and a second no-recipients send
+  of the same issue is refused with 409.
+- Unsubscribes: reply-to-unsubscribe (stated in every issue's footer) —
+  clear the contact's `newsletter_subscription` property in HubSpot.
+
+**Where subscribers live — and where they must never live.** The Sanity
+dataset is PUBLIC (and this project's plan does not allow private
+datasets), so subscriber emails are never stored in Sanity. HubSpot is the
+subscriber store; the per-signup admin notification email is the backstop
+record while the HubSpot token is broken.
+
+Additional env vars for this flow (beyond the Gmail/HubSpot ones above):
+
+| Variable | Purpose |
+| --- | --- |
+| `NEWSLETTER_SEND_SECRET` | Bearer secret gating `POST /api/newsletter/send` |
+| `SANITY_API_WRITE_TOKEN` | Optional — lets the send endpoint stamp `sentAt` on the issue (mint at manage.sanity.io → API → Tokens, Editor role) |

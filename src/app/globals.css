@@ -81,6 +81,7 @@
   --brown-deep: #583e2e;     /* Link hover */
 
   /* Accents (locked at A1) */
+  --accent-amber: #e0b48e; /* Lodge accent for eyebrows/links on dark imagery */
   --accent-rock: #b67d5e;    /* Red Rock */
   --accent-trail: #67563b;   /* Trail Brown */
 

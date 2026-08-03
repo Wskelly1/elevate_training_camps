@@ -42,7 +42,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function SectionBody({ body }: { body?: EditorialSection["body"] }) {
   if (!body?.length) return null;
   return (
-    <div className="[&>p]:mt-4 [&>p]:max-w-[52ch] [&>p]:text-[17px] [&>p]:leading-[1.75] [&>p]:text-[#4a4a4a] [&>p:first-child]:mt-7">
+    <div className="[&>p]:mt-4 [&>p]:max-w-[52ch] [&>p]:text-[17px] [&>p]:leading-[1.75] [&>p]:text-[#4a4a4a] [&>p:first-child]:mt-7 [&_strong]:font-semibold [&_strong]:text-[var(--primary-deep)]">
       <PortableText value={body} />
     </div>
   );
