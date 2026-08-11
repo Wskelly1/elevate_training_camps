@@ -183,11 +183,12 @@ Three findings that shape the build:
    lead records. Lead PII must not be written to that dataset. This is why the
    storage question in §7 is a real decision and not a formality.
 2. **A client-side password is not authentication.** The source CRM's lock
-   screen is defeated by View Source. Replacement: the password is checked
-   **server-side**, and success sets a signed, `httpOnly`, `Secure`,
-   `SameSite=Lax` session cookie; every CRM route and API endpoint verifies it
-   in middleware. Records are never served to an unauthenticated request —
-   not even to be hidden by CSS.
+   screen is defeated by View Source. Replaced by **Google Workspace SSO with
+   an email allowlist** (decision D5) — the app stores no password at all, and
+   inherits the 2-Step Verification already on the Workspace account. Every
+   CRM route and API endpoint verifies the session in middleware. Records are
+   never served to an unauthenticated request — not even to be hidden by CSS,
+   which is what the source CRM does.
 3. **The CRM is excluded from indexing** — `robots`, sitemap and nav — the
    same treatment `/style-guide` already gets.
 
@@ -196,17 +197,29 @@ Collection discipline: capture what the funnel and the alumni asset need
 college destination). Nothing medical, nothing beyond, until a phase actually
 requires it.
 
-## §7 — Open decisions
+## §7 — Decisions (settled 2026-08-11)
 
-Blocking, in order of consequence. Recorded here so the answer is written down
-rather than living in a chat scrollback.
+All four resolved by Will on 2026-08-11. Recorded here so they are not
+reopened from scratch in a later session.
 
-| # | Decision | Options |
+| # | Decision | Resolution |
 |---|---|---|
-| **D1** | **Where lead records are stored.** Ruled out: the public Sanity dataset (§6.1) and `localStorage` (§2). | (a) A **second, private Sanity dataset** — no new vendor, no new bill, reuses existing auth and the Studio as a fallback admin UI; but Sanity is a CMS being asked to be a database, and this project has already been billing-blocked once on its free tier. (b) **Postgres** (Vercel/Neon free tier) — the correct tool, private by default, real queries; adds one vendor and one more thing to keep alive. |
-| **D2** | **Where the CRM lives.** | (a) A protected route inside this app (`/crm`), deploying with the site — recommended, since the contact-form hook is then in-process. (b) A separate deployment. |
-| **D3** | **HubSpot: replace or run alongside?** Its token has been dead since 2026-07-30 (O-3), so today it captures nothing either way. Newsletter recipients are currently read from HubSpot (`newsletter_subscription`), so dropping it means moving that list too. | (a) Replace — CRM becomes the single lead store. (b) Keep both. |
-| **D4** | **Import the 523 Blank's contacts?** They are running/bike retail stores — real businesses, wrong industry, and not Elevate's leads. | (a) Skip; seed from the marketing plan's coach target list instead. (b) Import as a separate partner/sponsor list. |
+| **D1** | Where lead records are stored | **Neon Postgres** (free tier, provisioned through the Vercel marketplace). Private by default, no bill, and it decouples the CRM from the Sanity quota that billing-blocked the project once (O-2). ⚠️ **A private Sanity dataset was chosen first and proved impossible**: `create_dataset` returned `ACL mode "private" not allowed for this project` — private datasets require a paid Sanity plan, so the very thing that made Sanity attractive (no new bill) is what ruled it out. Do not re-propose it without a plan upgrade. The `production` dataset stays public and untouched for site content. |
+| **D2** | Where the CRM lives | **A protected `/crm` route inside this app**, deploying with the site. The contact-form hook is then in-process — no cross-service call, no second secret, no network leg that can fail independently. |
+| **D3** | HubSpot | **Replaced entirely.** The CRM becomes the single lead store. The HubSpot leg is removed from `/api/contact` and `/api/newsletter`, `@hubspot/api-client` is dropped, and `HUBSPOT_ACCESS_TOKEN` is retired from the env surface and `06-billing.md`. **This closes owner action O-3** — the token no longer needs regenerating. Newsletter recipients, currently read from HubSpot's `newsletter_subscription` property, move into the CRM as a subscriber flag on the lead record; `scripts/send-newsletter.mjs` follows. |
+| **D5** | How `/crm` authenticates | **Google Workspace SSO**, restricted to an allowlist of `@elevatetrainingcamps.com` addresses. Raised by Will on 2026-08-11 — *"I would like the sign in to be more secure because we are going to be storing PII records"* — which supersedes the simple server-checked password §6.2 originally proposed. Chosen because the Workspace account already carries **2-Step Verification** (the Gmail app password requires it), so the CRM inherits real 2FA at no cost, and **no password is ever stored by this app**. Access is granted and revoked by editing the allowlist. Session: signed, `httpOnly`, `Secure`, `SameSite=Lax`, 12-hour expiry, verified in middleware on every `/crm` route and API endpoint. |
+| **D4** | The 523 supplied contacts | **Not imported.** They are running and bike retail stores — real businesses in the wrong industry. A handful may be used as throwaway fixtures during the build and must not survive into the live dataset. Real seeding comes from the marketing plan's coach target list (AZ/NV/NM/CA/W-TX programs). |
+
+### Consequences worth carrying forward
+
+- **The newsletter depends on this.** Its recipient list is currently a
+  HubSpot query. Until D3's migration lands, `npm run newsletter:send` must
+  not be run against the new path — see `04-email-setup.md`.
+- **Sanity and the CRM are now fully separate.** Sanity keeps site content and
+  nothing else; the CRM never reads or writes it. That is a feature: the CRM
+  cannot exhaust the quota the live site depends on.
+- **One new env var**, `DATABASE_URL`, in Vercel (all environments) and
+  `.env.local`. It is the whole credential surface for the CRM store.
 
 ## §8 — Phasing
 
