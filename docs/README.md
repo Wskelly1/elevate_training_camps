@@ -23,6 +23,7 @@ document that owns it rather than scattered across the tree.
 | **09** | [`09-architecture.md`](09-architecture.md) | How the app works end to end — rendering model, the caching rules that keep Sanity inside its free tier, integrations, and the known debt. |
 | **10** | [`10-sanity-content-plan.md`](10-sanity-content-plan.md) | The coordination contract for Sanity: surface ownership, pending content fixes, branch sequencing, single-writer rules, the Phase 1.5 reshape, and CMS write-safety. |
 | **11** | [`11-content-sync-verification.md`](11-content-sync-verification.md) | How to verify the Studio actually connects to what the pages render (`npm run check:content`), and the dispute rule: the page wins. |
+| **12** | [`12-crm-plan.md`](12-crm-plan.md) | **Phase 9, active.** The in-house CRM: why it exists, what it inherits from the supplied concept, the retail→camps domain mapping, how the contact form feeds it, and the PII constraints that govern it. |
 
 ## Where content lives
 

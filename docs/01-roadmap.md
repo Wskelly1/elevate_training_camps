@@ -5,7 +5,14 @@ is never stalled waiting on a key, decision, or approval. Engineering phases (§
 route around whatever is still pending. Maintained by Claude Code sessions;
 update it as phases complete rather than letting it rot.
 
-## Current state (as of 2026-08-02)
+## Current state (as of 2026-08-11)
+
+**Active work: Phase 9 — the CRM** (started 2026-08-11, plan at
+[`12-crm-plan.md`](12-crm-plan.md)). Everything below this line was last
+revised 2026-08-02 and remains accurate; note only that the HubSpot 401 it
+records is now the reason Phase 9 exists, since no lead has reached any CRM
+since 2026-07-30.
+
 
 Live at https://elevatetrainingcamps.com (Vercel, auto-deploy from `main`).
 Shipped: site-wide crash fix, SendGrid→Gmail SMTP migration, GA4, CVE-2025-66478
@@ -57,7 +64,7 @@ coach can't travel; parent-led trips are first-class (see
 | O-6 | **Photo consent** — confirm which of the 195 staged photos are cleared for public use (identifiable people, especially minors, need releases). Hard stop; not defaulted | Phase 3 publishing (Gate-4) |
 | O-7 | Legal inputs: business entity name, refund/cancellation policy; lawyer review of waiver language recommended (physical sports business) | Phase 4 → Stripe go-live |
 | O-8 | Real registration + coaching content (pricing, dates, packages, testimonials with consent) | Phase 6 |
-| O-9 | Custom-CRM API/data-model details from partner contact | Gate-1 CRM side |
+| O-9 | ✅ **Resolved 2026-08-11.** The custom CRM is Will's own — supplied as a working single-file app (Blank's Retailer Pipeline v6.10) plus a 523-contact JSON export, so the data model and feature set are known and no longer wait on a partner. Being rebuilt on the Elevate token layer as **Phase 9**; see [`12-crm-plan.md`](12-crm-plan.md) | ~~Gate-1 CRM side~~ |
 
 **Tier 1b — gates what the site is allowed to say.** Added 2026-07-29 from the
 three planning documents. These are business actions, listed here because
@@ -173,6 +180,7 @@ touches visuals gets promoted to gated.
 | **5 · Stripe foundation** | **Re-scoped by Phase 1.5.** The sale is B2B and quote-based: two-part tariff (team base fee + per-athlete), squad minimum, non-refundable deposit at booking with balance before arrival. So: deposit/invoice flow rather than a per-head product checkout; signature-verified idempotent webhook; `/registration/success`; drop `paymentOption` schema | O-1, Phase 1.5, Gate-1 (or fallback); live: Phase 4 | payment security review + **A5** |
 | **6 · Real content** | ✅ Complete 2026-08-01: canonical tariff live from the CMS, all copy Studio-editable, tone pass applied. Only the Phase-5 CTA wiring (quote/deposit flow) remains, tracked under Phase 5 | Gate-6 still governs 3-week-specific investment | done |
 | **8 · Recruiting advisory surface** | **Partly shipped** via O-16 (PRs #15/#17): `/recruiting` is live with the Y1-phased, no-pricing copy. Remaining: the priced rate card (waits on the Gate-7 measured attach rate), any schema backing, and the two-buyer split if the copy ever needs it | Phase 1.5, Gate-7 | **A8** direction + approval, Gate-5 rule 4 |
+| **9 · CRM** | 🟢 **ACTIVE — started 2026-08-11.** Promoted out of §7 by O-9's resolution. An in-house CRM at `/crm`, rebuilt from Will's supplied concept onto the Elevate token layer, **with `/api/contact` and `/api/newsletter` writing every submission into it automatically**. Closes the gap left by the dead HubSpot token (O-3), gives the marketing plan's 120-coach funnel a tool to run in, and is where the alumni database (§5.5 — *"the only asset that cannot be purchased later at any price"*) starts accumulating. Full plan, domain mapping, security constraints and open decisions: [`12-crm-plan.md`](12-crm-plan.md) | O-9 (done); D1–D3 in the plan doc; Gate-5 for Onboarding copy | server-side auth review before any real lead data lands (R16 — minors' records) |
 
 **Cut from the roadmap:** Phase 7 (Blog) — owner decision 2026-08-02, not
 necessary; the monthly newsletter (issues authored in the Studio, archived at
@@ -481,9 +489,11 @@ never speculatively.
 ## §7 — Parking lot
 
 Customer/parent portal + auth (prereq for an in-site billing dashboard);
-coaching booking/calendar; dark mode; multi-location; custom-CRM integration
-(awaiting O-9); custom weekly-analytics report via Vercel Cron (native GA
-scheduled emails already active).
+coaching booking/calendar; dark mode; multi-location; custom weekly-analytics
+report via Vercel Cron (native GA scheduled emails already active).
+
+**Left the parking lot 2026-08-11:** custom-CRM integration, now **Phase 9**
+(§4) — O-9 resolved, plan at [`12-crm-plan.md`](12-crm-plan.md).
 
 Later service lines from doc 03, each needing a surface eventually but **not
 yet** — winter & spring break camps, coach education & clinics, brand
