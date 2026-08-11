@@ -96,23 +96,52 @@ Studio (Newsletter → Issues). Publishing one makes it appear at
 it does NOT email anyone. The page copy for the archive lives in the
 `newsletterPage` singleton (Newsletter → Page Settings).
 
-**Sending.** `POST /api/newsletter/send` emails a *published* issue to the
-subscriber list, rendered into branded HTML, with recipients in BCC batches
-of 50 so addresses are never exposed to each other.
+**Sending — manual trigger ONLY (owner decision 2026-08-11).** Nothing
+sends automatically: no webhook fires on publish, no schedule exists, and
+publishing an issue in the Studio only puts it on the website. An email
+goes out exactly when the owner runs the send script, which wraps
+`POST /api/newsletter/send` (branded HTML, recipients in BCC batches of 50
+so addresses are never exposed to each other). Do not add a publish
+webhook, a `readyToSend` automation, or a cron job — that trade-off was
+considered and rejected.
 
-```bash
-curl -X POST https://elevatetrainingcamps.com/api/newsletter/send \
-  -H "Authorization: Bearer $NEWSLETTER_SEND_SECRET" \
-  -H "Content-Type: application/json" \
-  -d '{"slug":"august-2026"}'
-```
+### The monthly send, step by step
 
-- Auth: `NEWSLETTER_SEND_SECRET` env var (Vercel). Endpoint returns 503
-  until it is set, 401 on a wrong bearer.
-- Recipients come from HubSpot: every contact the signup route flagged with
-  `newsletter_subscription = true`. Until the HubSpot token is fixed
-  (roadmap O-3), pass an explicit list instead:
-  `{"slug":"...", "recipients":["a@b.com","c@d.com"]}`.
+1. **Write the issue** — Studio (`/studio`) → **Newsletter → Issues** →
+   create: title (doubles as the email subject), slug (e.g.
+   `september-2026`), issue month, intro/teaser, optional hero image, body.
+2. **Publish it.** This puts it on the site only — nobody is emailed.
+3. **Review it live** at `elevatetrainingcamps.com/newsletter/<slug>`
+   (allow up to 5 minutes for the page cache). Fix and re-publish until
+   happy; still nobody has been emailed.
+4. **Send it** from the app repo:
+
+   ```bash
+   npm run newsletter:send -- september-2026
+   ```
+
+   The script looks the issue up, shows its title/month/sent-status and
+   the recipient source, and makes you type the slug back before anything
+   goes out. Recipients come from HubSpot (every contact with
+   `newsletter_subscription = true`). Until the HubSpot token is fixed
+   (roadmap O-3), pass the list explicitly:
+
+   ```bash
+   npm run newsletter:send -- september-2026 --recipients a@b.com,c@d.com
+   ```
+
+5. **Check the result.** The script prints the endpoint's response:
+   `sent`/`failed` counts and whether `sentAt` was stamped on the issue.
+
+### Guards in the pipeline
+
+- Auth: `NEWSLETTER_SEND_SECRET` must be set in Vercel (endpoint returns
+  503 until it is, 401 on a wrong bearer) AND in `.env.local` (where the
+  script reads it). One-time setup:
+  `openssl rand -hex 32 | vercel env add NEWSLETTER_SEND_SECRET production`,
+  then put the same value in `.env.local`.
+- Drafts are never sent — the endpoint and the script both resolve only
+  the published issue.
 - Re-send protection: after a successful send the issue's `sentAt` is
   stamped (requires `SANITY_API_WRITE_TOKEN`; without it the send works but
   the response notes the stamp was skipped) and a second no-recipients send
