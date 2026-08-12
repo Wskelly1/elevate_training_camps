@@ -10,15 +10,20 @@ documented a SendGrid integration that was removed in July 2026.)
   authenticated as a real Google Workspace account via an App Password, sending
   from a "Send mail as" alias so recipients see `support@elevatetrainingcamps.com`.
 - **`POST /api/contact`** (`src/app/api/contact/route.ts`) — validates the
-  contact form, sends an admin notification + a user confirmation email, and
-  creates a HubSpot contact.
+  contact form, files the enquirer in the CRM, and sends an admin notification
+  + a user confirmation email.
 - **`POST /api/newsletter`** (`src/app/api/newsletter/route.ts`) — validates the
-  email, sends an admin notification + a welcome email, and creates a HubSpot
-  contact with newsletter properties.
+  email, flags the lead as a newsletter subscriber in the CRM, and sends an
+  admin notification + a welcome email.
 - Client pieces: `src/components/ContactForm.tsx` (contact page form) and the
   newsletter form inside `src/components/LayoutClient.tsx` (site footer).
-- Both routes degrade gracefully: if email fails but HubSpot succeeds (or vice
-  versa) the request still returns success; only total failure returns a 500.
+- Both routes degrade gracefully: if email fails but the CRM write succeeds (or
+  vice versa) the request still returns success; only total failure returns a
+  500.
+
+> **HubSpot was removed on 2026-08-11.** The in-house CRM at `/crm` replaced it
+> (Phase 9, decision D3) — see [`13-crm-setup.md`](13-crm-setup.md). Lead
+> capture, the subscriber list and the dedupe all live there now.
 
 ## Environment variables
 
@@ -27,7 +32,7 @@ GMAIL_USER=william.skelly@elevatetrainingcamps.com   # real account that authent
 GMAIL_APP_PASSWORD=****                              # 16-char App Password (not the account password)
 GMAIL_FROM_EMAIL=support@elevatetrainingcamps.com    # verified "Send mail as" alias
 GMAIL_TO_EMAIL=support@elevatetrainingcamps.com      # where admin notifications land
-HUBSPOT_ACCESS_TOKEN=****                            # HubSpot private-app token
+DATABASE_URL=****                                    # CRM store — lead capture + subscriber list
 ```
 
 Set locally in `.env.local` (gitignored) and in Vercel for
@@ -49,13 +54,14 @@ production/preview/development.
 Limits: Workspace accounts can send to ~2,000 recipients/day — far beyond a
 contact form's volume. If the site ever sends bulk mail, revisit.
 
-## HubSpot setup (one-time)
+## CRM setup (one-time)
 
-1. HubSpot → Settings → Integrations → **Private Apps** → create (or open) the
-   app for this site.
-2. Required scope: `crm.objects.contacts.write` (add `.read` for dedupe work).
-3. Copy the access token into the env var. Regenerating the token invalidates
-   the old one — update Vercel at the same time.
+Lead capture needs `DATABASE_URL` and the CRM tables. Full runbook:
+[`13-crm-setup.md`](13-crm-setup.md) §2. Short version: create a free Neon
+database from the Vercel dashboard's Storage tab, `npx vercel env pull
+.env.local`, then `npm run crm:migrate`.
+
+Without it, both form routes still email — they just don't file anything.
 
 ## Testing
 
@@ -122,9 +128,9 @@ considered and rejected.
 
    The script looks the issue up, shows its title/month/sent-status and
    the recipient source, and makes you type the slug back before anything
-   goes out. Recipients come from HubSpot (every contact with
-   `newsletter_subscription = true`). Until the HubSpot token is fixed
-   (roadmap O-3), pass the list explicitly:
+   goes out. Recipients come from the CRM (every lead with
+   `newsletter_subscribed = true`, excluding archived ones). To override that
+   list, pass it explicitly:
 
    ```bash
    npm run newsletter:send -- september-2026 --recipients a@b.com,c@d.com
@@ -147,13 +153,13 @@ considered and rejected.
   the response notes the stamp was skipped) and a second no-recipients send
   of the same issue is refused with 409.
 - Unsubscribes: reply-to-unsubscribe (stated in every issue's footer) —
-  clear the contact's `newsletter_subscription` property in HubSpot.
+  archive the lead in the CRM, or clear its newsletter flag. Archiving does
+  both: the recipient query excludes archived leads.
 
 **Where subscribers live — and where they must never live.** The Sanity
-dataset is PUBLIC (and this project's plan does not allow private
-datasets), so subscriber emails are never stored in Sanity. HubSpot is the
-subscriber store; the per-signup admin notification email is the backstop
-record while the HubSpot token is broken.
+`production` dataset is PUBLIC — confirmed 2026-08-11 as `aclMode: public` —
+and the free plan refuses private datasets, so subscriber emails are never
+stored in Sanity. The CRM's Postgres database is the subscriber store.
 
 Additional env vars for this flow (beyond the Gmail/HubSpot ones above):
 

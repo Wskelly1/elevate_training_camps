@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { PortableTextBlock } from '@portabletext/types';
-import { Client } from '@hubspot/api-client';
-import { FilterOperatorEnum } from '@hubspot/api-client/lib/codegen/crm/contacts';
 import { sendMail } from '../../../../lib/email';
 import { client as sanityClient } from '../../../../lib/sanity';
+import { isCrmConfigured, sql } from '../../../../lib/crm/db';
 
 /**
  * POST /api/newsletter/send — email a published newsletter issue to the
@@ -14,11 +13,11 @@ import { client as sanityClient } from '../../../../lib/sanity';
  * endpoint is disabled (503) until that env var is set.
  *
  * Body: { "slug": "<issue slug>", "recipients"?: ["a@b.com", ...] }
- *   - Without `recipients`, the list is pulled from HubSpot (contacts with
- *     newsletter_subscription = true — the property the signup route sets).
- *     Subscriber emails are NEVER stored in Sanity: the dataset is public.
- *   - With `recipients`, exactly those addresses are used (manual sends,
- *     or a fallback while the HubSpot token is broken — roadmap O-3).
+ *   - Without `recipients`, the list comes from the CRM (leads with
+ *     newsletter_subscribed = true — the flag the signup route sets).
+ *     Subscriber emails are NEVER stored in Sanity: that dataset is public.
+ *   - With `recipients`, exactly those addresses are used (manual sends, or a
+ *     fallback if the CRM is unreachable).
  *
  * Recipients ride BCC in batches so addresses are never exposed to each
  * other. If SANITY_API_WRITE_TOKEN is set the issue's `sentAt` is stamped
@@ -113,33 +112,21 @@ function blocksToHtml(blocks: PortableTextBlock[]): { html: string; text: string
   return { html: htmlParts.join('\n'), text: textParts.join('\n\n') };
 }
 
-/** All HubSpot contacts flagged as newsletter subscribers (paginated). */
-async function fetchHubSpotSubscribers(): Promise<string[]> {
-  const hubspot = new Client({ accessToken: process.env.HUBSPOT_ACCESS_TOKEN });
-  const emails: string[] = [];
-  let after: string | undefined;
-
-  do {
-    const page = await hubspot.crm.contacts.searchApi.doSearch({
-      filterGroups: [
-        {
-          filters: [
-            { propertyName: 'newsletter_subscription', operator: FilterOperatorEnum.Eq, value: 'true' },
-          ],
-        },
-      ],
-      properties: ['email'],
-      limit: 100,
-      after,
-    });
-    for (const contact of page.results) {
-      const email = contact.properties?.email;
-      if (email) emails.push(email);
-    }
-    after = page.paging?.next?.after;
-  } while (after);
-
-  return emails;
+/**
+ * Every CRM lead flagged as a newsletter subscriber.
+ *
+ * Was a HubSpot search until 2026-08-11; HubSpot is gone (decision D3) and the
+ * CRM is now the only subscriber list. Archived leads are excluded, so
+ * archiving someone also unsubscribes them — one action, not two.
+ */
+async function fetchSubscribers(): Promise<string[]> {
+  const rows = (await sql().query(
+    `SELECT email FROM leads
+     WHERE newsletter_subscribed AND NOT archived AND email <> ''
+     ORDER BY email`,
+    [],
+  )) as Array<{ email: string }>;
+  return rows.map((r) => r.email);
 }
 
 export async function POST(request: NextRequest) {
@@ -194,22 +181,22 @@ export async function POST(request: NextRequest) {
   let recipients: string[];
   if (Array.isArray(body.recipients) && body.recipients.length > 0) {
     recipients = body.recipients;
-  } else if (process.env.HUBSPOT_ACCESS_TOKEN) {
+  } else if (isCrmConfigured()) {
     try {
-      recipients = await fetchHubSpotSubscribers();
+      recipients = await fetchSubscribers();
     } catch (error) {
-      console.error('HubSpot subscriber fetch failed:', error);
+      console.error('CRM subscriber fetch failed:', error);
       return NextResponse.json(
         {
           error:
-            'Could not fetch the subscriber list from HubSpot. Fix the HubSpot token (roadmap O-3) or pass an explicit "recipients" list.',
+            'Could not fetch the subscriber list from the CRM. Check DATABASE_URL, or pass an explicit "recipients" list.',
         },
         { status: 502 }
       );
     }
   } else {
     return NextResponse.json(
-      { error: 'No subscriber source: set HUBSPOT_ACCESS_TOKEN or pass "recipients".' },
+      { error: 'No subscriber source: set DATABASE_URL or pass "recipients".' },
       { status: 503 }
     );
   }

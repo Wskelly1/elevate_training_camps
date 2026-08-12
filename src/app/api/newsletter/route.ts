@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendMail } from '../../../lib/email';
-import { Client } from '@hubspot/api-client';
-
-// Initialize HubSpot client
-const hubspotClient = new Client({
-  accessToken: process.env.HUBSPOT_ACCESS_TOKEN,
-});
+import { recordNewsletterSignup } from '../../../lib/crm/intake';
 
 interface NewsletterData {
   email: string;
@@ -33,9 +28,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const results = {
+    const results: {
+      email: { success: boolean; error: string | null };
+      crm: { success: boolean; skipped?: boolean; error: string | null };
+    } = {
       email: { success: false, error: null },
-      hubspot: { success: false, error: null }
+      crm: { success: false, error: null },
+    };
+
+    // Subscribers land in the same lead table as enquirers, so a coach who
+    // subscribes and later fills in the contact form is one record with two
+    // touches rather than two silos. Never throws.
+    const crmResult = await recordNewsletterSignup(email);
+    results.crm = {
+      success: crmResult.success,
+      skipped: crmResult.skipped,
+      error: crmResult.error ?? null,
     };
 
     // Send email notification via Gmail/Workspace
@@ -138,32 +146,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create contact in HubSpot with newsletter subscription
-    if (process.env.HUBSPOT_ACCESS_TOKEN) {
-      try {
-        const properties = {
-          email: email,
-          hs_lead_status: 'NEW',
-          lifecyclestage: 'lead',
-          lead_source: 'Newsletter Signup',
-          newsletter_subscription: 'true',
-          newsletter_signup_date: new Date().toISOString(),
-          newsletter_source: 'Website Footer'
-        };
-
-        await hubspotClient.crm.contacts.basicApi.create({
-          properties
-        });
-
-        results.hubspot.success = true;
-      } catch (error) {
-        console.error('HubSpot error:', error);
-        results.hubspot.error = error instanceof Error ? error.message : 'Unknown error';
-      }
-    }
-
-    // Check if at least one service succeeded
-    const hasSuccess = results.email.success || results.hubspot.success;
+    const hasSuccess = results.email.success || results.crm.success;
 
     if (!hasSuccess) {
       return NextResponse.json(

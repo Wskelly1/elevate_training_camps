@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendMail } from '../../../lib/email';
-import { Client } from '@hubspot/api-client';
-
-// Initialize HubSpot client
-const hubspotClient = new Client({
-  accessToken: process.env.HUBSPOT_ACCESS_TOKEN,
-});
+import { recordContactSubmission } from '../../../lib/crm/intake';
 
 type ContactSegment = 'coach' | 'athlete' | 'partner' | 'local' | 'other';
 
@@ -96,9 +91,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const results = {
+    const results: {
+      email: { success: boolean; error: string | null };
+      crm: { success: boolean; skipped?: boolean; leadId?: string; error: string | null };
+    } = {
       email: { success: false, error: null },
-      hubspot: { success: false, error: null }
+      crm: { success: false, error: null },
+    };
+
+    // Store the lead first. It is the authoritative record — email is a
+    // notification, and an inbox is not a pipeline. Doing it before the mail
+    // send means a slow SMTP handshake can never cost us the lead.
+    //
+    // Never throws: `recordContactSubmission` returns a result object, so a
+    // CRM outage degrades to "we emailed you but didn't file it" rather than
+    // showing a visitor an error.
+    const crmResult = await recordContactSubmission(body);
+    results.crm = {
+      success: crmResult.success,
+      skipped: crmResult.skipped,
+      leadId: crmResult.leadId,
+      error: crmResult.error ?? null,
     };
 
     // Send email via Gmail/Workspace
@@ -194,33 +207,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create contact in HubSpot
-    if (process.env.HUBSPOT_ACCESS_TOKEN) {
-      try {
-        const properties = {
-          firstname: firstName,
-          lastname: lastName,
-          email: email,
-          subject: subjectLine,
-          message: [detailsText, message].filter(Boolean).join('\n\n'),
-          hs_lead_status: 'NEW',
-          lifecyclestage: 'lead',
-          lead_source: `Website Contact Form — ${SEGMENT_LABELS[segment]}`
-        };
-
-        await hubspotClient.crm.contacts.basicApi.create({
-          properties
-        });
-
-        results.hubspot.success = true;
-      } catch (error) {
-        console.error('HubSpot error:', error);
-        results.hubspot.error = error instanceof Error ? error.message : 'Unknown error';
-      }
-    }
-
-    // Check if at least one service succeeded
-    const hasSuccess = results.email.success || results.hubspot.success;
+    // Fail only if the enquiry reached nowhere at all. Either leg surviving
+    // means the submission is not lost.
+    const hasSuccess = results.email.success || results.crm.success;
 
     if (!hasSuccess) {
       return NextResponse.json(

@@ -12,9 +12,9 @@
  * The script is a safety wrapper around POST /api/newsletter/send: it
  * looks the issue up first, shows what is about to happen, and requires
  * you to type the slug back before anything is sent. The endpoint itself
- * pulls the issue body from Sanity and the recipient list from HubSpot
- * (contacts with newsletter_subscription = true) unless --recipients is
- * given, and refuses to re-send an already-sent issue.
+ * pulls the issue body from Sanity and the recipient list from the CRM
+ * (leads with newsletter_subscribed = true, archived ones excluded) unless
+ * --recipients is given, and refuses to re-send an already-sent issue.
  *
  * Auth: NEWSLETTER_SEND_SECRET, from the environment or .env.local in the
  * repo root. Monthly procedure: docs/04-email-setup.md.
@@ -72,7 +72,7 @@ if (!issue) {
 console.log(`Issue:      ${issue.title}`);
 console.log(`Month:      ${issue.issueDate ?? '(no issue date)'}`);
 console.log(`Sent:       ${issue.sentAt ? `ALREADY SENT ${issue.sentAt}` : 'not yet'}`);
-console.log(`Recipients: ${recipients ? `${recipients.length} explicit address(es)` : 'HubSpot newsletter subscribers'}`);
+console.log(`Recipients: ${recipients ? `${recipients.length} explicit address(es)` : 'CRM newsletter subscribers'}`);
 console.log(`Target:     ${base}/api/newsletter/send\n`);
 
 if (!skipConfirm) {
