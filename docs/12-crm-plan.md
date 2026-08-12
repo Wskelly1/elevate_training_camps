@@ -223,16 +223,35 @@ reopened from scratch in a later session.
 
 ## §8 — Phasing
 
-| Step | Scope | Depends on |
+Shipped as **PR #35** (branch `worktree-crm-build`), draft until the database
+is provisioned.
+
+| Step | Scope | Status |
 |---|---|---|
-| **9.0** | This plan; roadmap activation; O-9 resolved | — |
-| **9.1** | Data model + storage layer + server-side auth | D1, D2 |
-| **9.2** | Contact-form + newsletter hook (§4), with dedupe and source attribution | 9.1, D3 |
-| **9.3** | Core UI: Leads, Pipeline, My Queue on the Elevate token layer | 9.1 |
-| **9.4** | Call Mode + Callbacks + dated notes — the O-10 tool | 9.3 |
-| **9.5** | Booked teams, Onboarding, Check-in clock, Coach packet | 9.3, Gate-5 |
-| **9.6** | Import, export/backup, printable report, Settings | 9.3 |
-| **9.7** | Alumni fields (school, grad year, college destination) | Phase 5 registration flow |
+| **9.0** | This plan; roadmap activation; O-9 resolved | ✅ done |
+| **9.1** | Data model + storage layer + Google SSO | ✅ done |
+| **9.2** | Contact-form + newsletter hook (§4), with dedupe and source attribution | ✅ done — **not yet verified end to end**, which needs the database (O-17) |
+| **9.3** | Core UI: Leads, Pipeline, My Queue on the Elevate token layer | ✅ done |
+| **9.4** | Call Mode + Callbacks + dated notes — the O-10 tool | ✅ done |
+| **9.5** | Check-in clock ✅ · Booked teams ✅ · **Onboarding + coach packet outstanding** | partial — Gate-5 governs the Onboarding copy |
+| **9.6** | Export/backup ✅ · Settings ✅ · **paste-import and printable report outstanding** | partial |
+| **9.7** | Alumni fields (school, grad year, college destination) — columns exist, no capture surface | not started; waits on Phase 5's registration flow |
+
+**Owner action O-17** gates everything: until the Neon database exists, `/crm`
+shows setup instructions and contact-form submissions email without being
+filed. See [`13-crm-setup.md`](13-crm-setup.md) §2.
+
+### Verified at build time
+
+`tsc` and `eslint` clean, `next build` passes. Every protected `/crm` route
+307s to sign-in when unauthenticated; `/api/crm/export` 401s without serving
+data; `/crm/signin` renders 200 with `noindex`; the public site is untouched
+by the middleware. The migration's statement splitter was tested offline
+against the real schema (19 statements, `plpgsql` body intact).
+
+One bug caught in that pass and fixed: `/crm/signin` initially inherited the
+auth-checking layout and therefore redirected to itself forever. The protected
+pages now live in an `(app)` route group.
 
 **Do not build 9.5's Onboarding copy ahead of Gate-5** — no screen may assert
 a safety practice, credential or track record that isn't yet true.
