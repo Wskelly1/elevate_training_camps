@@ -4,16 +4,23 @@ import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import type { Lead, LeadStatus } from '../../../../../lib/crm/types';
 import { STATUS_LABELS, STATUS_ORDER } from '../../../../../lib/crm/types';
+import type { Operator } from '../../../../../auth.config';
 import {
   actionArchive,
   actionMarkCheckedIn,
   actionSetCallback,
-  actionSetOwner,
   actionSetStatus,
 } from '../../actions';
+import OwnerSelect from '../../OwnerSelect';
 
 /** Status, owner, callback and check-in controls for one lead. */
-export default function LeadDetailActions({ lead }: { lead: Lead }) {
+export default function LeadDetailActions({
+  lead,
+  operators,
+}: {
+  lead: Lead;
+  operators: Operator[];
+}) {
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -40,21 +47,12 @@ export default function LeadDetailActions({ lead }: { lead: Lead }) {
         ))}
       </select>
 
-      <select
-        aria-label="Owner"
-        value={lead.owner}
-        disabled={pending}
-        onChange={(e) =>
-          startTransition(() => {
-            void actionSetOwner(lead.id, e.target.value);
-          })
-        }
+      <OwnerSelect
+        leadId={lead.id}
+        owner={lead.owner}
+        operators={operators}
         className={control}
-      >
-        <option value="">Unassigned</option>
-        <option value="will">Will</option>
-        <option value="cofounder">Co-founder</option>
-      </select>
+      />
 
       <label className="flex items-center gap-2 text-xs text-muted-foreground">
         Callback

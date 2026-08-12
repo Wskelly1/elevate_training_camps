@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { crmOperators, operatorName } from '../../../../../auth.config';
 import { isCrmConfigured } from '../../../../../lib/crm/db';
 import { getLead, listNotes, listTouches } from '../../../../../lib/crm/leads';
 import { SEGMENT_LABELS, SOURCE_LABELS, checkinState } from '../../../../../lib/crm/types';
@@ -57,7 +58,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           </div>
         </div>
 
-        <LeadDetailActions lead={lead} />
+        <LeadDetailActions lead={lead} operators={crmOperators()} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
@@ -112,7 +113,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Source" value={SOURCE_LABELS[lead.source]} />
-              <Field label="Owner" value={lead.owner || 'Unassigned'} />
+              <Field
+                label="Owner"
+                value={lead.owner ? operatorName(lead.owner) : 'Unassigned'}
+              />
               <Field label="First seen" value={formatDate(lead.createdAt)} />
               <Field
                 label="Last contacted"

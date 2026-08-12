@@ -103,7 +103,7 @@ last 12 hours.
 | Tab | What it is for |
 |---|---|
 | **Leads** | The database. Search and filter; filters live in the URL, so a filtered view is a link you can send to your co-founder. |
-| **My Queue** | Leads split by owner, so two people never call the same coach. |
+| **My Queue** | Leads split by owner, so two people never call the same coach. Owners come from the allowlist, so the tab defaults to *your* queue whoever you are. |
 | **Call Mode** | One lead at a time with disposition buttons. This is the tool for the O-10 coach calls and then the 120-coach funnel. |
 | **Callbacks** | Everyone who asked to be called back, overdue first. |
 | **Check-ins** | 30-day cadence over booked teams and interested coaches. |
@@ -111,13 +111,38 @@ last 12 hours.
 | **Pipeline** | The whole funnel as one table, with the conversion rate. |
 | **Settings** | JSON export, manual lead entry, and who can sign in. |
 
-### Granting access
+### Granting access — and adding a queue owner
 
-Add the address to `CRM_ALLOWED_EMAILS` in Vercel and redeploy. It must also
-be a Workspace account on the domain — Google blocks anyone else first.
+Both are the same action. `CRM_ALLOWED_EMAILS` is the single roster: who can
+sign in **and** who can be assigned leads in My Queue. There is deliberately
+no second list, because someone who cannot sign in cannot work a queue, and
+two lists would only give you a way for them to disagree.
 
-Removing an address takes effect on that person's **next request**, not when
-their session expires: the allowlist is re-checked per request on purpose.
+```bash
+npx vercel env rm  CRM_ALLOWED_EMAILS production --yes
+printf '%s' "william.skelly@elevatetrainingcamps.com,will.sacay@elevatetrainingcamps.com" \
+  | npx vercel env add CRM_ALLOWED_EMAILS production
+```
+
+Repeat for `preview` and `development`, then redeploy.
+
+Display names are derived from the address — `will.sacay@…` renders as **Will
+Sacay** — by splitting the local part on `.`, `_` and `-` and capitalising each
+word. Nothing to configure.
+
+Two constraints:
+
+- The address must be a **Workspace account on the domain**. Google blocks
+  everyone else before the allowlist is consulted, because the OAuth client is
+  an Internal app. To admit an outside address you would have to switch the
+  consent screen to External, which removes that outer gate — not recommended
+  while the database holds minors' contact details.
+- Removing an address takes effect on that person's **next request**, not when
+  their session expires: the allowlist is re-checked per request on purpose.
+
+A lead already assigned to someone who has since been removed keeps them, shown
+as *"(no longer has access)"* in the owner dropdown, rather than being silently
+reassigned. Pick a new owner to move it.
 
 ### Where leads come from
 

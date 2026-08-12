@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import type { Lead, LeadStatus } from '../../../lib/crm/types';
 import { STATUS_LABELS, STATUS_ORDER, SEGMENT_LABELS } from '../../../lib/crm/types';
-import { actionSaveField, actionSetOwner, actionSetStatus } from './actions';
+import type { Operator } from '../../../auth.config';
+import { actionSaveField, actionSetStatus } from './actions';
+import OwnerSelect from './OwnerSelect';
 
 /**
  * One lead, with the actions worth doing without leaving the list.
@@ -15,13 +17,13 @@ import { actionSaveField, actionSetOwner, actionSetStatus } from './actions';
  * flight.
  */
 
-const OWNERS = [
-  { value: '', label: 'Unassigned' },
-  { value: 'will', label: 'Will' },
-  { value: 'cofounder', label: 'Co-founder' },
-];
-
-export default function LeadCard({ lead }: { lead: Lead }) {
+export default function LeadCard({
+  lead,
+  operators,
+}: {
+  lead: Lead;
+  operators: Operator[];
+}) {
   const [pending, startTransition] = useTransition();
 
   const name = [lead.firstName, lead.lastName].filter(Boolean).join(' ');
@@ -97,23 +99,7 @@ export default function LeadCard({ lead }: { lead: Lead }) {
           ))}
         </select>
 
-        <select
-          aria-label="Owner"
-          value={lead.owner}
-          disabled={pending}
-          onChange={(e) =>
-            startTransition(() => {
-              void actionSetOwner(lead.id, e.target.value);
-            })
-          }
-          className="rounded border border-border bg-background px-2 py-1 text-xs text-muted-foreground"
-        >
-          {OWNERS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+        <OwnerSelect leadId={lead.id} owner={lead.owner} operators={operators} />
 
         <Link
           href={`/crm/lead/${lead.id}`}

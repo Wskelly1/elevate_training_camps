@@ -47,6 +47,45 @@ export function isAllowed(email: string | null | undefined): boolean {
   return list.includes(email.toLowerCase());
 }
 
+/** A person who can use the CRM, and therefore own leads in it. */
+export interface Operator {
+  /** The email — the stored value, stable even if the display name changes. */
+  email: string;
+  /** Derived for display: "will.sacay@…" → "Will Sacay". */
+  name: string;
+}
+
+/**
+ * Turn an email's local part into a display name.
+ *
+ * Pure and dependency-free so it is safe to call from a Client Component when
+ * rendering an owner that has since left the allowlist.
+ */
+export function operatorName(email: string): string {
+  const local = email.split('@')[0] ?? email;
+  const words = local
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1));
+  return words.join(' ') || email;
+}
+
+/**
+ * Everyone who can be assigned a lead — derived from `CRM_ALLOWED_EMAILS`
+ * rather than hardcoded.
+ *
+ * The two lists are deliberately the same one: someone who cannot sign in
+ * cannot work a queue, so maintaining a second roster would only create a way
+ * for them to disagree. Adding a teammate to the allowlist makes them an
+ * assignable owner in the same change.
+ *
+ * Reads the environment, so this is server-only. Call it in a Server Component
+ * and pass the result down as props; never import it into a Client Component.
+ */
+export function crmOperators(): Operator[] {
+  return allowedEmails().map((email) => ({ email, name: operatorName(email) }));
+}
+
 export const authConfig: NextAuthConfig = {
   providers: [
     Google({

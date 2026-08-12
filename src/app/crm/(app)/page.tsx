@@ -1,3 +1,4 @@
+import { crmOperators } from '../../../auth.config';
 import { isCrmConfigured } from '../../../lib/crm/db';
 import { leadCounts, listLeads, listStates } from '../../../lib/crm/leads';
 import type { LeadSegment, LeadStatus } from '../../../lib/crm/types';
@@ -23,6 +24,7 @@ export default async function LeadsPage({
   if (!isCrmConfigured()) return <NotConfigured />;
 
   const params = await searchParams;
+  const operators = crmOperators();
   const [leads, counts, states] = await Promise.all([
     listLeads({
       search: params.q,
@@ -71,7 +73,7 @@ export default async function LeadsPage({
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {leads.map((lead) => (
-              <LeadCard key={lead.id} lead={lead} />
+              <LeadCard key={lead.id} lead={lead} operators={operators} />
             ))}
           </div>
         </>
