@@ -53,7 +53,8 @@ coach can't travel; parent-led trips are first-class (see
 |---|---|---|
 | O-1 | Create Stripe account, start business verification (takes days) | Phase 5 build (test keys) and go-live (live keys) |
 | O-2 | ✅ **Resolved 2026-07-30** — the billing block lifted; the CMS has taken schema deploys and content writes continuously since | ~~Gate-1; CMS writes~~ |
-| O-3 | Regenerate HubSpot private-app token (Settings → Integrations → Private Apps), provide new token (~10 min) | CRM lead capture working again |
+| O-3 | ✅ **Closed 2026-08-11 — no longer needed.** HubSpot was removed entirely (CRM decision D3): both form routes and the newsletter recipient query now use the in-house CRM, and `@hubspot/api-client` is gone. The dead token does not need regenerating. Superseded by O-17 | ~~CRM lead capture~~ |
+| O-17 | **Provision the CRM database** — Vercel dashboard → project → Storage → Create Database → **Neon**, Free plan, connect to all environments (~3 min). The CLI path (`vercel integration add neon`) needs an interactive terminal and fails silently when scripted. Then `npx vercel env pull .env.local && npm run crm:migrate`. See [`13-crm-setup.md`](13-crm-setup.md) §2 | Phase 9 — until this is done, `/crm` shows setup instructions and contact-form submissions email but are not filed |
 | O-4 | Vercel preview access: issue a protection-bypass secret (recommended) or disable deployment protection | Preview rung of the verification ladder (Gate-2) |
 
 **Tier 2 — this week (inputs needed mid-phase):**

@@ -9,7 +9,9 @@ A **Next.js 15 App Router** site. Every public page is a **Server Component**
 that fetches its own content from **Sanity CMS** at build/revalidate time, and
 ships almost no JavaScript. Interactivity is opt-in, isolated in a few
 `'use client'` islands. Three integrations hang off it: Gmail SMTP for
-transactional mail, HubSpot for lead capture, Mux for video.
+transactional mail, Mux for video, and **Neon Postgres behind the in-house CRM
+at `/crm`** — which is also where lead capture goes (HubSpot was removed
+2026-08-11; see [`12-crm-plan.md`](12-crm-plan.md)).
 
 ```
 Browser
@@ -25,7 +27,10 @@ Vercel edge ──► Next.js App Router
                    │                            ContactForm · AnimatedCarousel
                    │
                    ├── Route handlers /api/*  ──► nodemailer ──► Gmail SMTP
-                   │                          └─► HubSpot CRM
+                   │                          └─► lib/crm ──► Neon Postgres
+                   │
+                   ├── /crm  ─────────────────► Neon Postgres (lead pipeline)
+                   │     middleware-gated, Google Workspace SSO
                    │
                    └── /studio  ──────────────► Sanity Studio (client-side SPA)
 
@@ -223,8 +228,11 @@ src/app/
   style-guide/          /style-guide   live token/type reference, noindexed
   studio/[[...tool]]/   /studio        Sanity Studio SPA
   icon.tsx              /icon          generated favicon (edge runtime)
-  api/contact/          POST           email + HubSpot
-  api/newsletter/       POST           email + HubSpot
+  crm/                  /crm           the CRM, middleware-gated + noindexed
+  api/auth/[...]        GET/POST       Google SSO for the CRM
+  api/crm/export        GET            full CRM JSON dump (auth required)
+  api/contact/          POST           email + CRM upsert
+  api/newsletter/       POST           email + CRM upsert
   api/favicon/          GET            Sanity-derived favicon
   api/manifest/         GET            PWA manifest from siteSettings
 ```
@@ -240,20 +248,27 @@ Both form routes (`/api/contact`, `/api/newsletter`) follow the same pattern:
 2. **If** the Gmail env vars are present, send two mails via
    `src/lib/email.ts` — a notification to the team and a confirmation to the
    sender.
-3. **If** `HUBSPOT_ACCESS_TOKEN` is present, create a CRM contact.
+3. **If** `DATABASE_URL` is present, upsert the submitter into the CRM and log
+   a touch. This runs *before* the mail send: the lead is the authoritative
+   record, and a slow SMTP handshake should never cost it.
 4. Return success if **either** succeeded; 500 only if both failed.
 
-Two consequences to be aware of:
+Three consequences to be aware of:
 
 - **The integrations are env-gated and fail soft.** If the Gmail variables are
   absent the route skips email entirely and still returns 200. Production once
   ran for a long time with only two env vars configured, so the contact form
   was silently doing nothing for real visitors. If you add an integration,
   make its absence visible somewhere.
-- **A HubSpot failure is currently invisible to the user.** The response body
-  carries a `results` object with per-service status, but the UI only reads
-  the top-level success flag. HubSpot is 401ing right now (owner action O-3),
-  which means leads reach the inbox but not the CRM.
+- **A CRM failure is invisible to the user, on purpose.** The response body
+  carries a `results.crm` object with the status, the reason, and `leadId` on
+  success — but the UI only reads the top-level flag. A visitor must never see
+  an error because an internal tool is down. Check function logs for
+  `[crm] contact intake failed`.
+- **Dedupe is on `lower(email)`.** A repeat submission enriches the existing
+  lead rather than creating a second one, fills only fields that were blank,
+  and never changes `status` or `owner` — pipeline position belongs to the
+  operator, not the form.
 
 `src/lib/email.ts` wraps nodemailer with a lazily-created, memoised Gmail
 transport. Auth is a Google Workspace **App Password**, and the `from` address

@@ -85,19 +85,22 @@ function toTouch(r: Row): LeadTouch {
   };
 }
 
-/** Columns a lead is written from — kept in one place so upsert and update agree. */
-const WRITABLE = [
-  'first_name', 'last_name', 'email', 'phone',
-  'segment', 'organization', 'city', 'state', 'website',
-  'status', 'owner',
-  'squad_size', 'preferred_weeks', 'grad_year', 'interest',
-  'affiliation', 'connection_type', 'business_type', 'subject',
-  'school', 'college_destination',
-  'source', 'newsletter_subscribed',
-  'callback_at', 'last_contacted_at', 'last_checkin_at', 'archived',
-] as const;
-
-type WritableColumn = (typeof WRITABLE)[number];
+/**
+ * Columns a lead may be written to.
+ *
+ * The union is the guard: `COLUMN_OF` below is typed against it, so a typo in
+ * a column name fails to compile rather than producing SQL that references a
+ * column that does not exist.
+ */
+type WritableColumn =
+  | 'first_name' | 'last_name' | 'email' | 'phone'
+  | 'segment' | 'organization' | 'city' | 'state' | 'website'
+  | 'status' | 'owner'
+  | 'squad_size' | 'preferred_weeks' | 'grad_year' | 'interest'
+  | 'affiliation' | 'connection_type' | 'business_type' | 'subject'
+  | 'school' | 'college_destination'
+  | 'source' | 'newsletter_subscribed'
+  | 'callback_at' | 'last_contacted_at' | 'last_checkin_at' | 'archived';
 
 /* -------------------------------------------------------------------------
  * Reads
