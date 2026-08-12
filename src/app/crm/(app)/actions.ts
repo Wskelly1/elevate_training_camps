@@ -15,6 +15,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireOperator } from '../../../auth';
+import { isAllowed } from '../../../auth.config';
 import {
   addNote,
   archiveLead,
@@ -39,8 +40,23 @@ export async function actionSetStatus(id: string, status: LeadStatus) {
   refresh();
 }
 
+/**
+ * Assign a lead.
+ *
+ * `owner` must be '' (unassign) or an address on the allowlist. A server
+ * action is a POST endpoint that can be called directly, so the value is
+ * validated here rather than trusted from the select that rendered it —
+ * otherwise a lead could be assigned to an arbitrary string and quietly
+ * disappear from every queue.
+ *
+ * Reassigning away from someone who has since lost access is still allowed;
+ * only the destination is checked.
+ */
 export async function actionSetOwner(id: string, owner: string) {
   await requireOperator();
+  if (owner !== '' && !isAllowed(owner)) {
+    throw new Error('Owner must be someone with CRM access');
+  }
   await updateLead(id, { owner });
   refresh();
 }
