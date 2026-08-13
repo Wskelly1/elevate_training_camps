@@ -7,11 +7,15 @@ update it as phases complete rather than letting it rot.
 
 ## Current state (as of 2026-08-11)
 
-**Active work: Phase 9 — the CRM** (started 2026-08-11, plan at
-[`12-crm-plan.md`](12-crm-plan.md)). Everything below this line was last
-revised 2026-08-02 and remains accurate; note only that the HubSpot 401 it
-records is now the reason Phase 9 exists, since no lead has reached any CRM
-since 2026-07-30.
+**Phase 9 — the CRM — is live** (2026-08-11; PRs #35 and #36). `/crm` is in
+production on Neon Postgres behind Google Workspace SSO, and `/api/contact`
+and `/api/newsletter` file every submission into it. HubSpot is gone. Remaining
+Phase 9 work is paste-import, the printable report, the onboarding queue
+(Gate-5) and the coach packet — see [`12-crm-plan.md`](12-crm-plan.md) §8.
+
+Everything below this line was last revised 2026-08-02 and remains accurate,
+except that the HubSpot 401 it records is now moot — the integration was
+removed rather than repaired.
 
 
 Live at https://elevatetrainingcamps.com (Vercel, auto-deploy from `main`).
@@ -54,7 +58,7 @@ coach can't travel; parent-led trips are first-class (see
 | O-1 | Create Stripe account, start business verification (takes days) | Phase 5 build (test keys) and go-live (live keys) |
 | O-2 | ✅ **Resolved 2026-07-30** — the billing block lifted; the CMS has taken schema deploys and content writes continuously since | ~~Gate-1; CMS writes~~ |
 | O-3 | ✅ **Closed 2026-08-11 — no longer needed.** HubSpot was removed entirely (CRM decision D3): both form routes and the newsletter recipient query now use the in-house CRM, and `@hubspot/api-client` is gone. The dead token does not need regenerating. Superseded by O-17 | ~~CRM lead capture~~ |
-| O-17 | **Provision the CRM database** — Vercel dashboard → project → Storage → Create Database → **Neon**, Free plan, connect to all environments (~3 min). The CLI path (`vercel integration add neon`) needs an interactive terminal and fails silently when scripted. Then `npx vercel env pull .env.local && npm run crm:migrate`. See [`13-crm-setup.md`](13-crm-setup.md) §2 | Phase 9 — until this is done, `/crm` shows setup instructions and contact-form submissions email but are not filed |
+| O-17 | ✅ **Done 2026-08-11.** Neon provisioned via the Vercel dashboard and connected to all environments; `npm run crm:migrate` applied all 19 statements; `DATABASE_URL`, `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` and `CRM_ALLOWED_EMAILS` are set in production/preview/development. HubSpot's env vars deleted. Contact-form intake verified end to end against the live database | ~~Phase 9~~ |
 | O-4 | Vercel preview access: issue a protection-bypass secret (recommended) or disable deployment protection | Preview rung of the verification ladder (Gate-2) |
 
 **Tier 2 — this week (inputs needed mid-phase):**
