@@ -223,31 +223,54 @@ reopened from scratch in a later session.
 
 ## §8 — Phasing
 
-Shipped as **PR #35** (branch `worktree-crm-build`), draft until the database
-is provisioned.
+**Live in production since 2026-08-11.** PR #35 (`f8e17ed`) shipped the CRM;
+PR #36 (`f54e9d0`) made queue owners derive from the allowlist. Owner action
+O-17 (provision the database) is **done** — Neon is connected to all
+environments and migrated.
 
 | Step | Scope | Status |
 |---|---|---|
 | **9.0** | This plan; roadmap activation; O-9 resolved | ✅ done |
 | **9.1** | Data model + storage layer + Google SSO | ✅ done |
-| **9.2** | Contact-form + newsletter hook (§4), with dedupe and source attribution | ✅ done — **not yet verified end to end**, which needs the database (O-17) |
+| **9.2** | Contact-form + newsletter hook (§4), with dedupe and source attribution | ✅ done and **verified against the live database** |
 | **9.3** | Core UI: Leads, Pipeline, My Queue on the Elevate token layer | ✅ done |
 | **9.4** | Call Mode + Callbacks + dated notes — the O-10 tool | ✅ done |
-| **9.5** | Check-in clock ✅ · Booked teams ✅ · **Onboarding + coach packet outstanding** | partial — Gate-5 governs the Onboarding copy |
-| **9.6** | Export/backup ✅ · Settings ✅ · **paste-import and printable report outstanding** | partial |
-| **9.7** | Alumni fields (school, grad year, college destination) — columns exist, no capture surface | not started; waits on Phase 5's registration flow |
+| **9.5** | Check-in clock ✅ · Booked teams ✅ | **Onboarding queue and coach packet outstanding.** Gate-5 governs the Onboarding copy |
+| **9.6** | Export/backup ✅ · Settings ✅ · manual lead entry ✅ | **Paste-import and printable report outstanding** |
+| **9.7** | Alumni fields (school, grad year, college destination) — columns exist, no capture surface | **Not started.** Waits on Phase 5's registration flow |
 
-**Owner action O-17** gates everything: until the Neon database exists, `/crm`
-shows setup instructions and contact-form submissions email without being
-filed. See [`13-crm-setup.md`](13-crm-setup.md) §2.
+### What remains, in the order it will matter
 
-### Verified at build time
+1. **Paste-import (9.6).** The highest-value remaining piece, because it is
+   what turns the marketing plan's 120-coach target list into a working queue.
+   Until it exists, seeding means typing coaches in one at a time through
+   Settings. The source CRM's format auto-detection is the model.
+2. **Printable report (9.6).** The funnel summary as a PDF — useful for the
+   co-founder and the investor package, neither of which can open `/crm`.
+3. **Onboarding queue (9.5).** Blocked on **Gate-5**, not on engineering: no
+   screen may assert a safety practice, credential or track record that isn't
+   yet true, and no season has run. Deposit/waiver/roster/rooming tracking can
+   be built; the copy around it cannot until O-12 and O-13 land.
+4. **Coach packet (9.5).** Quote assembly. Prices must render from the
+   canonical tariff (`business-plan/PRICING.md`, enforced by
+   `npm run check:pricing`) and never be typed into the CRM.
+5. **Alumni capture (9.7).** The columns are already there. The capture surface
+   belongs to Phase 5's registration flow, so this waits on Stripe (O-1).
 
-`tsc` and `eslint` clean, `next build` passes. Every protected `/crm` route
-307s to sign-in when unauthenticated; `/api/crm/export` 401s without serving
-data; `/crm/signin` renders 200 with `noindex`; the public site is untouched
-by the middleware. The migration's statement splitter was tested offline
-against the real schema (19 statements, `plpgsql` body intact).
+### Verified
+
+Build time: `tsc` and `eslint` clean, `next build` passes. Every protected
+`/crm` route 307s to sign-in when unauthenticated; `/api/crm/export` 401s
+without serving data; `/crm/signin` renders 200 with `noindex`; the public site
+is untouched by the middleware. The migration's statement splitter was tested
+offline against the real schema (19 statements, `plpgsql` body intact).
+
+Against the live database: two contact-form submissions with different-case
+emails produced **one** lead and two touches; the first program survived an
+explicit overwrite attempt; squad size survived a blank in the second
+submission; `status` stayed `new`; a newsletter signup merged into the same
+record and set `newsletter_subscribed` without changing `source`. Test data
+deleted afterwards.
 
 One bug caught in that pass and fixed: `/crm/signin` initially inherited the
 auth-checking layout and therefore redirected to itself forever. The protected
